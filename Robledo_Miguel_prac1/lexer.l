@@ -1,6 +1,10 @@
 // C declarations
 %{
-#include #include #include %}
+#include <stdio.h>
+#include <stdlib.h> 
+#include "data.h"
+#include "functions.h"
+%}
 
 %option yylineno
 %option noyywrap
@@ -14,6 +18,26 @@ float {digit}+"."{digit}+
 boolean ("true"|"false")
 string \"([^\\\"]|\\.)*\"
 
+trig_func (cos|sin|tan)
+
+plus \+
+minus     \-
+mult      \*
+div       /
+mod       %
+pow       \*\*
+
+gt        >
+ge        >=
+lt        <
+le        <=
+eq        ==
+ne        <>
+
+not       not
+and       and
+or        or
+
 %%
 
 // ID
@@ -25,8 +49,8 @@ yylval.ident.id_val.val_type = UNKNOWN_TYPE;
 return ID;
 }
 
-// ASSIG
-"=" { return ASSIGN; }
+// ASSIGN
+":=" { return ASSIGN; }
 
 // INTEGER
 {digit}+ {
@@ -39,6 +63,7 @@ return INTEGER;
 yylval.real = atof(yytext);
 return REAL;
 }
+
 // BOOLEAN
 {boolean} {
 yylval.boolean = (strcmp(yytext, "true") == 0) ? 1 : 0;
@@ -51,6 +76,71 @@ yylval.cadena = strdup(yytext);
 return CADENA;
 }
 
+{trig_func} {
+        return (strcmp(yytext, "cos") == 0) ? COS :
+               (strcmp(yytext, "sin") == 0) ? SIN :
+               (strcmp(yytext, "tan") == 0) ? TAN : -1;
+}
+
+{plus} {
+    return PLUS;
+}
+
+{minus} {
+    return MINUS;
+}
+
+{mult} {
+    return MULT;
+}
+
+{div} {
+    return DIV;
+}
+
+{mod} {
+    return MOD;
+}
+
+{pow} {
+    return POW;
+}
+
+{gt} {
+    return GT;
+}
+
+{ge} {
+    return GE;
+}
+
+{lt} {
+    return LT;
+}
+
+{le} {
+    return LE;
+}
+
+{eq} {
+    return EQ;
+}
+
+{ne} {
+    return NE;
+}
+
+{not} {
+    return NOT;
+}
+
+{and} {
+    return AND;
+}
+
+{or} {
+    return OR;
+}
 
 // Comments
 //.* { }
