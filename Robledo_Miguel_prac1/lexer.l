@@ -12,15 +12,18 @@
 %option nounput
 
 // Pattern definition
-digit [0-9]
+decimal [0-9]+
+octal 0[oO][0-7]+
+binary 0[bB][01]+
+hexadecimal 0[xX][0-9a-fA-F]+
 letter [a-zA-Z]
-float {digit}+"."{digit}+
-boolean ("true"|"false")
+float {decimal}"."{decimal}
+boolean (true|false|TRUE|FALSE)
 string \"([^\\\"]|\\.)*\"
 
-trig_func (cos|sin|tan)
+trig_func (cos|sin|tan|COS|SIN|TAN)
 
-plus \+
+plus      \+
 minus     \-
 mult      \*
 div       /
@@ -34,9 +37,12 @@ le        <=
 eq        ==
 ne        <>
 
-not       not
-and       and
-or        or
+not       not | NOT
+and       and | AND
+or        or  | OR
+
+pi        pi | PI
+e         e  | E
 
 %%
 
@@ -52,10 +58,28 @@ return ID;
 // ASSIGN
 ":=" { return ASSIGN; }
 
-// INTEGER
-{digit}+ {
-yylval.enter = atoi(yytext);
-return INTEGER;
+// INTEGER DECIMAL
+decimal {
+    yylval.integer = atoi(yytext);
+    return INTEGER;
+}
+
+// INTEGER OCTAL
+octal {
+    yylval.integer = strtol(yytext, NULL, 8);
+    return INTEGER;
+}
+
+// INTEGER BINARY
+binary {
+    yylval.integer = strtol(yytext, NULL, 2);
+    return INTEGER;
+}
+
+// INTEGER HEXADECIMAL
+hexadecimal {
+    yylval.integer = strtol(yytext, NULL, 16);
+    return INTEGER;
 }
 
 // FLOAT
@@ -66,7 +90,7 @@ return REAL;
 
 // BOOLEAN
 {boolean} {
-yylval.boolean = (strcmp(yytext, "true") == 0) ? 1 : 0;
+yylval.boolean = (strcmp(yytext, "true") == 0 || strcmp(yytext, "TRUE") == 0) ? 1 : 0;
 return BOOLEAN;
 }
 
@@ -77,9 +101,9 @@ return CADENA;
 }
 
 {trig_func} {
-        return (strcmp(yytext, "cos") == 0) ? COS :
-               (strcmp(yytext, "sin") == 0) ? SIN :
-               (strcmp(yytext, "tan") == 0) ? TAN : -1;
+        return (strcmp(yytext, "cos") == 0 || strcmp(yytext, "COS") == 0) ? COS :
+               (strcmp(yytext, "sin") == 0 || strcmp(yytext, "SIN") == 0) ? SIN :
+               (strcmp(yytext, "tan") == 0 || strcmp(yytext, "TAN") == 0) ? TAN : -1;
 }
 
 {plus} {
@@ -140,6 +164,14 @@ return CADENA;
 
 {or} {
     return OR;
+}
+
+{pi} {
+    return PI;
+}
+
+{e} {
+    return E;
 }
 
 // Comments
