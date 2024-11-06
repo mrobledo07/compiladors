@@ -17,7 +17,7 @@
         int lenght;
         int line;
         value_info id_val;
-    }
+    } ident;
     int integer;
     float real;
     char *string;
@@ -37,6 +37,7 @@
 %token NOT AND OR 
 %token PI 
 %token E
+%token LEN SUBSTR
 
 %start program
 
@@ -57,9 +58,7 @@ statement:
 
 assignment:
     ID ASSIGN expression {
-        // Aquí irá la comprobación de tipos y la asignación
-        // yylval.ident.id_val.val_type = tipo de expression;
-        printf("Asignación: %s := ...\n", $1.lexema);
+        
     }
     ;
 
@@ -136,34 +135,39 @@ expr_boolean_or:
 
 factor_boolean:
     ID
-    | INTEGER
-    | REAL
-    | PI
-    | E
+    | BOOLEAN
     | '(' expression ')'
     ;
 
 expr_trig:
     SIN '(' expression ')' {
-        $$ = sin($3); 
+        $$ = sin_wrapper($3); 
     }
     | COS '(' expression ')' {
-        $$ = cos($3);
+        $$ = cos_wrapper($3);
     }
     | TAN '(' expression ')' {
-        $$ = tan($3);
+        $$ = tan_wrapper($3);
     }
     | ID
     ;
     
 expr_len:
-    LEN '(' STRING ')'
-    | len '(' STRING ')'
+    LEN '(' STRING ')' {
+        $$ = len_wrapper($3);
+    }
+    | len '(' STRING ')' {
+        $$ = len_wrapper($3);
+    }
     ;
 
 expr_substr:
-    SUBSTR '(' STRING ';' INTEGER ';' INTEGER ')'
-    | substr '(' STRING ';' INTEGER ';' INTEGER ')'
+    SUBSTR '(' STRING ';' expression ';' expression ')' {
+        $$ = substr_wrapper($3, $5, $7);
+    }
+    | substr '(' STRING ';' expression ';' expression ')' {
+        $$ = substr_wrapper($3, $5, $7);
+    }
     ;
 
 %%

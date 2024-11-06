@@ -23,6 +23,9 @@ string \"([^\\\"]|\\.)*\"
 
 trig_func (cos|sin|tan|COS|SIN|TAN)
 
+len (len|LEN)
+substr (substr|SUBSTR)
+
 plus      \+
 minus     \-
 mult      \*
@@ -104,6 +107,14 @@ return CADENA;
         return (strcmp(yytext, "cos") == 0 || strcmp(yytext, "COS") == 0) ? COS :
                (strcmp(yytext, "sin") == 0 || strcmp(yytext, "SIN") == 0) ? SIN :
                (strcmp(yytext, "tan") == 0 || strcmp(yytext, "TAN") == 0) ? TAN : -1;
+}
+
+{len} {
+    return LEN;
+}
+
+{substr} {
+    return SUBSTR;
 }
 
 {plus} {
