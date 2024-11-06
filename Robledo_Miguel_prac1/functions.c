@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <math.h>
 #include "functions.h"
 
 extern int yyparse();
@@ -9,23 +7,12 @@ extern FILE *yyin;
 extern FILE *yyout;
 extern int yylineno;
 
-float sin_wrapper(float x) {
-    return sin(x);
-}
-
-float cos_wrapper(float x) {
-    return cos(x);
-}
-
-float tan_wrapper(float x) {
-    return tan(x);
-}
-
-int len_wrapper(char *str) {
-    return strlen(str);
-}
 
 char *substr_wrapper(char *str, int start, int length) {
+    if (start < 0 || length < 0 || start > length) {
+        yyerror("Invalid arguments for substr, returning empty string");
+        return strdup("");
+    }
     char *result = (char *)malloc(length + 1);
     strncpy(result, str + start, length);
     result[length] = '\0';

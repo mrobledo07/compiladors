@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #ifndef DATA_H
 #define DATA_H
 
@@ -15,7 +16,7 @@ typedef struct {
   data_type val_type;
   int val_int;
   float val_float;
-  int val_bool;
+  bool val_bool;
   char val_str[STR_MAX_LENGTH];
 } value_info;
 

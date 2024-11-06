@@ -12,6 +12,10 @@ char *type_to_str(data_type val_type)
     return strdup("Integer");
   } else if (val_type == FLOAT_TYPE) {
     return strdup("Float");
+  } else if (val_type == BOOL_TYPE) {
+    return strdup("Bool");
+  } else if (val_type == STR_TYPE) {
+    return strdup("String");
   } else {
     return strdup("Error: incorrect value for 'val_type'");
   }
@@ -25,7 +29,7 @@ char *value_info_to_str(value_info value)
     } else if (value.val_type == FLOAT_TYPE) {
         sprintf(buffer, "Float: %f", value.val_float);
     } else if (value.val_type == BOOL_TYPE) {
-        if (value.val_bool == 0) {
+        if (value.val_bool == false) {
             sprintf(buffer, "Bool: false");
         } else {
             sprintf(buffer, "Bool: true");
