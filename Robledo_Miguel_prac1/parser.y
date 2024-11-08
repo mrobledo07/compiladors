@@ -11,6 +11,7 @@
 %code requires {
     #include "data.h"
     #include "functions.h"
+    #include "symtab.h"
 }
 
 %union {
@@ -59,7 +60,7 @@ statement:
     ;
 
 assignment:
-    ID ASSIGN expression {
+ID ASSIGN expression {
         // Assign only if the type is compatible or if it has not been initialized
         if ($1.id_val.val_type == UNKNOWN_TYPE || $1.id_val.val_type == $3.val_type) {
             $1.id_val.val_type = $3.val_type;
@@ -72,12 +73,24 @@ assignment:
             } else if ($3.val_type == BOOL_TYPE) {
                 $1.id_val.val_bool = $3.val_bool;
             }
-            printf("Assignment: %s := %s\n", $1.lexema, value_info_to_str($1.id_val));
+            value_info value = {
+                .val_type = $3.val_type,
+                .val_int = $3.val_int,
+                .val_float = $3.val_float,
+                .val_bool = $3.val_bool,
+                .val_str = $3.val_str
+            }
+            if (sym_enter($1.lexema, &value) == SYMTAB_OK) {
+                printf("Assignment: %s := %s\n", $1.lexema, value_info_to_str($1.id_val));
+            } else {
+                yyerror("Error: Variable could not be entered into the symbol table. Stack overflow.");
+            }
         } else {
             yyerror("Incompatible types in assignment");
         }
     }
-    ;
+
+;
 
 expression:
     expr_arithmetic
@@ -234,8 +247,22 @@ expr_pow:
 
 factor_arithmetic: 
     ID {
-        // Search the type and value of the identifier in a symbol table (SYMTAB)
-       
+        value_info value;
+        if (sym_lookup($1.lexema, &value) == SYMTAB_NOT_FOUND) {
+            yyerror("Variable not found");
+        } else {
+            if (value.val_type != INT_TYPE && value.val_type != FLOAT_TYPE) {
+                yyerror("Type error: Arithmetic operation requires numeric values");
+                $$.val_type = UNKNOWN_TYPE;
+            } else {
+                $$.val_type = value.val_type;
+                $$.val_int = value.val_int;
+                $$.val_float = value.val_float;
+                $$.val_bool = value.val_bool;
+                strncpy($$.val_str, value.val_str, STR_MAX_LENGTH - 1);
+                $$.val_str[STR_MAX_LENGTH - 1] = '\0';
+            }
+        }
     }
     | INTEGER {
         $$.val_type = INT_TYPE;
@@ -394,7 +421,22 @@ expr_boolean_or:
 
 factor_boolean:
     ID {
-        // Search the type and value of the identifier in a symbol table (SYMTAB)
+        value_info value;
+        if (sym_lookup($1.lexema, &value) == SYMTAB_NOT_FOUND) {
+            yyerror("Variable not found");
+        } else {
+            if (value.val_type != BOOL_TYPE) {
+                yyerror("Type error: Boolean operation requires boolean values");
+                $$.val_type = UNKNOWN_TYPE;
+            } else {
+                $$.val_type = value.val_type;
+                $$.val_int = value.val_int;
+                $$.val_float = value.val_float;
+                $$.val_bool = value.val_bool;
+                strncpy($$.val_str, value.val_str, STR_MAX_LENGTH - 1);
+                $$.val_str[STR_MAX_LENGTH - 1] = '\0';
+            }
+        }
     }
     | BOOLEAN {
         $$.val_type = BOOL_TYPE;
@@ -450,7 +492,6 @@ expr_trig:
             $$.val_type = UNKNOWN_TYPE;
         }
     }
-    | ID
     ;
     
 expr_len:
@@ -464,20 +505,20 @@ expr_len:
             $$.val_type = UNKNOWN_TYPE;
         }
     }
-    | len '(' STRING ')' {
-        if ($3.val_type == STR_TYPE) {
-            $$.val_int = strlen($3.val_str);
-            $$.val_type = INT_TYPE;
-        } else {
-            yyerror("The len function only applies to strings.");
-            $$.val_type = UNKNOWN_TYPE; 
-        }
-    }
     | LEN '(' ID ')' {
-        // TODO
-    }
-    | len '(' ID ')' {
-        // TODO
+        value_info value;
+        if (sym_lookup($3.lexema, &value) == SYMTAB_NOT_FOUND) {
+            yyerror("Variable not found");
+            $$.val_type = UNKNOWN_TYPE;
+        } else {
+            if (value.val_type != STR_TYPE) {
+                yyerror("The len function only applies to strings.");
+                $$.val_type = UNKNOWN_TYPE;
+            } else {
+                $$.val_int = strlen(value.val_str);
+                $$.val_type = INT_TYPE;
+            }
+        }
     }
     ;
 
@@ -493,20 +534,25 @@ expr_substr:
             $$.val_type = UNKNOWN_TYPE;
         }
     }
-    | substr '(' STRING ';' expression ';' expression ')' {
-        if ($5.val_type == INT_TYPE && $7.val_type == INT_TYPE) {
-            $$.val_str = substr_wrapper($3, $5.val_int, $7.val_int);
-            $$.val_type = STR_TYPE;
-        } else {
-            yyerror("Substrings indexes must be integers.");
-            $$.val_type = UNKNOWN_TYPE;
-        }
-    }
     | SUBSTR '(' ID ';' expression ';' expression ')' {
-        // TODO
-    }
-    | substr '(' ID ';' expression ';' expression ')' {
-        // TODO
+        valuye_info value;
+        if (sym_lookup($3.lexema, &value) == SYMTAB_NOT_FOUND) {
+            yyerror("Variable not found");
+            $$.val_type = UNKNOWN_TYPE;
+        } else {
+            if (value.val_type != STR_TYPE) {
+                yyerror("The substr function only applies to strings.");
+                $$.val_type = UNKNOWN_TYPE;
+            } else {
+                if ($5.val_type == INT_TYPE && $7.val_type == INT_TYPE) {
+                    $$.val_str = substr_wrapper(value.val_str, $5.val_int, $7.val_int);
+                    $$.val_type = STR_TYPE;
+                } else {
+                    yyerror("Substrings indexes must be integers.");
+                    $$.val_type = UNKNOWN_TYPE;
+                }
+            }
+        }
     }
     ;
 
