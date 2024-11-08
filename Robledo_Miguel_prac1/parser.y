@@ -56,7 +56,10 @@ statement_list:
 
 statement:
     assignment
-    | expression
+    | expression {
+        // Print the result of the expression
+        printf("Expression result: %s\n", value_info_to_str($1));
+    }
     ;
 
 assignment:

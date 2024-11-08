@@ -1,13 +1,13 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
-int init_analisi_lexica(char *);
-int end_analisi_lexica();
+int init_lexical_analysis(char *);
+int end_lexical_analysis();
 
-int init_analisi_sintactica(char *);
-int end_analisi_sintactica(void);
+int init_syntactic_analysis(char *);
+int end_syntactic_analysis(void);
 
-int analisi_semantica(void);
+int semantic_analysis(void);
 
 void yyerror(char *explanation);
 

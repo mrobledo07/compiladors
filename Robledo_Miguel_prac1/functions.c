@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "functions.h"
 
 extern int yyparse();
@@ -8,18 +9,7 @@ extern FILE *yyout;
 extern int yylineno;
 
 
-char *substr_wrapper(char *str, int start, int length) {
-    if (start < 0 || length < 0 || start > length) {
-        yyerror("Invalid arguments for substr, returning empty string");
-        return strdup("");
-    }
-    char *result = (char *)malloc(length + 1);
-    strncpy(result, str + start, length);
-    result[length] = '\0';
-    return result;
-}
-
-int init_analisi_lexica(char *filename)
+int init_lexical_analysis(char *filename)
 {
   int error;
   yyin = fopen(filename,"r");
@@ -32,7 +22,7 @@ int init_analisi_lexica(char *filename)
 }
 
 
-int end_analisi_lexica()
+int end_lexical_analysis()
 {
   int error;
   error = fclose(yyin);
@@ -45,7 +35,7 @@ int end_analisi_lexica()
 }
 
 
-int init_analisi_sintactica(char* filename)
+int init_syntactic_analysis(char* filename)
 {
   int error = EXIT_SUCCESS;
   yyout = fopen(filename,"w");
@@ -56,7 +46,7 @@ int init_analisi_sintactica(char* filename)
 }
 
 
-int end_analisi_sintactica(void)
+int end_syntactic_analysis(void)
 {
   int error;
 
@@ -71,7 +61,7 @@ int end_analisi_sintactica(void)
 }
 
 
-int analisi_semantica(void)
+int semantic_analysis(void)
 {
   int error;
 
@@ -87,4 +77,35 @@ int analisi_semantica(void)
 void yyerror(char *explanation)
 {
   fprintf(stderr, "Error: %s , in line %d\n", explanation, yylineno);
+}
+
+float sin_wrapper(float x)
+{
+  return sin(x);
+}
+
+float cos_wrapper(float x)
+{
+  return cos(x);
+}
+
+float tan_wrapper(float x)
+{
+  return tan(x);
+}
+
+int len_wrapper(char *str)
+{
+  return strlen(str);
+}
+
+char *substr_wrapper(char *str, int start, int length) {
+    if (start < 0 || length < 0 || start > length) {
+        yyerror("Invalid arguments for substr, returning empty string");
+        return strdup("");
+    }
+    char *result = (char *)malloc(length + 1);
+    strncpy(result, str + start, length);
+    result[length] = '\0';
+    return result;
 }
