@@ -1,5 +1,3 @@
-#include <stdbool.h>
-#include "symtab.h"
 #ifndef DATA_H
 #define DATA_H
 
@@ -17,11 +15,9 @@ typedef struct {
   data_type val_type;
   int val_int;
   float val_float;
-  bool val_bool;
-  char val_str[STR_MAX_LENGTH];
+  int val_bool;
+  char *val_str;
 } value_info;
-
-typedef value_info * sym_value_type;
 
 char *type_to_str(data_type val_type);
 char *value_info_to_str(value_info value);

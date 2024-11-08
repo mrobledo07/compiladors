@@ -1,0 +1,3 @@
+bison -d -v parser.y
+flex  lexer.l
+gcc -o compiler.exe -Wall -g main.c data.c functions.c symtab.c parser.tab.c lex.yy.c -lfl -lm

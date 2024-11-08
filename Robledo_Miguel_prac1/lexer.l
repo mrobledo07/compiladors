@@ -1,8 +1,8 @@
-// C declarations
 %{
 #include <stdio.h>
 #include <stdlib.h> 
-#include "data.h"
+#include <string.h>
+#include "parser.tab.h"
 #include "functions.h"
 %}
 
@@ -11,8 +11,8 @@
 %option noinput
 %option nounput
 
-// Pattern definition
-decimal [0-9]+
+digit [0-9]
+decimal {digit}+
 octal 0[oO][0-7]+
 binary 0[bB][01]+
 hexadecimal 0[xX][0-9a-fA-F]+
@@ -29,7 +29,7 @@ substr (substr|SUBSTR)
 plus      \+
 minus     \-
 mult      \*
-div       /
+div       \/
 mod       %
 pow       \*\*
 
@@ -40,67 +40,18 @@ le        <=
 eq        ==
 ne        <>
 
-not       not | NOT
-and       and | AND
-or        or  | OR
+not       (not|NOT)
+and       (and|AND)
+or        (or|OR)
 
-pi        pi | PI
-e         e  | E
+pi        (pi|PI)
+e         (e|E)
 
 %%
 
-// ID
-{letter}({letter}|{digit})* {
-yylval.ident.lexema = strdup(yytext);
-yylval.ident.lenght = yyleng;
-yylval.ident.line = yylineno;
-yylval.ident.id_val.val_type = UNKNOWN_TYPE;
-return ID;
-}
-
-// ASSIGN
-":=" { return ASSIGN; }
-
-// INTEGER DECIMAL
-decimal {
-    yylval.integer = atoi(yytext);
-    return INTEGER;
-}
-
-// INTEGER OCTAL
-octal {
-    yylval.integer = strtol(yytext, NULL, 8);
-    return INTEGER;
-}
-
-// INTEGER BINARY
-binary {
-    yylval.integer = strtol(yytext, NULL, 2);
-    return INTEGER;
-}
-
-// INTEGER HEXADECIMAL
-hexadecimal {
-    yylval.integer = strtol(yytext, NULL, 16);
-    return INTEGER;
-}
-
-// FLOAT
-{float} {
-yylval.real = atof(yytext);
-return REAL;
-}
-
-// BOOLEAN
 {boolean} {
-yylval.boolean = (strcmp(yytext, "true") == 0 || strcmp(yytext, "TRUE") == 0) ? 1 : 0;
-return BOOLEAN;
-}
-
-// STRING
-{string} {
-yylval.cadena = strdup(yytext);
-return CADENA;
+    yylval.boolean = (strcmp(yytext, "true") == 0 || strcmp(yytext, "TRUE") == 0) ? 1 : 0;
+    return BOOLEAN;
 }
 
 {trig_func} {
@@ -116,6 +67,67 @@ return CADENA;
 {substr} {
     return SUBSTR;
 }
+
+{not} {
+    return NOT;
+}
+
+{and} {
+    return AND;
+}
+
+{or} {
+    return OR;
+}
+
+{pi} {
+    return PI;
+}
+
+{e} {
+    return E;
+}
+
+{letter}({letter}|{digit})* {
+    yylval.ident.lexema = strdup(yytext);
+    yylval.ident.lenght = yyleng;
+    yylval.ident.line = yylineno;
+    yylval.ident.id_val.val_type = UNKNOWN_TYPE;
+    return ID;
+}
+
+":=" { return ASSIGN; }
+
+{decimal} {
+    yylval.integer = atoi(yytext);
+    return INTEGER;
+}
+
+{octal} {
+    yylval.integer = strtol(yytext, NULL, 8);
+    return INTEGER;
+}
+
+{binary} {
+    yylval.integer = strtol(yytext, NULL, 2);
+    return INTEGER;
+}
+
+{hexadecimal} {
+    yylval.integer = strtol(yytext, NULL, 16);
+    return INTEGER;
+}
+
+{float} {
+    yylval.real = atof(yytext);
+    return REAL;
+}
+
+{string} {
+    yylval.string = strdup(yytext);
+    return STRING;
+}
+
 
 {plus} {
     return PLUS;
@@ -165,36 +177,22 @@ return CADENA;
     return NE;
 }
 
-{not} {
-    return NOT;
-}
 
-{and} {
-    return AND;
-}
-
-{or} {
-    return OR;
-}
-
-{pi} {
-    return PI;
-}
-
-{e} {
-    return E;
-}
-
-// Comments
-//.* { }
-/*([^*]|\*+[^/])*\*+/ { }
+\/\/.* { }
+\/*([^*]|\*+[^/])*\*+\/ { }
 #.* { }
 
-// Blank spaces
 ^[ \t]*[\n] { }
 [\n] { return ENDLINE; }
 
-// Other characters
-. { }
+. { 
+    // Format error explanation with unknown character
+    char *error_message = "Lexical error: Unknown character ";
+    char *error = malloc(strlen(yytext) + 1);
+    strcpy(error, yytext);
+
+    // Call yyerror with error message with unknown character
+    yyerror(strcat(error_message, error));
+}
 
 %%

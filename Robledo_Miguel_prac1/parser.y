@@ -42,6 +42,22 @@
 %token E
 %token LEN SUBSTR
 
+%type <ident.id_val> expression
+%type <ident.id_val> expr_arithmetic
+%type <ident.id_val> expr_op
+%type <ident.id_val> expr_term
+%type <ident.id_val> expr_pow
+%type <ident.id_val> factor_arithmetic
+%type <ident.id_val> expr_arithmetic_boolean
+%type <ident.id_val> expr_boolean
+%type <ident.id_val> expr_boolean_not
+%type <ident.id_val> expr_boolean_and
+%type <ident.id_val> expr_boolean_or
+%type <ident.id_val> factor_boolean
+%type <ident.id_val> expr_trig
+%type <ident.id_val> expr_len
+%type <ident.id_val> expr_substr
+
 %start program
 
 %%
@@ -71,7 +87,7 @@ ID ASSIGN expression {
                 $1.id_val.val_int = $3.val_int;
             } else if ($3.val_type == FLOAT_TYPE) {
                 $1.id_val.val_float = $3.val_float;
-            } else if ($3.val_type == STRING_TYPE) {
+            } else if ($3.val_type == STR_TYPE) {
                 $1.id_val.val_str = $3.val_str;
             } else if ($3.val_type == BOOL_TYPE) {
                 $1.id_val.val_bool = $3.val_bool;
@@ -82,7 +98,7 @@ ID ASSIGN expression {
                 .val_float = $3.val_float,
                 .val_bool = $3.val_bool,
                 .val_str = $3.val_str
-            }
+            };
             if (sym_enter($1.lexema, &value) == SYMTAB_OK) {
                 printf("Assignment: %s := %s\n", $1.lexema, value_info_to_str($1.id_val));
             } else {
@@ -109,7 +125,18 @@ expr_arithmetic:
 
 expr_op:
     expr_term
-    | PLUS expr_op
+    | PLUS expr_op {
+        // Verify its a number
+        if ($2.val_type == INT_TYPE || $2.val_type == FLOAT_TYPE) {
+            if ($2.val_type == INT_TYPE) {
+                $$.val_int = $2.val_int;
+                $$.val_type = INT_TYPE;
+            } else {
+                $$.val_float = $2.val_float;
+                $$.val_type = FLOAT_TYPE;
+            }
+        }
+    }
     | MINUS expr_op {
         // Verify its a number
         if ($2.val_type == INT_TYPE || $2.val_type == FLOAT_TYPE) {
@@ -402,7 +429,7 @@ expr_boolean_not:
     expr_boolean_and
     | NOT expr_boolean_not {
         $$.val_type = BOOL_TYPE;
-        $$.val_bool = !$2; // Perform logical NOT on the operand
+        $$.val_bool = !$2.val_bool; // Perform logical NOT on the operand
     }
     ;
 
@@ -410,7 +437,7 @@ expr_boolean_and:
     expr_boolean_or
     | expr_boolean_and AND expr_boolean_or {
         $$.val_type = BOOL_TYPE;
-        $$.val_bool = $1 && $3; // Perform logical AND between the two operands
+        $$.val_bool = $1.val_bool && $3.val_bool; // Perform logical AND between the two operands
     }
     ;
 
@@ -418,7 +445,7 @@ expr_boolean_or:
     factor_boolean
     | expr_boolean_or OR factor_boolean {
         $$.val_type = BOOL_TYPE;
-        $$.val_bool = $1 || $3; // Perform logical OR between the two operands
+        $$.val_bool = $1.val_bool || $3.val_bool; // Perform logical OR between the two operands
     }
     ;
 
@@ -460,10 +487,10 @@ expr_trig:
     SIN '(' expression ')' {
         // Verify if the parameter is a number
         if ($3.val_type == INT_TYPE) {
-            $$.val_int = sin($3);
+            $$.val_int = sin($3.val_int);
             $$.val_type = INT_TYPE;
         } else if ($3.val_type == FLOAT_TYPE) {
-            $$.val_float = sin($3);
+            $$.val_float = sin($3.val_float);
             $$.val_type = FLOAT_TYPE;
         } else {
             yyerror("The sine function only applies to numbers.");
@@ -472,10 +499,10 @@ expr_trig:
     }
     | COS '(' expression ')' {
         if ($3.val_type == INT_TYPE) {
-            $$.val_int = cos($3);
+            $$.val_int = cos($3.val_int);
             $$.val_type = INT_TYPE;
         } else if ($3.val_type == FLOAT_TYPE) {
-            $$.val_float = cos($3);
+            $$.val_float = cos($3.val_float);
             $$.val_type = FLOAT_TYPE;
         } else {
             yyerror("The cosine function only applies to numbers.");
@@ -485,10 +512,10 @@ expr_trig:
     }
     | TAN '(' expression ')' {
         if ($3.val_type == INT_TYPE) {
-            $$.val_int = tan($3);
+            $$.val_int = tan($3.val_int);
             $$.val_type = INT_TYPE;
         } else if ($3.val_type == FLOAT_TYPE) {
-            $$.val_float = tan($3);
+            $$.val_float = tan($3.val_float);
             $$.val_type = FLOAT_TYPE;
         } else {
             yyerror("The tangent function only applies to numbers.");
@@ -499,14 +526,8 @@ expr_trig:
     
 expr_len:
     LEN '(' STRING ')' {
-        // Verify if the parameter is a string
-        if ($3.val_type == STR_TYPE) {
-            $$.val_int = strlen($3.val_str);
-            $$.val_type = INT_TYPE;
-        } else {
-            yyerror("The len function only applies to strings.");
-            $$.val_type = UNKNOWN_TYPE;
-        }
+        $$.val_int = strlen($3);
+        $$.val_type = INT_TYPE;
     }
     | LEN '(' ID ')' {
         value_info value;
@@ -526,7 +547,6 @@ expr_len:
     ;
 
 expr_substr:
-    expr_substr:
     SUBSTR '(' STRING ';' expression ';' expression ')' {
         // Verify if the indexes are integers
         if ($5.val_type == INT_TYPE && $7.val_type == INT_TYPE) {
@@ -538,7 +558,7 @@ expr_substr:
         }
     }
     | SUBSTR '(' ID ';' expression ';' expression ')' {
-        valuye_info value;
+        value_info value;
         if (sym_lookup($3.lexema, &value) == SYMTAB_NOT_FOUND) {
             yyerror("Variable not found");
             $$.val_type = UNKNOWN_TYPE;

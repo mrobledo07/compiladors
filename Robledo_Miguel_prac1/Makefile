@@ -8,6 +8,7 @@ CC = gcc
 LEX = flex
 YACC = bison
 LIB = -lfl
+MATH_LIB = -lm
 
 SRC_LEX = lexer.l
 SRC_YACC = parser.y
@@ -25,6 +26,8 @@ BIN = compiler.exe
 
 SRC_EXTRA = data.c functions.c
 
+SYMTAB = symtab.c
+
 LFLAGS =
 YFLAGS = -d -v
 CFLAGS = -Wall -g
@@ -37,7 +40,7 @@ EG_OUT = output_file.txt
 ######################################################################
 
 all : yacc lex
-	$(CC) -o $(BIN) $(CFLAGS) $(SRC) $(SRC_EXTRA) $(YACC_OUT_C) $(LEX_OUT) $(LIB)
+	$(CC) -o $(BIN) $(CFLAGS) $(SRC) $(SRC_EXTRA) $(SYMTAB) $(YACC_OUT_C) $(LEX_OUT) $(LIB) $(MATH_LIB)
 
 yacc : $(SRC_YACC)
 	$(YACC) $(YFLAGS) $(SRC_YACC)

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 #include "functions.h"
 
 extern int yyparse();
@@ -81,7 +82,7 @@ void yyerror(char *explanation)
 
 float sin_wrapper(float x)
 {
-  return sin(x);
+  return sin(x);  
 }
 
 float cos_wrapper(float x)
