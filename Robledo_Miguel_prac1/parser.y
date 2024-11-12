@@ -126,7 +126,7 @@ expression:
 
 expr_arithmetic:
     expr_op
-    | expr_add PLUS expr_op {
+    | expr_arithmetic PLUS expr_op {
         // Verify that are numbers
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
