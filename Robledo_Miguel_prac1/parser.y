@@ -121,7 +121,6 @@ expression:
     expr_arithmetic
     | expr_add
     | expr_boolean
-    | expr_arithmetic_boolean
     | expr_trig
     | expr_len
     | expr_substr
@@ -348,8 +347,7 @@ factor_arithmetic:
 
 
 expr_boolean:
-    expr_boolean_not
-    | expr_boolean_or
+    expr_boolean_or
     ;
 
 expr_boolean_or:

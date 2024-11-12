@@ -76,7 +76,8 @@ int semantic_analysis(void)
 
 void yyerror(char *explanation)
 {
-  fprintf(stderr, "Error: %s, in line %d\n", explanation, yylineno-1);
+  fprintf(stderr, "Error: %s, in line %d\nExiting...\n", explanation, yylineno);
+  exit(1);
 }
 
 char *concat(char *s1, char *s2) {
