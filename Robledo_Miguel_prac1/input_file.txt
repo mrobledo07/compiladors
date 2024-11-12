@@ -1,19 +1,15 @@
 // assignacions
-/*
-s := "Hola"
-
-str2 := "Hola que tal"
-
-str3 := "A ver que me da ahora"
-
-len(str3)
-substr(str3, 4, 24)
-sin(PI/2)
-cos(PI)
-tan(PI/4) */
-
 x := 1.5
 i := 5
 z := i * (x + i) - i / 4.0
+s := "Hola"
+b := z > 3 or not (i > 0 and i <= 10) or false
+str1 := " Mundo"
 
-b := z > 31.25 or not (i > 0 and i <= 10) or false
+// operacions
+str2 := s + str1
+str2
+
+i + s
+
+str2 + i

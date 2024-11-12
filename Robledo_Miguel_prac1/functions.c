@@ -79,7 +79,14 @@ void yyerror(char *explanation)
   fprintf(stderr, "Error: %s , in line %d\n", explanation, yylineno);
 }
 
-char *substr_wrapper(char *str, int start, int length) {
+char *concat(char *s1, char *s2) {
+    char *result = (char *)malloc(strlen(s1) + strlen(s2) + 1);
+    strcpy(result, s1);
+    strcat(result, s2);
+    return result;
+}
+
+char *substr(char *str, int start, int length) {
     if (start < 0 || length < 0 || start > length) {
         yyerror("Invalid arguments for substr, returning empty string");
         return strdup("");

@@ -35,7 +35,28 @@ char *value_info_to_str(value_info value)
             snprintf(buffer, sizeof(buffer), "Bool: true");
         }
     } else if (value.val_type == STR_TYPE) {
-        snprintf(buffer, sizeof(buffer), "String: %s", value.val_str);    
+        snprintf(buffer, sizeof(buffer), "String: \"%s\"", value.val_str);    
+  } else {
+        snprintf(buffer, sizeof(buffer), "Error: incorrect value for 'value.val_type'");
+    }
+    return strdup(buffer);
+}
+
+char *value_to_str(value_info value) 
+{
+    char buffer[STR_MAX_LENGTH+100];
+    if (value.val_type == INT_TYPE) {
+        snprintf(buffer, sizeof(buffer), "%d", value.val_int);
+    } else if (value.val_type == FLOAT_TYPE) {
+        snprintf(buffer, sizeof(buffer), "%f", value.val_float);
+    } else if (value.val_type == BOOL_TYPE) {
+        if (value.val_bool == 0) {
+            snprintf(buffer, sizeof(buffer), "false");
+        } else {
+            snprintf(buffer, sizeof(buffer), "true");
+        }
+    } else if (value.val_type == STR_TYPE) {
+        snprintf(buffer, sizeof(buffer), "%s", value.val_str);    
   } else {
         snprintf(buffer, sizeof(buffer), "Error: incorrect value for 'value.val_type'");
     }

@@ -170,6 +170,26 @@ expr_op:
                     }
                     $$.val_type = FLOAT_TYPE;
                 }
+            } else if ($1.val_type == STR_TYPE && $3.val_type == STR_TYPE) {
+                $$.val_str = concat($1.val_str, $3.val_str);
+                $$.val_type = STR_TYPE;
+            } else if ($1.val_type == STR_TYPE && $3.val_type != STR_TYPE) {
+                if ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE) {
+                    $$.val_str = concat($1.val_str, value_to_str($3));
+                    $$.val_type = STR_TYPE;
+                } else {
+                    yyerror("Type error: Concatenation operation is only allowed between numeric values and strings");
+                }
+            } else if ($1.val_type != STR_TYPE && $3.val_type == STR_TYPE) {
+                if ($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) {
+                    $$.val_str = concat(value_to_str($1), $3.val_str);
+                    $$.val_type = STR_TYPE;
+                } else {
+                    yyerror("Type error: Concatenation operation is only allowed between numeric values and strings");
+                }
+            } else {
+                yyerror("Type error: Addition operation is only allowed between numeric values or strings (concat)");
+                $$.val_type = UNKNOWN_TYPE;
             }
     }
     | expr_op MINUS expr_term {
@@ -189,6 +209,9 @@ expr_op:
                     }
                     $$.val_type = FLOAT_TYPE;
                 }
+            } else {
+                yyerror("Type error: Subtraction operation is only allowed between numeric values");
+                $$.val_type = UNKNOWN_TYPE;
             }
     }
     ;
@@ -212,6 +235,9 @@ expr_term:
                     }
                     $$.val_type = FLOAT_TYPE;
                 }
+            } else {
+                yyerror("Type error: Multiplication operation is only allowed between numeric values");
+                $$.val_type = UNKNOWN_TYPE;
             }
     }
     | expr_term DIV expr_pow {
@@ -230,6 +256,9 @@ expr_term:
                         $$.val_float = (float) $1.val_int / $3.val_float;
                     }
                 }
+            } else {
+                yyerror("Type error: Division operation is only allowed between numeric values");
+                $$.val_type = UNKNOWN_TYPE;
             }
     }
     | expr_term MOD expr_pow {
@@ -277,8 +306,8 @@ factor_arithmetic:
         if (sym_lookup($1.lexema, &value) == SYMTAB_NOT_FOUND) {
             yyerror("Variable not found");
         } else {
-            if (value.val_type != INT_TYPE && value.val_type != FLOAT_TYPE) {
-                yyerror("Type error: Arithmetic operation requires numeric values");
+            if (value.val_type != INT_TYPE && value.val_type != FLOAT_TYPE && value.val_type != STR_TYPE) {
+                yyerror("Type error: Arithmetic operation requires numeric values or strings (concat)");
                 $$.val_type = UNKNOWN_TYPE;
             } else {
                 $$ = value;
@@ -295,7 +324,7 @@ factor_arithmetic:
     }
     | STRING {
         $$.val_type = STR_TYPE;
-        $$.val_str = $1;
+        $$.val_str = substr($1, 1, strlen($1) - 2);
     }
     | PI {
         $$.val_type = FLOAT_TYPE;
@@ -528,7 +557,7 @@ expr_substr:
     SUBSTR LPAREN STRING COMMA expression COMMA expression RPAREN {
         // Verify if the indexes are integers
         if ($5.val_type == INT_TYPE && $7.val_type == INT_TYPE) {
-            $$.val_str = substr_wrapper($3, $5.val_int, $7.val_int);
+            $$.val_str = substr($3, $5.val_int, $7.val_int);
             $$.val_type = STR_TYPE;
         } else {
             yyerror("Substrings indexes must be integers.");
@@ -546,7 +575,7 @@ expr_substr:
                 $$.val_type = UNKNOWN_TYPE;
             } else {
                 if ($5.val_type == INT_TYPE && $7.val_type == INT_TYPE) {
-                    $$.val_str = substr_wrapper(value.val_str, $5.val_int, $7.val_int);
+                    $$.val_str = substr(value.val_str, $5.val_int, $7.val_int);
                     $$.val_type = STR_TYPE;
                 } else {
                     yyerror("Substrings indexes must be integers.");

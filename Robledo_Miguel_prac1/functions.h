@@ -10,7 +10,7 @@ int end_syntactic_analysis(void);
 int semantic_analysis(void);
 
 void yyerror(char *explanation);
-char *substr_wrapper(char *str, int start, int length);
+char *substr(char *str, int start, int length);
 
 
 #endif
