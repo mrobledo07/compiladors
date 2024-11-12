@@ -29,7 +29,7 @@ SRC_EXTRA = data.c functions.c
 SYMTAB = symtab.c
 
 LFLAGS =
-YFLAGS = -d -v
+YFLAGS = -d -v -Wcounterexamples
 CFLAGS = -Wall -g -O0
 
 EG_IN = input_file.txt

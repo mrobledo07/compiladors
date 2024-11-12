@@ -62,6 +62,15 @@
 %type <ident.id_val> expr_unary
 %type <ident.id_val> variable
 
+%left OR
+%left AND
+%left EQ NE
+%left GT GE LT LE
+%left PLUS MINUS
+%left MULT DIV MOD
+%right POW
+%right NOT
+
 %start program
 
 %%
@@ -322,7 +331,7 @@ factor_arithmetic:
         $$.val_type = FLOAT_TYPE;
         $$.val_float = 2.718281828459045;
     }
-    | LPAREN expression RPAREN {
+    | LPAREN expr_arithmetic RPAREN {
         $$ = $2;
     }
     ;
