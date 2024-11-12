@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <string.h>
 #include "functions.h"
 
@@ -78,26 +77,6 @@ int semantic_analysis(void)
 void yyerror(char *explanation)
 {
   fprintf(stderr, "Error: %s , in line %d\n", explanation, yylineno);
-}
-
-float sin_wrapper(float x)
-{
-  return sin(x);  
-}
-
-float cos_wrapper(float x)
-{
-  return cos(x);
-}
-
-float tan_wrapper(float x)
-{
-  return tan(x);
-}
-
-int len_wrapper(char *str)
-{
-  return strlen(str);
 }
 
 char *substr_wrapper(char *str, int start, int length) {

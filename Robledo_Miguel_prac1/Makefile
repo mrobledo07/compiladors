@@ -30,7 +30,7 @@ SYMTAB = symtab.c
 
 LFLAGS =
 YFLAGS = -d -v
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -O0
 
 EG_IN = input_file.txt
 EG_OUT = output_file.txt

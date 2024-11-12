@@ -88,7 +88,7 @@ e         (e|E)
     return E;
 }
 
-{letter}({letter}|{digit})* {
+{letter}({letter}|{digit}|"_")* {
     yylval.ident.lexema = strdup(yytext);
     yylval.ident.lenght = yyleng;
     yylval.ident.line = yylineno;
@@ -177,17 +177,24 @@ e         (e|E)
     return NE;
 }
 
+\( { return LPAREN; }
 
-\/\/.* { }
-\/*([^*]|\*+[^/])*\*+\/ { }
-#.* { }
+\) { return RPAREN; }
 
-^[ \t]*[\n] { }
+"," { return COMMA; }
+
+"//".*[\n]* { }
+"/*"([^\*]|\*+[^"/"])*\*+"/"[\n]* { }
+"#".*[\n]* { }
+
+^[ \t]*\n { }
+[ \t] { }
 [\n] { return ENDLINE; }
 
 . { 
     // Format error explanation with unknown character
-    char *error_message = "Lexical error: Unknown character ";
+    char *error_message = (char *)malloc(37+strlen(yytext));
+    strcpy(error_message, "Lexycal error - Unknown character: ");
     char *error = malloc(strlen(yytext) + 1);
     strcpy(error, yytext);
 

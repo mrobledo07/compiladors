@@ -23,7 +23,7 @@ char *type_to_str(data_type val_type)
 
 char *value_info_to_str(value_info value) 
 {
-    char buffer[STR_MAX_LENGTH+20];
+    char buffer[STR_MAX_LENGTH+100];
     if (value.val_type == INT_TYPE) {
         snprintf(buffer, sizeof(buffer), "Integer: %d", value.val_int);
     } else if (value.val_type == FLOAT_TYPE) {

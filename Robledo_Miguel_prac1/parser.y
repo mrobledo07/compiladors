@@ -41,6 +41,8 @@
 %token PI 
 %token E
 %token LEN SUBSTR
+%token LPAREN RPAREN
+%token COMMA
 
 %type <ident.id_val> expression
 %type <ident.id_val> expr_arithmetic
@@ -67,6 +69,7 @@ program:
 
 statement_list:
     statement ENDLINE statement_list
+    | statement
     | 
     ;
 
@@ -241,15 +244,7 @@ expr_term:
     ;
 
 expr_pow:
-    factor_arithmetic {
-        // Simply propagate the value and type of factor_arithmetic
-        $$.val_type = $1.val_type;
-        $$.val_int = $1.val_int;
-        $$.val_float = $1.val_float;
-        $$.val_bool = $1.val_bool;
-        strncpy($$.val_str, $1.val_str, STR_MAX_LENGTH - 1);
-        $$.val_str[STR_MAX_LENGTH - 1] = '\0';
-    }
+    factor_arithmetic 
     | expr_pow POW factor_arithmetic {
         // Verify that both operands are numeric (int or float)
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
@@ -285,12 +280,7 @@ factor_arithmetic:
                 yyerror("Type error: Arithmetic operation requires numeric values");
                 $$.val_type = UNKNOWN_TYPE;
             } else {
-                $$.val_type = value.val_type;
-                $$.val_int = value.val_int;
-                $$.val_float = value.val_float;
-                $$.val_bool = value.val_bool;
-                strncpy($$.val_str, value.val_str, STR_MAX_LENGTH - 1);
-                $$.val_str[STR_MAX_LENGTH - 1] = '\0';
+                $$ = value;
             }
         }
     }
@@ -304,8 +294,7 @@ factor_arithmetic:
     }
     | STRING {
         $$.val_type = STR_TYPE;
-        strncpy($$.val_str, $1, STR_MAX_LENGTH - 1);
-        $$.val_str[STR_MAX_LENGTH - 1] = '\0'; 
+        $$.val_str = $1;
     }
     | PI {
         $$.val_type = FLOAT_TYPE;
@@ -315,14 +304,8 @@ factor_arithmetic:
         $$.val_type = FLOAT_TYPE;
         $$.val_float = 2.718281828459045;
     }
-    | '(' expression ')' {
-        // Simply inherit the type and value from the subexpression
-        $$.val_type = $2.val_type;
-        $$.val_int = $2.val_int;
-        $$.val_float = $2.val_float;
-        $$.val_bool = $2.val_bool;
-        strncpy($$.val_str, $2.val_str, STR_MAX_LENGTH - 1);
-        $$.val_str[STR_MAX_LENGTH - 1] = '\0';
+    | LPAREN expression RPAREN {
+        $$ = $2;
     }
     ;
 
@@ -423,29 +406,30 @@ expr_arithmetic_boolean:
 
 expr_boolean:
     expr_boolean_not
+    | expr_boolean_or
     ;
 
-expr_boolean_not:
+expr_boolean_or:
     expr_boolean_and
-    | NOT expr_boolean_not {
+    | expr_boolean_or OR expr_boolean_and {
         $$.val_type = BOOL_TYPE;
-        $$.val_bool = !$2.val_bool; // Perform logical NOT on the operand
+        $$.val_bool = $1.val_bool || $3.val_bool; // Perform logical OR between the two operands
     }
     ;
 
 expr_boolean_and:
-    expr_boolean_or
-    | expr_boolean_and AND expr_boolean_or {
+    expr_boolean_not
+    | expr_boolean_and AND expr_boolean_not {
         $$.val_type = BOOL_TYPE;
         $$.val_bool = $1.val_bool && $3.val_bool; // Perform logical AND between the two operands
     }
     ;
 
-expr_boolean_or:
+expr_boolean_not:
     factor_boolean
-    | expr_boolean_or OR factor_boolean {
+    | NOT expr_boolean_not {
         $$.val_type = BOOL_TYPE;
-        $$.val_bool = $1.val_bool || $3.val_bool; // Perform logical OR between the two operands
+        $$.val_bool = !$2.val_bool; // Perform logical NOT on the operand
     }
     ;
 
@@ -459,12 +443,7 @@ factor_boolean:
                 yyerror("Type error: Boolean operation requires boolean values");
                 $$.val_type = UNKNOWN_TYPE;
             } else {
-                $$.val_type = value.val_type;
-                $$.val_int = value.val_int;
-                $$.val_float = value.val_float;
-                $$.val_bool = value.val_bool;
-                strncpy($$.val_str, value.val_str, STR_MAX_LENGTH - 1);
-                $$.val_str[STR_MAX_LENGTH - 1] = '\0';
+                $$ = value;
             }
         }
     }
@@ -472,23 +451,17 @@ factor_boolean:
         $$.val_type = BOOL_TYPE;
         $$.val_bool = $1;
     }
-    | '(' expr_boolean ')' {
-        // Simply inherit the type and value from the subexpression
-        $$.val_type = $2.val_type;
-        $$.val_int = $2.val_int;
-        $$.val_float = $2.val_float;
-        $$.val_bool = $2.val_bool;
-        strncpy($$.val_str, $2.val_str, STR_MAX_LENGTH - 1);
-        $$.val_str[STR_MAX_LENGTH - 1] = '\0';
+    | LPAREN expr_boolean RPAREN {
+        $$ = $2;
     }
     ;
 
 expr_trig:
-    SIN '(' expression ')' {
+    SIN LPAREN expression RPAREN {
         // Verify if the parameter is a number
         if ($3.val_type == INT_TYPE) {
-            $$.val_int = sin($3.val_int);
-            $$.val_type = INT_TYPE;
+            $$.val_float = sin($3.val_int);
+            $$.val_type = FLOAT_TYPE;
         } else if ($3.val_type == FLOAT_TYPE) {
             $$.val_float = sin($3.val_float);
             $$.val_type = FLOAT_TYPE;
@@ -497,10 +470,10 @@ expr_trig:
             $$.val_type = UNKNOWN_TYPE;
         }
     }
-    | COS '(' expression ')' {
+    | COS LPAREN expression RPAREN {
         if ($3.val_type == INT_TYPE) {
-            $$.val_int = cos($3.val_int);
-            $$.val_type = INT_TYPE;
+            $$.val_float = cos($3.val_int);
+            $$.val_type = FLOAT_TYPE;
         } else if ($3.val_type == FLOAT_TYPE) {
             $$.val_float = cos($3.val_float);
             $$.val_type = FLOAT_TYPE;
@@ -510,10 +483,10 @@ expr_trig:
         }
         
     }
-    | TAN '(' expression ')' {
+    | TAN LPAREN expression RPAREN {
         if ($3.val_type == INT_TYPE) {
-            $$.val_int = tan($3.val_int);
-            $$.val_type = INT_TYPE;
+            $$.val_float = tan($3.val_int);
+            $$.val_type = FLOAT_TYPE;
         } else if ($3.val_type == FLOAT_TYPE) {
             $$.val_float = tan($3.val_float);
             $$.val_type = FLOAT_TYPE;
@@ -525,11 +498,11 @@ expr_trig:
     ;
     
 expr_len:
-    LEN '(' STRING ')' {
-        $$.val_int = strlen($3);
+    LEN LPAREN STRING RPAREN {
+        $$.val_int = strlen($3) - 2;
         $$.val_type = INT_TYPE;
     }
-    | LEN '(' ID ')' {
+    | LEN LPAREN ID RPAREN {
         value_info value;
         if (sym_lookup($3.lexema, &value) == SYMTAB_NOT_FOUND) {
             yyerror("Variable not found");
@@ -539,7 +512,7 @@ expr_len:
                 yyerror("The len function only applies to strings.");
                 $$.val_type = UNKNOWN_TYPE;
             } else {
-                $$.val_int = strlen(value.val_str);
+                $$.val_int = strlen(value.val_str) - 2;
                 $$.val_type = INT_TYPE;
             }
         }
@@ -547,7 +520,7 @@ expr_len:
     ;
 
 expr_substr:
-    SUBSTR '(' STRING ';' expression ';' expression ')' {
+    SUBSTR LPAREN STRING COMMA expression COMMA expression RPAREN {
         // Verify if the indexes are integers
         if ($5.val_type == INT_TYPE && $7.val_type == INT_TYPE) {
             $$.val_str = substr_wrapper($3, $5.val_int, $7.val_int);
@@ -557,7 +530,7 @@ expr_substr:
             $$.val_type = UNKNOWN_TYPE;
         }
     }
-    | SUBSTR '(' ID ';' expression ';' expression ')' {
+    | SUBSTR LPAREN ID COMMA expression COMMA expression RPAREN {
         value_info value;
         if (sym_lookup($3.lexema, &value) == SYMTAB_NOT_FOUND) {
             yyerror("Variable not found");
