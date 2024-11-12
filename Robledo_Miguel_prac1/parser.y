@@ -59,8 +59,8 @@
 %type <ident.id_val> expr_trig
 %type <ident.id_val> expr_len
 %type <ident.id_val> expr_substr
-%type <ident.id_val> expr_add
 %type <ident.id_val> expr_unary
+%type <ident.id_val> variable
 
 %start program
 
@@ -84,7 +84,7 @@ statement:
     ;
 
 assignment:
-ID ASSIGN expression {
+    ID ASSIGN expression {
         // Assign only if the type is compatible or if it has not been initialized
         if ($1.id_val.val_type == UNKNOWN_TYPE || $1.id_val.val_type == $3.val_type) {
             $1.id_val.val_type = $3.val_type;
@@ -114,12 +114,10 @@ ID ASSIGN expression {
             yyerror("Incompatible types in assignment");
         }
     }
-
-;
+    ;
 
 expression:
     expr_arithmetic
-    | expr_add
     | expr_boolean
     | expr_trig
     | expr_len
@@ -127,10 +125,6 @@ expression:
     ;
 
 expr_arithmetic:
-    expr_add
-    ;
-
-expr_add:
     expr_op
     | expr_add PLUS expr_op {
         // Verify that are numbers
@@ -307,19 +301,7 @@ expr_pow:
     ;
 
 factor_arithmetic: 
-    ID {
-        value_info value;
-        if (sym_lookup($1.lexema, &value) == SYMTAB_NOT_FOUND) {
-            yyerror("Variable not found");
-        } else {
-            if (value.val_type == UNKNOWN_TYPE) {
-                yyerror("Type error: Arithmetic operation requires numeric values or strings (concat)");
-                $$.val_type = UNKNOWN_TYPE;
-            } else {
-                $$ = value;
-            }
-        }
-    }
+    variable
     | INTEGER {
         $$.val_type = INT_TYPE;
         $$.val_int = $1;
@@ -375,19 +357,7 @@ expr_boolean_not:
     ;
 
 factor_boolean:
-    ID {
-        value_info value;
-        if (sym_lookup($1.lexema, &value) == SYMTAB_NOT_FOUND) {
-            yyerror("Variable not found");
-        } else {
-            if (value.val_type != BOOL_TYPE) {
-                yyerror("Type error: Boolean operation requires boolean values");
-                $$.val_type = UNKNOWN_TYPE;
-            } else {
-                $$ = value;
-            }
-        }
-    }
+    variable
     | BOOLEAN {
         $$.val_type = BOOL_TYPE;
         $$.val_bool = $1;
@@ -400,6 +370,18 @@ factor_boolean:
         $$.val_bool = $1.val_bool;
     }
     ;
+
+
+variable:
+    ID {
+        value_info value;
+        if (sym_lookup($1.lexema, &value) == SYMTAB_NOT_FOUND) {
+            yyerror("Variable not found");
+        } else {
+                $$ = value;
+            }
+        }
+    
 
 expr_arithmetic_boolean:
     expr_arithmetic GT expr_arithmetic {

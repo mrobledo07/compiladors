@@ -17,4 +17,4 @@ b
 i + i * 2
 -i + x
 s + (s + i) + "--" + x + b
-b or not b
+b and not b
