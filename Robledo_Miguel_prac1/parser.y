@@ -102,7 +102,8 @@ ID ASSIGN expression {
                 .val_bool = $3.val_bool,
                 .val_str = $3.val_str
             };
-            if (sym_enter($1.lexema, &value) == SYMTAB_OK) {
+            int symtab_status = sym_enter($1.lexema, &value);
+            if (symtab_status == SYMTAB_OK || symtab_status == SYMTAB_DUPLICATE) {
                 printf("Assignment: %s := %s\n", $1.lexema, value_info_to_str($1.id_val));
             } else {
                 yyerror("Error: Variable could not be entered into the symbol table. Stack overflow.");
@@ -139,18 +140,24 @@ expr_op:
                 $$.val_float = $2.val_float;
                 $$.val_type = FLOAT_TYPE;
             }
+        } else {
+            yyerror("Type error: Unary plus operation is only allowed on numeric values");
+            $$.val_type = UNKNOWN_TYPE;
         }
     }
     | MINUS expr_op {
         // Verify its a number
         if ($2.val_type == INT_TYPE || $2.val_type == FLOAT_TYPE) {
             if ($2.val_type == INT_TYPE) {
-                $$.val_int = -$2.val_int;
+                $$.val_int = $2.val_int * -1;
                 $$.val_type = INT_TYPE;
             } else {
-                $$.val_float = -$2.val_float;
+                $$.val_float = $2.val_float * -1;
                 $$.val_type = FLOAT_TYPE;
             }
+        } else {
+            yyerror("Type error: Unary minus operation is only allowed on numeric values");
+            $$.val_type = UNKNOWN_TYPE;
         }
     }
     | expr_op PLUS expr_term {
@@ -170,25 +177,11 @@ expr_op:
                     }
                     $$.val_type = FLOAT_TYPE;
                 }
-            } else if ($1.val_type == STR_TYPE && $3.val_type == STR_TYPE) {
-                $$.val_str = concat($1.val_str, $3.val_str);
+            } else if ($1.val_type != UNKNOWN_TYPE && $3.val_type != UNKNOWN_TYPE) {
+                $$.val_str = concat(value_to_str($1), value_to_str($3));
                 $$.val_type = STR_TYPE;
-            } else if ($1.val_type == STR_TYPE && $3.val_type != STR_TYPE) {
-                if ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE) {
-                    $$.val_str = concat($1.val_str, value_to_str($3));
-                    $$.val_type = STR_TYPE;
-                } else {
-                    yyerror("Type error: Concatenation operation is only allowed between numeric values and strings");
-                }
-            } else if ($1.val_type != STR_TYPE && $3.val_type == STR_TYPE) {
-                if ($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) {
-                    $$.val_str = concat(value_to_str($1), $3.val_str);
-                    $$.val_type = STR_TYPE;
-                } else {
-                    yyerror("Type error: Concatenation operation is only allowed between numeric values and strings");
-                }
             } else {
-                yyerror("Type error: Addition operation is only allowed between numeric values or strings (concat)");
+                yyerror("Type error: Unknown type in addition operation");
                 $$.val_type = UNKNOWN_TYPE;
             }
     }
@@ -306,7 +299,7 @@ factor_arithmetic:
         if (sym_lookup($1.lexema, &value) == SYMTAB_NOT_FOUND) {
             yyerror("Variable not found");
         } else {
-            if (value.val_type != INT_TYPE && value.val_type != FLOAT_TYPE && value.val_type != STR_TYPE) {
+            if (value.val_type == UNKNOWN_TYPE) {
                 yyerror("Type error: Arithmetic operation requires numeric values or strings (concat)");
                 $$.val_type = UNKNOWN_TYPE;
             } else {

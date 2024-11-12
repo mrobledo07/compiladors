@@ -1,15 +1,20 @@
 // assignacions
 x := 1.5
+x := 2
 i := 5
 z := i * (x + i) - i / 4.0
 s := "Hola"
 b := z > 3 or not (i > 0 and i <= 10) or false
-str1 := " Mundo"
-
-// operacions
-str2 := s + str1
-str2
-
-i + s
-
-str2 + i
+// expressions bàsiques
+x
+i
+z
+s
+b
+/*
+* expressions
+*/
+i + i * 2
+-i + x
+s + (s + i) + "--" + x + b
+b or not b
