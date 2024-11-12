@@ -117,6 +117,7 @@ ID ASSIGN expression {
 expression:
     expr_arithmetic
     | expr_arithmetic_boolean
+    | expr_boolean
     | expr_trig
     | expr_len
     | expr_substr
@@ -309,6 +310,63 @@ factor_arithmetic:
     }
     ;
 
+
+expr_boolean:
+    expr_boolean_not
+    | expr_boolean_or
+    ;
+
+expr_boolean_or:
+    expr_boolean_and
+    | expr_boolean_or OR expr_boolean_and {
+        $$.val_type = BOOL_TYPE;
+        $$.val_bool = $1.val_bool || $3.val_bool; // Perform logical OR between the two operands
+    }
+    ;
+
+expr_boolean_and:
+    expr_boolean_not
+    | expr_boolean_and AND expr_boolean_not {
+        $$.val_type = BOOL_TYPE;
+        $$.val_bool = $1.val_bool && $3.val_bool; // Perform logical AND between the two operands
+    }
+    ;
+
+expr_boolean_not:
+    factor_boolean
+    | NOT expr_boolean_not {
+        $$.val_type = BOOL_TYPE;
+        $$.val_bool = !$2.val_bool; // Perform logical NOT on the operand
+    }
+    ;
+
+factor_boolean:
+    ID {
+        value_info value;
+        if (sym_lookup($1.lexema, &value) == SYMTAB_NOT_FOUND) {
+            yyerror("Variable not found");
+        } else {
+            if (value.val_type != BOOL_TYPE) {
+                yyerror("Type error: Boolean operation requires boolean values");
+                $$.val_type = UNKNOWN_TYPE;
+            } else {
+                $$ = value;
+            }
+        }
+    }
+    | BOOLEAN {
+        $$.val_type = BOOL_TYPE;
+        $$.val_bool = $1;
+    }
+    | LPAREN expr_boolean RPAREN {
+        $$ = $2;
+    }
+    | expr_arithmetic_boolean {
+        $$.val_type = BOOL_TYPE;
+        $$.val_bool = $1.val_bool;
+    }
+    ;
+
 expr_arithmetic_boolean:
     expr_arithmetic GT expr_arithmetic {
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
@@ -400,59 +458,6 @@ expr_arithmetic_boolean:
             yyerror("Type error: Comparison requires numeric types");
             $$.val_type = UNKNOWN_TYPE;
         }
-    }
-    | expr_boolean
-    ;
-
-expr_boolean:
-    expr_boolean_not
-    | expr_boolean_or
-    ;
-
-expr_boolean_or:
-    expr_boolean_and
-    | expr_boolean_or OR expr_boolean_and {
-        $$.val_type = BOOL_TYPE;
-        $$.val_bool = $1.val_bool || $3.val_bool; // Perform logical OR between the two operands
-    }
-    ;
-
-expr_boolean_and:
-    expr_boolean_not
-    | expr_boolean_and AND expr_boolean_not {
-        $$.val_type = BOOL_TYPE;
-        $$.val_bool = $1.val_bool && $3.val_bool; // Perform logical AND between the two operands
-    }
-    ;
-
-expr_boolean_not:
-    factor_boolean
-    | NOT expr_boolean_not {
-        $$.val_type = BOOL_TYPE;
-        $$.val_bool = !$2.val_bool; // Perform logical NOT on the operand
-    }
-    ;
-
-factor_boolean:
-    ID {
-        value_info value;
-        if (sym_lookup($1.lexema, &value) == SYMTAB_NOT_FOUND) {
-            yyerror("Variable not found");
-        } else {
-            if (value.val_type != BOOL_TYPE) {
-                yyerror("Type error: Boolean operation requires boolean values");
-                $$.val_type = UNKNOWN_TYPE;
-            } else {
-                $$ = value;
-            }
-        }
-    }
-    | BOOLEAN {
-        $$.val_type = BOOL_TYPE;
-        $$.val_bool = $1;
-    }
-    | LPAREN expr_boolean RPAREN {
-        $$ = $2;
     }
     ;
 
