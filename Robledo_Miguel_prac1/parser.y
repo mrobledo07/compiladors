@@ -59,6 +59,8 @@
 %type <ident.id_val> expr_trig
 %type <ident.id_val> expr_len
 %type <ident.id_val> expr_substr
+%type <ident.id_val> expr_add
+%type <ident.id_val> expr_unary
 
 %start program
 
@@ -117,18 +119,77 @@ ID ASSIGN expression {
 
 expression:
     expr_arithmetic
-    | expr_arithmetic_boolean
+    | expr_add
     | expr_boolean
+    | expr_arithmetic_boolean
     | expr_trig
     | expr_len
     | expr_substr
     ;
 
 expr_arithmetic:
+    expr_add
+    ;
+
+expr_add:
     expr_op
+    | expr_add PLUS expr_op {
+        // Verify that are numbers
+        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
+            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
+                if ($1.val_type == INT_TYPE && $3.val_type == INT_TYPE) {
+                    $$.val_int = ($1.val_int + $3.val_int);
+                    $$.val_type = INT_TYPE;
+                } else {
+                    if ($1.val_type == FLOAT_TYPE && $3.val_type == FLOAT_TYPE) {
+                        $$.val_float = $1.val_float + $3.val_float;
+                    } else if ($1.val_type == FLOAT_TYPE && $3.val_type == INT_TYPE) {
+                        $$.val_float = (float) $1.val_float + $3.val_int;
+                    } else {
+                        $$.val_float = (float) $1.val_int + $3.val_float;
+                    }
+                    $$.val_type = FLOAT_TYPE;
+                }
+            } else if (($1.val_type != UNKNOWN_TYPE && $3.val_type != UNKNOWN_TYPE) && 
+                        ($1.val_type == STR_TYPE || $3.val_type == STR_TYPE)) {
+                // Concatenate strings
+                $$.val_str = concat(value_to_str($1), value_to_str($3));    
+                $$.val_type = STR_TYPE;
+            }
+            else {
+                yyerror("Type error: Unknown type in addition operation");
+                $$.val_type = UNKNOWN_TYPE;
+            }
+    }
     ;
 
 expr_op:
+    expr_unary
+    | expr_op MINUS expr_unary {
+        // Verify that are numbers
+        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
+            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
+                if ($1.val_type == INT_TYPE && $3.val_type == INT_TYPE) {
+                    $$.val_int = ($1.val_int - $3.val_int);
+                    $$.val_type = INT_TYPE;
+                } else {
+                    if ($1.val_type == FLOAT_TYPE && $3.val_type == FLOAT_TYPE) {
+                        $$.val_float = $1.val_float - $3.val_float;
+                    } else if ($1.val_type == FLOAT_TYPE && $3.val_type == INT_TYPE) {
+                        $$.val_float = (float) $1.val_float - $3.val_int;
+                    } else {
+                        $$.val_float = (float) $1.val_int - $3.val_float;
+                    }
+                    $$.val_type = FLOAT_TYPE;
+                }
+            } else {
+                yyerror("Type error: Subtraction operation is only allowed between numeric values");
+                $$.val_type = UNKNOWN_TYPE;
+            }
+    }
+    ;
+
+expr_unary:
     expr_term
     | PLUS expr_op {
         // Verify its a number
@@ -159,53 +220,6 @@ expr_op:
             yyerror("Type error: Unary minus operation is only allowed on numeric values");
             $$.val_type = UNKNOWN_TYPE;
         }
-    }
-    | expr_op PLUS expr_term {
-        // Verify that are numbers
-        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
-            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-                if ($1.val_type == INT_TYPE && $3.val_type == INT_TYPE) {
-                    $$.val_int = ($1.val_int + $3.val_int);
-                    $$.val_type = INT_TYPE;
-                } else {
-                    if ($1.val_type == FLOAT_TYPE && $3.val_type == FLOAT_TYPE) {
-                        $$.val_float = $1.val_float + $3.val_float;
-                    } else if ($1.val_type == FLOAT_TYPE && $3.val_type == INT_TYPE) {
-                        $$.val_float = (float) $1.val_float + $3.val_int;
-                    } else {
-                        $$.val_float = (float) $1.val_int + $3.val_float;
-                    }
-                    $$.val_type = FLOAT_TYPE;
-                }
-            } else if ($1.val_type != UNKNOWN_TYPE && $3.val_type != UNKNOWN_TYPE) {
-                $$.val_str = concat(value_to_str($1), value_to_str($3));
-                $$.val_type = STR_TYPE;
-            } else {
-                yyerror("Type error: Unknown type in addition operation");
-                $$.val_type = UNKNOWN_TYPE;
-            }
-    }
-    | expr_op MINUS expr_term {
-        // Verify that are numbers
-        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
-            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-                if ($1.val_type == INT_TYPE && $3.val_type == INT_TYPE) {
-                    $$.val_int = ($1.val_int - $3.val_int);
-                    $$.val_type = INT_TYPE;
-                } else {
-                    if ($1.val_type == FLOAT_TYPE && $3.val_type == FLOAT_TYPE) {
-                        $$.val_float = $1.val_float - $3.val_float;
-                    } else if ($1.val_type == FLOAT_TYPE && $3.val_type == INT_TYPE) {
-                        $$.val_float = (float) $1.val_float - $3.val_int;
-                    } else {
-                        $$.val_float = (float) $1.val_int - $3.val_float;
-                    }
-                    $$.val_type = FLOAT_TYPE;
-                }
-            } else {
-                yyerror("Type error: Subtraction operation is only allowed between numeric values");
-                $$.val_type = UNKNOWN_TYPE;
-            }
     }
     ;
 
@@ -311,13 +325,13 @@ factor_arithmetic:
         $$.val_type = INT_TYPE;
         $$.val_int = $1;
     }
-    | REAL {
-        $$.val_type = FLOAT_TYPE;
-        $$.val_float = $1;
-    }
     | STRING {
         $$.val_type = STR_TYPE;
         $$.val_str = substr($1, 1, strlen($1) - 2);
+    }
+    | REAL {
+        $$.val_type = FLOAT_TYPE;
+        $$.val_float = $1;
     }
     | PI {
         $$.val_type = FLOAT_TYPE;
