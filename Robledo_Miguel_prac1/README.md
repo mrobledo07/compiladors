@@ -97,4 +97,6 @@ I also prepared a script to test the program with some examples. You can run it 
 ```bash
 ./execution_script.sh
 ```
+If you execute this script, you do not have to worry about the compilation (using the previous commands) and generation of the output files, this is all done by the script itself.
+
 You cand find the examples in example_files/input_files. The script will generate two additional folders: example_files/output_files and example_files/stdout_files. The first one will contain each syntactic production of the input files, and the second one will contain the output of the program for each input file.
