@@ -11,7 +11,6 @@
 %option noinput
 %option nounput
 
-%X C_COMMENT 
 
 digit [0-9]
 decimal {digit}+

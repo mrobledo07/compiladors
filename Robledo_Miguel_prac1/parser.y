@@ -6,6 +6,7 @@
     extern int yylex();
     extern int yylineno;
     void yyerror(char *s);
+    extern FILE *yyout;
 %}
 
 %code requires {
@@ -88,6 +89,7 @@ statement:
 
 assignment:
     ID ASSIGN expression {
+        fprintf(yyout, "PRODUCTION Assignment %s := %s\n", $1.lexema, value_info_to_str($3));
         // Assign only if the type is compatible or if it has not been initialized
         if ($1.id_val.val_type == UNKNOWN_TYPE || $1.id_val.val_type == $3.val_type) {
             $1.id_val.val_type = $3.val_type;
@@ -126,6 +128,7 @@ expression:
 expr_arithmetic:
     expr_unary
     | expr_arithmetic PLUS expr_unary {
+        fprintf(yyout, "PRODUCTION expr_arithmetic %s + %s\n", value_info_to_str($1), value_info_to_str($3));
         // Verify that are numbers
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
@@ -154,6 +157,7 @@ expr_arithmetic:
             }
     }
     | expr_arithmetic MINUS expr_unary {
+        fprintf(yyout, "PRODUCTION expr_arithmetic %s - %s\n", value_info_to_str($1), value_info_to_str($3));
         // Verify that are numbers
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
@@ -176,6 +180,7 @@ expr_arithmetic:
             }
     }
     | expr_arithmetic OR expr_unary {
+        fprintf(yyout, "PRODUCTION expr_arithmetic %s OR %s\n", value_info_to_str($1), value_info_to_str($3));
         // Verify that are booleans
         if ($1.val_type == BOOL_TYPE && $3.val_type == BOOL_TYPE) {
             $$.val_bool = $1.val_bool || $3.val_bool;
@@ -190,6 +195,7 @@ expr_arithmetic:
 expr_unary:
     expr_term
     | PLUS expr_unary {
+        fprintf(yyout, "PRODUCTION expr_unary + %s\n", value_info_to_str($2));
         // Verify its a number
         if ($2.val_type == INT_TYPE || $2.val_type == FLOAT_TYPE) {
             if ($2.val_type == INT_TYPE) {
@@ -205,6 +211,7 @@ expr_unary:
         }
     }
     | MINUS expr_unary {
+        fprintf(yyout, "PRODUCTION expr_unary - %s\n", value_info_to_str($2));
         // Verify its a number
         if ($2.val_type == INT_TYPE || $2.val_type == FLOAT_TYPE) {
             if ($2.val_type == INT_TYPE) {
@@ -220,6 +227,7 @@ expr_unary:
         }
     }
     | expr_unary AND expr_term {
+        fprintf(yyout, "PRODUCTION expr_unary %s AND %s\n", value_info_to_str($1), value_info_to_str($3));
         // Verify that are booleans
         if ($1.val_type == BOOL_TYPE && $3.val_type == BOOL_TYPE) {
             $$.val_bool = $1.val_bool && $3.val_bool;
@@ -234,6 +242,7 @@ expr_unary:
 expr_term:
     expr_pow
     | expr_term MULT expr_pow {
+        fprintf(yyout, "PRODUCTION expr_term %s * %s\n", value_info_to_str($1), value_info_to_str($3));
         // Verify that are numbers
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
@@ -256,6 +265,7 @@ expr_term:
             }
     }
     | expr_term DIV expr_pow {
+        fprintf(yyout, "PRODUCTION expr_term %s / %s\n", value_info_to_str($1), value_info_to_str($3));
         // Verify that are numbers
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
@@ -277,6 +287,7 @@ expr_term:
             }
     }
     | expr_term MOD expr_pow {
+        fprintf(yyout, "PRODUCTION expr_term %s %% %s\n", value_info_to_str($1), value_info_to_str($3));
         // Verify that both operands are integers
         if ($1.val_type == INT_TYPE && $3.val_type == INT_TYPE) {
             $$.val_type = INT_TYPE;
@@ -287,6 +298,7 @@ expr_term:
         }
     }
     | NOT expr_term {
+        fprintf(yyout, "PRODUCTION NOT %s\n", value_info_to_str($2));
         // Verify that the operand is a boolean
         if ($2.val_type == BOOL_TYPE) {
             $$.val_type = BOOL_TYPE;
@@ -301,10 +313,10 @@ expr_term:
 expr_pow:
     factor 
     | expr_pow POW factor {
+        fprintf(yyout, "PRODUCTION expr_pow %s ** %s\n", value_info_to_str($1), value_info_to_str($3));
         // Verify that both operands are numeric (int or float)
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-            
             // Perform the power operation based on the operand types
             if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
                 // Convert to float if either operand is float
@@ -324,6 +336,7 @@ expr_pow:
         }
     }
     | expr_pow GT factor {
+        fprintf(yyout, "PRODUCTION expr_pow %s > %s\n", value_info_to_str($1), value_info_to_str($3));
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
                 $$.val_type = BOOL_TYPE;
@@ -339,6 +352,7 @@ expr_pow:
         }
     }
     | expr_pow LT factor {
+        fprintf(yyout, "PRODUCTION expr_pow %s < %s\n", value_info_to_str($1), value_info_to_str($3));
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
                 $$.val_type = BOOL_TYPE;
@@ -354,6 +368,7 @@ expr_pow:
         }
     }
     | expr_pow GE factor {
+        fprintf(yyout, "PRODUCTION expr_pow %s >= %s\n", value_info_to_str($1), value_info_to_str($3));
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
                 $$.val_type = BOOL_TYPE;
@@ -369,6 +384,7 @@ expr_pow:
         }
     }
     | expr_pow LE factor {
+        fprintf(yyout, "PRODUCTION expr_pow %s <= %s\n", value_info_to_str($1), value_info_to_str($3));
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
                 $$.val_type = BOOL_TYPE;
@@ -384,6 +400,7 @@ expr_pow:
         }
     }
     | expr_pow EQ factor {
+        fprintf(yyout, "PRODUCTION expr_pow %s == %s\n", value_info_to_str($1), value_info_to_str($3));
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
                 $$.val_type = BOOL_TYPE;
@@ -400,6 +417,7 @@ expr_pow:
 
     }
     | expr_pow NE factor {
+        fprintf(yyout, "PRODUCTION expr_pow %s != %s\n", value_info_to_str($1), value_info_to_str($3));
          if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
                 $$.val_type = BOOL_TYPE;
@@ -410,7 +428,7 @@ expr_pow:
                     $$.val_bool = $1.val_int != $3.val_int;
                 }
         } else {
-            yyerror("Type error: Comparison requires numeric types");
+            fprintf(yyout, "PRODUCTION ERROR expr_pow %s != %s\n", value_info_to_str($1), value_info_to_str($3));
             $$.val_type = UNKNOWN_TYPE;
         }
     }
@@ -418,6 +436,7 @@ expr_pow:
 
 factor: 
     ID {
+        fprintf(yyout, "PRODUCTION ID Factor %s\n", $1.lexema);
         value_info value;
         if (sym_lookup($1.lexema, &value) == SYMTAB_NOT_FOUND) {
             yyerror("Variable not found");
@@ -426,30 +445,37 @@ factor:
             }
     }
     | INTEGER {
+        fprintf(yyout, "PRODUCTION INTEGER Factor %d\n", $1);
         $$.val_type = INT_TYPE;
         $$.val_int = $1;
     }
     | STRING {
+        fprintf(yyout, "PRODUCTION STRING Factor %s\n", $1);
         $$.val_type = STR_TYPE;
         $$.val_str = substr($1, 1, strlen($1) - 2);
     }
     | BOOLEAN {
+        fprintf(yyout, "PRODUCTION BOOLEAN Factor %d\n", $1);
         $$.val_type = BOOL_TYPE;
         $$.val_bool = $1;
     }
     | REAL {
+        fprintf(yyout, "PRODUCTION REAL Factor %f\n", $1);
         $$.val_type = FLOAT_TYPE;
         $$.val_float = $1;
     }
     | PI {
+        fprintf(yyout, "PRODUCTION PI Factor\n");
         $$.val_type = FLOAT_TYPE;
         $$.val_float = 3.141592653589793;
     }
     | E {
+        fprintf(yyout, "PRODUCTION E Factor\n");
         $$.val_type = FLOAT_TYPE;
         $$.val_float = 2.718281828459045;
     }
     | LPAREN expression RPAREN {
+        fprintf(yyout, "PRODUCTION LPAREN expression RPAREN %s\n", value_info_to_str($2));
         $$ = $2;
     }
     | expr_trig
@@ -460,6 +486,7 @@ factor:
 expr_trig:
     SIN LPAREN expression RPAREN {
         // Verify if the parameter is a number
+        fprintf(yyout, "PRODUCTION SIN %s\n", value_info_to_str($3));
         if ($3.val_type == INT_TYPE) {
             $$.val_float = sin($3.val_int);
             $$.val_type = FLOAT_TYPE;
@@ -472,6 +499,7 @@ expr_trig:
         }
     }
     | COS LPAREN expression RPAREN {
+        fprintf(yyout, "PRODUCTION COS %s\n", value_info_to_str($3));
         if ($3.val_type == INT_TYPE) {
             $$.val_float = cos($3.val_int);
             $$.val_type = FLOAT_TYPE;
@@ -485,6 +513,7 @@ expr_trig:
         
     }
     | TAN LPAREN expression RPAREN {
+        fprintf(yyout, "PRODUCTION TAN %s\n", value_info_to_str($3));
         if ($3.val_type == INT_TYPE) {
             $$.val_float = tan($3.val_int);
             $$.val_type = FLOAT_TYPE;
@@ -500,10 +529,12 @@ expr_trig:
     
 expr_len:
     LEN LPAREN STRING RPAREN {
+        fprintf(yyout, "PRODUCTION STRING LEN %s\n", $3);
         $$.val_int = strlen($3);
         $$.val_type = INT_TYPE;
     }
     | LEN LPAREN ID RPAREN {
+        fprintf(yyout, "PRODUCTION ID LEN %s\n", $3.lexema);
         value_info value;
         if (sym_lookup($3.lexema, &value) == SYMTAB_NOT_FOUND) {
             yyerror("Variable not found");
@@ -522,6 +553,7 @@ expr_len:
 
 expr_substr:
     SUBSTR LPAREN STRING COMMA expression COMMA expression RPAREN {
+        fprintf(yyout, "PRODUCTION STRING SUBSTR %s\n", $3);
         // Verify if the indexes are integers
         if ($5.val_type == INT_TYPE && $7.val_type == INT_TYPE) {
             $$.val_str = substr($3, $5.val_int, $7.val_int);
@@ -532,6 +564,7 @@ expr_substr:
         }
     }
     | SUBSTR LPAREN ID COMMA expression COMMA expression RPAREN {
+        fprintf(yyout, "PRODUCTION ID SUBSTR %s\n", $3.lexema);
         value_info value;
         if (sym_lookup($3.lexema, &value) == SYMTAB_NOT_FOUND) {
             yyerror("Variable not found");
