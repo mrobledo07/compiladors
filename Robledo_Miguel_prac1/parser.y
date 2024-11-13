@@ -43,6 +43,7 @@
 %token LEN SUBSTR
 %token LPAREN RPAREN
 %token COMMA
+%token COMMENT
 
 %type <ident.id_val> expression
 %type <ident.id_val> expr_arithmetic
@@ -72,8 +73,7 @@ program:
 
 statement_list:
     statement ENDLINE statement_list
-    | statement
-    | 
+    |
     ;
 
 statement:
@@ -82,6 +82,8 @@ statement:
         // Print the result of the expression
         printf("Expression result: %s\n", value_info_to_str($1));
     }
+    | statement COMMENT
+    |
     ;
 
 assignment:

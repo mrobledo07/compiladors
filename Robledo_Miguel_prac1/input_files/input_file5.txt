@@ -4,10 +4,10 @@ y := 10
 z := x + "hello" // Error: Type mismatch (cannot add integer and string)
 
 // Undefined variable usage
-a + b  // Error: Variable 'a' is not initialized
-
-// Lexical error (invalid character or syntax)
-@ := 12  // Error: Invalid syntax or identifier
-
-// Incorrect function call (wrong number of arguments)
-len("test", 5) // Error: Invalid number of arguments for function LEN
+c := x + y  // Error: Variable 'a' is not initialized
+c # ALL OK // a /
+/*
+ * This is a comment
+ * that spans multiple lines
+ */
+z

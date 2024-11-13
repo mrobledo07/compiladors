@@ -11,6 +11,8 @@
 %option noinput
 %option nounput
 
+%X C_COMMENT 
+
 digit [0-9]
 decimal {digit}+
 octal 0[oO][0-7]+
@@ -48,6 +50,13 @@ pi        (pi|PI)
 e         (e|E)
 
 %%
+
+
+
+"//".* { return COMMENT; }
+"#".* { return COMMENT; }
+"/*"([^\*]|\*+[^"/"])*\*+"/" { return COMMENT; }
+
 
 {boolean} {
     yylval.boolean = (strcmp(yytext, "true") == 0 || strcmp(yytext, "TRUE") == 0) ? 1 : 0;
@@ -183,9 +192,6 @@ e         (e|E)
 
 "," { return COMMA; }
 
-"//".*[\n]* { }
-"/*"([^\*]|\*+[^"/"])*\*+"/"[\n]* { }
-"#".*[\n]* { }
 
 ^[ \t]*\n { }
 [ \t] { }
