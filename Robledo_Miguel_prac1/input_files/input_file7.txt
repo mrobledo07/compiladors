@@ -1,0 +1,15 @@
+// Assignments with different numeric formats
+a := OCT 10   // Octal number (8 in decimal)
+b := BIN 101  // Binary number (5 in decimal)
+c := HEX A    // Hexadecimal number (10 in decimal)
+d := DEC 15   // Decimal number
+
+// Arithmetic operations with different formats
+sum := a + b + c + d
+
+// Display all expressions
+a
+b
+c
+d
+sum

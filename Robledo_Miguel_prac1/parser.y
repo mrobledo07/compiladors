@@ -297,97 +297,6 @@ expr_term:
             $$.val_type = UNKNOWN_TYPE;
         }
     }
-    | expr_term GT expr_pow {
-        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
-            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-                $$.val_type = BOOL_TYPE;
-                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
-                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) > 
-                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
-                } else {
-                    $$.val_bool = $1.val_int > $3.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.val_type = UNKNOWN_TYPE;
-        }
-    }
-    | expr_term LT expr_pow {
-        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
-            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-                $$.val_type = BOOL_TYPE;
-                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
-                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) < 
-                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
-                } else {
-                    $$.val_bool = $1.val_int < $3.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.val_type = UNKNOWN_TYPE;
-        }
-    }
-    | expr_term GE expr_pow {
-        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
-            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-                $$.val_type = BOOL_TYPE;
-                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
-                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) >= 
-                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
-                } else {
-                    $$.val_bool = $1.val_int >= $3.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.val_type = UNKNOWN_TYPE;
-        }
-    }
-    | expr_term LE expr_pow {
-        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
-            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-                $$.val_type = BOOL_TYPE;
-                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
-                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) <= 
-                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
-                } else {
-                    $$.val_bool = $1.val_int <= $3.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.val_type = UNKNOWN_TYPE;
-        }
-    }
-    | expr_term EQ expr_pow {
-        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
-            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-                $$.val_type = BOOL_TYPE;
-                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
-                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) == 
-                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
-                } else {
-                    $$.val_bool = $1.val_int == $3.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.val_type = UNKNOWN_TYPE;
-        }
-
-    }
-    | expr_term NE expr_pow {
-         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
-            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-                $$.val_type = BOOL_TYPE;
-                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
-                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) != 
-                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
-                } else {
-                    $$.val_bool = $1.val_int != $3.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.val_type = UNKNOWN_TYPE;
-        }
-    }
     ;
 
 expr_pow:
@@ -412,6 +321,97 @@ expr_pow:
             }
         } else {
             yyerror("Type error: Power operation is only allowed between numeric values");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+    }
+    | expr_pow GT factor {
+        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
+            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
+                $$.val_type = BOOL_TYPE;
+                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
+                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) > 
+                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
+                } else {
+                    $$.val_bool = $1.val_int > $3.val_int;
+                }
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+    }
+    | expr_pow LT factor {
+        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
+            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
+                $$.val_type = BOOL_TYPE;
+                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
+                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) < 
+                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
+                } else {
+                    $$.val_bool = $1.val_int < $3.val_int;
+                }
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+    }
+    | expr_pow GE factor {
+        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
+            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
+                $$.val_type = BOOL_TYPE;
+                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
+                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) >= 
+                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
+                } else {
+                    $$.val_bool = $1.val_int >= $3.val_int;
+                }
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+    }
+    | expr_pow LE factor {
+        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
+            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
+                $$.val_type = BOOL_TYPE;
+                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
+                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) <= 
+                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
+                } else {
+                    $$.val_bool = $1.val_int <= $3.val_int;
+                }
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+    }
+    | expr_pow EQ factor {
+        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
+            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
+                $$.val_type = BOOL_TYPE;
+                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
+                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) == 
+                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
+                } else {
+                    $$.val_bool = $1.val_int == $3.val_int;
+                }
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+
+    }
+    | expr_pow NE factor {
+         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
+            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
+                $$.val_type = BOOL_TYPE;
+                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
+                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) != 
+                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
+                } else {
+                    $$.val_bool = $1.val_int != $3.val_int;
+                }
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
             $$.val_type = UNKNOWN_TYPE;
         }
     }
@@ -450,7 +450,7 @@ factor:
         $$.val_type = FLOAT_TYPE;
         $$.val_float = 2.718281828459045;
     }
-    | LPAREN expr_arithmetic RPAREN {
+    | LPAREN expression RPAREN {
         $$ = $2;
     }
     ;
@@ -498,7 +498,7 @@ expr_trig:
     
 expr_len:
     LEN LPAREN STRING RPAREN {
-        $$.val_int = strlen($3) - 2;
+        $$.val_int = strlen($3);
         $$.val_type = INT_TYPE;
     }
     | LEN LPAREN ID RPAREN {
@@ -511,7 +511,7 @@ expr_len:
                 yyerror("The len function only applies to strings.");
                 $$.val_type = UNKNOWN_TYPE;
             } else {
-                $$.val_int = strlen(value.val_str) - 2;
+                $$.val_int = strlen(value.val_str);
                 $$.val_type = INT_TYPE;
             }
         }
