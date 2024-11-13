@@ -13,44 +13,40 @@ MATH_LIB = -lm
 SRC_LEX = lexer.l
 SRC_YACC = parser.y
 
-LEX_OUT = lex.yy.c
-YACC_OUT_C = parser.tab.c
-YACC_OUT_H = parser.tab.h
+LEX_OUT = build/lex.yy.c
+YACC_OUT_C = build/parser.tab.c
+YACC_OUT_H = build/parser.tab.h
 YACC_OUT = $(YACC_OUT_C) $(YACC_OUT_H)
 
 OTHERS = compiler.output
-OBJ = *.o
+OBJ = build/*.o
 
-SRC = main.c
-BIN = compiler.exe
+SRC = src/main.c
+BIN = bin/compiler
 
-SRC_EXTRA = data.c functions.c
+SRC_EXTRA = src/data.c src/functions.c
 
-SYMTAB = symtab.c
+SYMTAB = src/symtab.c
 
-LFLAGS =
 YFLAGS = -d -v -Wcounterexamples
 CFLAGS = -Wall -g -O0
-
-EG_IN = input_file.txt
-EG_OUT = output_file.txt
-
 
 
 ######################################################################
 
-all : yacc lex
+all : build_dir yacc lex
 	$(CC) -o $(BIN) $(CFLAGS) $(SRC) $(SRC_EXTRA) $(SYMTAB) $(YACC_OUT_C) $(LEX_OUT) $(LIB) $(MATH_LIB)
 
+# Create build directory if it does not exist
+build_dir:
+	mkdir -p build bin
+
 yacc : $(SRC_YACC)
-	$(YACC) $(YFLAGS) $(SRC_YACC)
+	$(YACC) $(YFLAGS) $(SRC_YACC) -o $(YACC_OUT_C)
 
 lex : $(SRC_LEX)
-	$(LEX) $(LFLAGS) $(SRC_LEX)
+	$(LEX) $(LFLAGS) -o $(LEX_OUT) $(SRC_LEX)
 
 clean :
-	rm -f *~ $(BIN) $(OBJ) $(YACC_OUT) $(LEX_OUT) $(OTHERS) $(EG_OUT)
-
-eg : $(EG_IN)
-	./$(BIN) $(EG_IN) $(EG_OUT)
-	cat $(EG_OUT)
+	rm -f *~ $(BIN) $(OBJ) $(YACC_OUT) $(LEX_OUT) $(OTHERS) build/parser.output
+	rm -rf build bin

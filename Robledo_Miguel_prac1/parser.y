@@ -10,9 +10,9 @@
 %}
 
 %code requires {
-    #include "data.h"
-    #include "functions.h"
-    #include "symtab.h"
+    #include "../include/data.h"
+    #include "../include/functions.h"
+    #include "../include/symtab.h"
 }
 
 %union {
@@ -81,6 +81,7 @@ statement:
     assignment
     | expression {
         // Print the result of the expression
+        fprintf(yyout, "PRODUCTION Expression %s\n", value_info_to_str($1));
         printf("Expression result: %s\n", value_info_to_str($1));
     }
     | statement COMMENT

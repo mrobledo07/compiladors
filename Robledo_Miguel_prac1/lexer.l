@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <string.h>
-#include "parser.tab.h"
-#include "functions.h"
+#include "../build/parser.tab.h"
+#include "../include/functions.h"
 %}
 
 %option yylineno

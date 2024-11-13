@@ -11,6 +11,6 @@ int semantic_analysis(void);
 
 void yyerror(char *explanation);
 char *substr(char *str, int start, int length);
-
+char *concat(char *s1, char *s2);
 
 #endif
