@@ -112,12 +112,12 @@ e         (e|E)
 }
 
 {octal} {
-    yylval.integer = strtol(yytext, NULL, 8);
+    yylval.integer = strtol(yytext+2, NULL, 8);
     return INTEGER;
 }
 
 {binary} {
-    yylval.integer = strtol(yytext, NULL, 2);
+    yylval.integer = strtol(yytext+2, NULL, 2);
     return INTEGER;
 }
 
