@@ -1,5 +1,5 @@
 // Assignments using trig functions
-angle := 45
+angle := PI / 4
 sin_val := sin(angle)
 cos_val := cos(angle)
 tan_val := tan(angle)

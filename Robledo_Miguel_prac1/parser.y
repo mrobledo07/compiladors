@@ -73,7 +73,7 @@ program:
 
 statement_list:
     statement ENDLINE statement_list
-    |
+    | statement
     ;
 
 statement:
@@ -121,9 +121,6 @@ assignment:
 
 expression:
     expr_arithmetic
-    | expr_trig
-    | expr_len
-    | expr_substr
     ;
 
 expr_arithmetic:
@@ -455,6 +452,9 @@ factor:
     | LPAREN expression RPAREN {
         $$ = $2;
     }
+    | expr_trig
+    | expr_len
+    | expr_substr
     ;
 
 expr_trig:

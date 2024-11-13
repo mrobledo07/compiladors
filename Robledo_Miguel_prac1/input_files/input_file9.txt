@@ -4,7 +4,7 @@ b := 7
 c := 5
 d := 2
 
-result := (a + b) * (c - d) / (a ** 2 + b) * sin(a + b) and (b < c or c == d)
+result := ((a + b) * (c - d)) / ((a ** 2 + b) * sin(a + b))
 
 // Display all expressions
 result
