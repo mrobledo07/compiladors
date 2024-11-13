@@ -46,21 +46,13 @@
 
 %type <ident.id_val> expression
 %type <ident.id_val> expr_arithmetic
-%type <ident.id_val> expr_op
 %type <ident.id_val> expr_term
 %type <ident.id_val> expr_pow
-%type <ident.id_val> factor_arithmetic
-%type <ident.id_val> expr_arithmetic_boolean
-%type <ident.id_val> expr_boolean
-%type <ident.id_val> expr_boolean_not
-%type <ident.id_val> expr_boolean_and
-%type <ident.id_val> expr_boolean_or
-%type <ident.id_val> factor_boolean
+%type <ident.id_val> factor
 %type <ident.id_val> expr_trig
 %type <ident.id_val> expr_len
 %type <ident.id_val> expr_substr
 %type <ident.id_val> expr_unary
-%type <ident.id_val> variable
 
 %left OR
 %left AND
@@ -127,15 +119,14 @@ assignment:
 
 expression:
     expr_arithmetic
-    | expr_boolean
     | expr_trig
     | expr_len
     | expr_substr
     ;
 
 expr_arithmetic:
-    expr_op
-    | expr_arithmetic PLUS expr_op {
+    expr_unary
+    | expr_arithmetic PLUS expr_unary {
         // Verify that are numbers
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
@@ -163,11 +154,7 @@ expr_arithmetic:
                 $$.val_type = UNKNOWN_TYPE;
             }
     }
-    ;
-
-expr_op:
-    expr_unary
-    | expr_op MINUS expr_unary {
+    | expr_arithmetic MINUS expr_unary {
         // Verify that are numbers
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
@@ -189,11 +176,21 @@ expr_op:
                 $$.val_type = UNKNOWN_TYPE;
             }
     }
+    | expr_arithmetic OR expr_unary {
+        // Verify that are booleans
+        if ($1.val_type == BOOL_TYPE && $3.val_type == BOOL_TYPE) {
+            $$.val_bool = $1.val_bool || $3.val_bool;
+            $$.val_type = BOOL_TYPE;
+        } else {
+            yyerror("Type error: Logical OR operation is only allowed between boolean values");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+    }
     ;
 
 expr_unary:
     expr_term
-    | PLUS expr_op {
+    | PLUS expr_unary {
         // Verify its a number
         if ($2.val_type == INT_TYPE || $2.val_type == FLOAT_TYPE) {
             if ($2.val_type == INT_TYPE) {
@@ -208,7 +205,7 @@ expr_unary:
             $$.val_type = UNKNOWN_TYPE;
         }
     }
-    | MINUS expr_op {
+    | MINUS expr_unary {
         // Verify its a number
         if ($2.val_type == INT_TYPE || $2.val_type == FLOAT_TYPE) {
             if ($2.val_type == INT_TYPE) {
@@ -220,6 +217,16 @@ expr_unary:
             }
         } else {
             yyerror("Type error: Unary minus operation is only allowed on numeric values");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+    }
+    | expr_unary AND expr_term {
+        // Verify that are booleans
+        if ($1.val_type == BOOL_TYPE && $3.val_type == BOOL_TYPE) {
+            $$.val_bool = $1.val_bool && $3.val_bool;
+            $$.val_type = BOOL_TYPE;
+        } else {
+            yyerror("Type error: Logical AND operation is only allowed between boolean values");
             $$.val_type = UNKNOWN_TYPE;
         }
     }
@@ -280,11 +287,112 @@ expr_term:
             $$.val_type = UNKNOWN_TYPE;
         }
     }
+    | NOT expr_term {
+        // Verify that the operand is a boolean
+        if ($2.val_type == BOOL_TYPE) {
+            $$.val_type = BOOL_TYPE;
+            $$.val_bool = !$2.val_bool;
+        } else {
+            yyerror("Type error: Logical NOT operation is only allowed on boolean values");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+    }
+    | expr_term GT expr_pow {
+        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
+            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
+                $$.val_type = BOOL_TYPE;
+                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
+                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) > 
+                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
+                } else {
+                    $$.val_bool = $1.val_int > $3.val_int;
+                }
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+    }
+    | expr_term LT expr_pow {
+        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
+            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
+                $$.val_type = BOOL_TYPE;
+                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
+                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) < 
+                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
+                } else {
+                    $$.val_bool = $1.val_int < $3.val_int;
+                }
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+    }
+    | expr_term GE expr_pow {
+        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
+            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
+                $$.val_type = BOOL_TYPE;
+                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
+                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) >= 
+                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
+                } else {
+                    $$.val_bool = $1.val_int >= $3.val_int;
+                }
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+    }
+    | expr_term LE expr_pow {
+        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
+            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
+                $$.val_type = BOOL_TYPE;
+                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
+                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) <= 
+                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
+                } else {
+                    $$.val_bool = $1.val_int <= $3.val_int;
+                }
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+    }
+    | expr_term EQ expr_pow {
+        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
+            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
+                $$.val_type = BOOL_TYPE;
+                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
+                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) == 
+                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
+                } else {
+                    $$.val_bool = $1.val_int == $3.val_int;
+                }
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+
+    }
+    | expr_term NE expr_pow {
+         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
+            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
+                $$.val_type = BOOL_TYPE;
+                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
+                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) != 
+                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
+                } else {
+                    $$.val_bool = $1.val_int != $3.val_int;
+                }
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.val_type = UNKNOWN_TYPE;
+        }
+    }
     ;
 
 expr_pow:
-    factor_arithmetic 
-    | expr_pow POW factor_arithmetic {
+    factor 
+    | expr_pow POW factor {
         // Verify that both operands are numeric (int or float)
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
@@ -309,8 +417,15 @@ expr_pow:
     }
     ;
 
-factor_arithmetic: 
-    variable
+factor: 
+    ID {
+        value_info value;
+        if (sym_lookup($1.lexema, &value) == SYMTAB_NOT_FOUND) {
+            yyerror("Variable not found");
+        } else {
+                $$ = value;
+            }
+    }
     | INTEGER {
         $$.val_type = INT_TYPE;
         $$.val_int = $1;
@@ -318,6 +433,10 @@ factor_arithmetic:
     | STRING {
         $$.val_type = STR_TYPE;
         $$.val_str = substr($1, 1, strlen($1) - 2);
+    }
+    | BOOLEAN {
+        $$.val_type = BOOL_TYPE;
+        $$.val_bool = $1;
     }
     | REAL {
         $$.val_type = FLOAT_TYPE;
@@ -333,156 +452,6 @@ factor_arithmetic:
     }
     | LPAREN expr_arithmetic RPAREN {
         $$ = $2;
-    }
-    ;
-
-
-expr_boolean:
-    expr_boolean_or
-    ;
-
-expr_boolean_or:
-    expr_boolean_and
-    | expr_boolean_or OR expr_boolean_and {
-        $$.val_type = BOOL_TYPE;
-        $$.val_bool = $1.val_bool || $3.val_bool; // Perform logical OR between the two operands
-    }
-    ;
-
-expr_boolean_and:
-    expr_boolean_not
-    | expr_boolean_and AND expr_boolean_not {
-        $$.val_type = BOOL_TYPE;
-        $$.val_bool = $1.val_bool && $3.val_bool; // Perform logical AND between the two operands
-    }
-    ;
-
-expr_boolean_not:
-    factor_boolean
-    | NOT expr_boolean_not {
-        $$.val_type = BOOL_TYPE;
-        $$.val_bool = !$2.val_bool; // Perform logical NOT on the operand
-    }
-    ;
-
-factor_boolean:
-    variable
-    | BOOLEAN {
-        $$.val_type = BOOL_TYPE;
-        $$.val_bool = $1;
-    }
-    | LPAREN expr_boolean RPAREN {
-        $$ = $2;
-    }
-    | expr_arithmetic_boolean {
-        $$.val_type = BOOL_TYPE;
-        $$.val_bool = $1.val_bool;
-    }
-    ;
-
-
-variable:
-    ID {
-        value_info value;
-        if (sym_lookup($1.lexema, &value) == SYMTAB_NOT_FOUND) {
-            yyerror("Variable not found");
-        } else {
-                $$ = value;
-            }
-        }
-    
-
-expr_arithmetic_boolean:
-    expr_arithmetic GT expr_arithmetic {
-        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
-            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-                $$.val_type = BOOL_TYPE;
-                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
-                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) > 
-                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
-                } else {
-                    $$.val_bool = $1.val_int > $3.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.val_type = UNKNOWN_TYPE;
-        }
-    }
-    | expr_arithmetic LT expr_arithmetic {
-        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
-            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-                $$.val_type = BOOL_TYPE;
-                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
-                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) < 
-                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
-                } else {
-                    $$.val_bool = $1.val_int < $3.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.val_type = UNKNOWN_TYPE;
-        }
-    }
-    | expr_arithmetic GE expr_arithmetic {
-        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
-            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-                $$.val_type = BOOL_TYPE;
-                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
-                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) >= 
-                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
-                } else {
-                    $$.val_bool = $1.val_int >= $3.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.val_type = UNKNOWN_TYPE;
-        }
-    }
-    | expr_arithmetic LE expr_arithmetic {
-        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
-            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-                $$.val_type = BOOL_TYPE;
-                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
-                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) <= 
-                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
-                } else {
-                    $$.val_bool = $1.val_int <= $3.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.val_type = UNKNOWN_TYPE;
-        }
-    }
-    | expr_arithmetic EQ expr_arithmetic {
-        if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
-            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-                $$.val_type = BOOL_TYPE;
-                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
-                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) == 
-                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
-                } else {
-                    $$.val_bool = $1.val_int == $3.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.val_type = UNKNOWN_TYPE;
-        }
-
-    }
-    | expr_arithmetic NE expr_arithmetic {
-         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) && 
-            ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
-                $$.val_type = BOOL_TYPE;
-                if ($1.val_type == FLOAT_TYPE || $3.val_type == FLOAT_TYPE) {
-                    $$.val_bool = ($1.val_type == INT_TYPE ? (float)$1.val_int : $1.val_float) != 
-                        ($3.val_type == INT_TYPE ? (float)$3.val_int : $3.val_float);
-                } else {
-                    $$.val_bool = $1.val_int != $3.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.val_type = UNKNOWN_TYPE;
-        }
     }
     ;
 
