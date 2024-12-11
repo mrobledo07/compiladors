@@ -1,0 +1,96 @@
+PRODUCTION INTEGER Factor 3
+PRODUCTION Assignment a := Integer: 3
+PRODUCTION REAL Factor 4.500000
+PRODUCTION Assignment b := Float: 4.500000
+PRODUCTION INTEGER Factor 2
+PRODUCTION Assignment c := Integer: 2
+PRODUCTION ID Factor a
+PRODUCTION ID Factor b
+PRODUCTION ID Factor c
+PRODUCTION expr_term Float: 4.500000 * Integer: 2
+PRODUCTION expr_arithmetic Integer: 3 + Float: 9.000000
+PRODUCTION Assignment d := Float: 12.000000
+PRODUCTION ID Factor a
+PRODUCTION ID Factor b
+PRODUCTION expr_arithmetic Integer: 3 + Float: 4.500000
+PRODUCTION LPAREN expression RPAREN Float: 7.500000
+PRODUCTION ID Factor c
+PRODUCTION expr_term Float: 7.500000 * Integer: 2
+PRODUCTION Assignment e1 := Float: 15.000000
+PRODUCTION ID Factor a
+PRODUCTION ID Factor b
+PRODUCTION expr_pow Integer: 3 ** Float: 4.500000
+PRODUCTION Assignment f := Float: 140.296112
+PRODUCTION ID Factor a
+PRODUCTION ID Factor b
+PRODUCTION expr_arithmetic Integer: 3 + Float: 4.500000
+PRODUCTION LPAREN expression RPAREN Float: 7.500000
+PRODUCTION expr_unary - Float: 7.500000
+PRODUCTION Assignment g := Float: -7.500000
+PRODUCTION ID Factor a
+PRODUCTION INTEGER Factor 5
+PRODUCTION expr_arithmetic Integer: 3 + Integer: 5
+PRODUCTION Assignment h := Integer: 8
+PRODUCTION ID Factor b
+PRODUCTION INTEGER Factor 2
+PRODUCTION expr_term Float: 4.500000 * Integer: 2
+PRODUCTION ID Factor a
+PRODUCTION expr_arithmetic Float: 9.000000 + Integer: 3
+PRODUCTION ID Factor c
+PRODUCTION expr_arithmetic Float: 12.000000 - Integer: 2
+PRODUCTION Assignment i := Float: 10.000000
+PRODUCTION ID Factor a
+PRODUCTION INTEGER Factor 3
+PRODUCTION expr_arithmetic Integer: 3 + Integer: 3
+PRODUCTION LPAREN expression RPAREN Integer: 6
+PRODUCTION ID Factor b
+PRODUCTION INTEGER Factor 2
+PRODUCTION expr_arithmetic Float: 4.500000 - Integer: 2
+PRODUCTION LPAREN expression RPAREN Float: 2.500000
+PRODUCTION expr_term Integer: 6 * Float: 2.500000
+PRODUCTION Assignment j := Float: 15.000000
+PRODUCTION ID Factor a
+PRODUCTION ID Factor b
+PRODUCTION expr_pow Integer: 3 > Float: 4.500000
+PRODUCTION Assignment p := Bool: false
+PRODUCTION ID Factor c
+PRODUCTION ID Factor a
+PRODUCTION expr_pow Integer: 2 < Integer: 3
+PRODUCTION ID Factor b
+PRODUCTION ID Factor c
+PRODUCTION expr_pow Float: 4.500000 >= Integer: 2
+PRODUCTION expr_arithmetic Bool: true OR Bool: true
+PRODUCTION Assignment q := Bool: true
+PRODUCTION ID Factor a
+PRODUCTION ID Factor b
+PRODUCTION expr_pow Integer: 3 == Float: 4.500000
+PRODUCTION LPAREN expression RPAREN Bool: false
+PRODUCTION NOT Bool: false
+PRODUCTION ID Factor c
+PRODUCTION ID Factor a
+PRODUCTION expr_pow Integer: 2 != Integer: 3
+PRODUCTION LPAREN expression RPAREN Bool: true
+PRODUCTION expr_unary Bool: true AND Bool: true
+PRODUCTION Assignment r := Bool: true
+PRODUCTION ID Factor d
+PRODUCTION Expression Float: 12.000000
+PRODUCTION E Factor
+PRODUCTION Expression Float: 2.718282
+PRODUCTION ID Factor e1
+PRODUCTION Expression Float: 15.000000
+PRODUCTION ID Factor f
+PRODUCTION Expression Float: 140.296112
+PRODUCTION ID Factor g
+PRODUCTION Expression Float: -7.500000
+PRODUCTION ID Factor h
+PRODUCTION Expression Integer: 8
+PRODUCTION ID Factor i
+PRODUCTION Expression Float: 10.000000
+PRODUCTION ID Factor j
+PRODUCTION Expression Float: 15.000000
+PRODUCTION ID Factor p
+PRODUCTION Expression Bool: false
+PRODUCTION ID Factor q
+PRODUCTION Expression Bool: true
+PRODUCTION ID Factor r
+PRODUCTION Expression Bool: true

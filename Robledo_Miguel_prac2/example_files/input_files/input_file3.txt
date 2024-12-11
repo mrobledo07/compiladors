@@ -1,0 +1,12 @@
+// Assignments
+name := "Calculadora"
+length := LEN(name)
+substring := SUBSTR(name, 3, 4)
+
+// Arithmetic with string concatenation
+message := name + " " + "funciona bé!" + " " + (3 + 4)
+
+// Display all expressions
+length
+substring
+message

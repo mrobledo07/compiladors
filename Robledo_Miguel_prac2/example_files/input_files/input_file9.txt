@@ -1,0 +1,10 @@
+// Assignments with complex expressions
+a := 3
+b := 7
+c := 5
+d := 2
+
+result := ((a + b) * (c - d)) / ((a ** 2 + b) * sin(a + b))
+
+// Display all expressions
+result

@@ -1,0 +1,15 @@
+// Assignments with different numeric formats
+a := 0o1074   // Octal number (572 in decimal)
+b := 0b10100011  // Binary number (163 in decimal)
+c := 0xAF41    // Hexadecimal number (44865 in decimal)
+d := 157   // Decimal number
+
+// Arithmetic operations with different formats
+sum := a + b + c + d
+
+// Display all expressions
+a
+b
+c
+d
+sum
