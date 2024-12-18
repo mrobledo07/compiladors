@@ -97,10 +97,9 @@ repeat_statement:
         if ($2.val_type != INT_TYPE) {
             yyerror("Repeat count must be an integer");
         } else {
-            int repeat_count = $2.int_val;
-            for (int i = 0; i < repeat_count; i++) {
-                execute_statement_list($4);
-            }
+            int repeat_count = $2.val_int;
+            fprintf(yyout, "PRODUCTION Repeat %d times\n", repeat_count);
+            printf("Repeat %d times\n", repeat_count);
         }
     }
     ;

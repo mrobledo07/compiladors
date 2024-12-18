@@ -94,7 +94,10 @@ extern int yydebug;
     LPAREN = 287,                  /* LPAREN  */
     RPAREN = 288,                  /* RPAREN  */
     COMMA = 289,                   /* COMMA  */
-    COMMENT = 290                  /* COMMENT  */
+    COMMENT = 290,                 /* COMMENT  */
+    REPEAT = 291,                  /* REPEAT  */
+    DO = 292,                      /* DO  */
+    DONE = 293                     /* DONE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -117,7 +120,7 @@ union YYSTYPE
     int boolean;
     void *no_value;
 
-#line 121 "build/parser.tab.h"
+#line 124 "build/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
