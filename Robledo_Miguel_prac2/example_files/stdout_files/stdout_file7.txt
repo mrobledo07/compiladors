@@ -1,0 +1,11 @@
+Assignment: a := Integer: 572
+Assignment: b := Integer: 163
+Assignment: c := Integer: 44865
+Assignment: d := Integer: 157
+Assignment: sum := Integer: 45757
+Expression result: Integer: 572
+Expression result: Integer: 163
+Expression result: Integer: 44865
+Expression result: Integer: 157
+Expression result: Integer: 45757
+The compilation has been successful

@@ -1,0 +1,8 @@
+Assignment: name := String: "Calculadora"
+Assignment: length := Integer: 11
+Assignment: substring := String: "cula"
+Assignment: message := String: "Calculadora funciona bé! 7"
+Expression result: Integer: 11
+Expression result: String: "cula"
+Expression result: String: "Calculadora funciona bé! 7"
+The compilation has been successful

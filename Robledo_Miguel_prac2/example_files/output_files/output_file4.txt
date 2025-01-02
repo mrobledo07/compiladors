@@ -1,0 +1,42 @@
+PRODUCTION INTEGER Factor 10
+PRODUCTION Assignment a := Integer: 10
+PRODUCTION INTEGER Factor 5
+PRODUCTION Assignment b := Integer: 5
+PRODUCTION INTEGER Factor 0
+PRODUCTION Assignment c := Integer: 0
+PRODUCTION ID Factor a
+PRODUCTION ID Factor b
+PRODUCTION expr_pow Integer: 10 > Integer: 5
+PRODUCTION ID Factor c
+PRODUCTION INTEGER Factor 10
+PRODUCTION expr_pow Integer: 0 > Integer: 10
+PRODUCTION expr_arithmetic Bool: true OR Bool: false
+PRODUCTION Assignment result1 := Bool: true
+PRODUCTION ID Factor a
+PRODUCTION ID Factor b
+PRODUCTION expr_pow Integer: 10 < Integer: 5
+PRODUCTION ID Factor c
+PRODUCTION INTEGER Factor 10
+PRODUCTION expr_pow Integer: 0 < Integer: 10
+PRODUCTION expr_arithmetic Bool: false OR Bool: true
+PRODUCTION LPAREN expression RPAREN Bool: true
+PRODUCTION ID Factor b
+PRODUCTION INTEGER Factor 5
+PRODUCTION expr_pow Integer: 5 == Integer: 5
+PRODUCTION expr_unary Bool: true AND Bool: true
+PRODUCTION Assignment result2 := Bool: true
+PRODUCTION ID Factor a
+PRODUCTION ID Factor b
+PRODUCTION expr_pow Integer: 10 < Integer: 5
+PRODUCTION ID Factor c
+PRODUCTION INTEGER Factor 10
+PRODUCTION expr_pow Integer: 0 > Integer: 10
+PRODUCTION NOT Bool: false
+PRODUCTION expr_arithmetic Bool: false OR Bool: true
+PRODUCTION Assignment result3 := Bool: true
+PRODUCTION ID Factor result1
+PRODUCTION Expression Bool: true
+PRODUCTION ID Factor result2
+PRODUCTION Expression Bool: true
+PRODUCTION ID Factor result3
+PRODUCTION Expression Bool: true

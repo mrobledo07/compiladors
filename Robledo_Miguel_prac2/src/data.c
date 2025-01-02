@@ -3,6 +3,7 @@
 #include <string.h>
 #include "../include/data.h"
 
+int temp_var_counter = 1;
 
 char *type_to_str(data_type val_type)
 {
@@ -60,5 +61,13 @@ char *value_to_str(value_info value)
   } else {
         snprintf(buffer, sizeof(buffer), "Error: incorrect value for 'value.val_type'");
     }
+    return strdup(buffer);
+}
+
+char *generate_temp_var()
+{
+    char buffer[6];
+    snprintf(buffer, sizeof(buffer), "$t%02d", temp_var_counter);
+    temp_var_counter++;
     return strdup(buffer);
 }

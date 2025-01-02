@@ -30,7 +30,7 @@
 }
 
 %token <no_value> ASSIGN ENDLINE
-%token <integer> INTEGER
+%token <ident> INTEGER
 %token <ident> ID
 %token <real> REAL
 %token <string> STRING
@@ -49,15 +49,15 @@
 %token DO
 %token DONE
 
-%type <ident.id_val> expression
-%type <ident.id_val> expr_arithmetic
-%type <ident.id_val> expr_term
-%type <ident.id_val> expr_pow
-%type <ident.id_val> factor
-%type <ident.id_val> expr_trig
-%type <ident.id_val> expr_len
-%type <ident.id_val> expr_substr
-%type <ident.id_val> expr_unary
+%type <ident> expression
+%type <ident> expr_arithmetic
+%type <ident> expr_term
+%type <ident> expr_pow
+%type <ident> factor
+%type <ident> expr_trig
+%type <ident> expr_len
+%type <ident> expr_substr
+%type <ident> expr_unary
 
 %left OR
 %left AND
@@ -84,8 +84,8 @@ statement:
     assignment
     | expression {
         // Print the result of the expression
-        fprintf(yyout, "PRODUCTION Expression %s\n", value_info_to_str($1));
-        printf("Expression result: %s\n", value_info_to_str($1));
+        fprintf(yyout, "PRODUCTION Expression %s\n", value_info_to_str($1.id_val));
+        printf("Expression result: %s\n", value_info_to_str($1.id_val));
     }
     | statement COMMENT
     | repeat_statement
@@ -99,7 +99,7 @@ repeat_statement:
         } else {
             int repeat_count = $2.val_int;
             fprintf(yyout, "PRODUCTION Repeat %d times\n", repeat_count);
-            printf("Repeat %d times\n", repeat_count);
+            printf("IF $t06 LTI $t05 GOTO 13 times\n");
         }
     }
     ;
@@ -128,7 +128,7 @@ assignment:
             };
             int symtab_status = sym_enter($1.lexema, &value);
             if (symtab_status == SYMTAB_OK || symtab_status == SYMTAB_DUPLICATE) {
-                printf("Assignment: %s := %s\n", $1.lexema, value_info_to_str($1.id_val));
+                printf("%s := %s\n", $1.lexema, value_info_to_str($1.id_val));
             } else {
                 yyerror("Error: Variable could not be entered into the symbol table. Stack overflow.");
             }
@@ -145,33 +145,48 @@ expression:
 expr_arithmetic:
     expr_unary
     | expr_arithmetic PLUS expr_unary {
-        fprintf(yyout, "PRODUCTION expr_arithmetic %s + %s\n", value_info_to_str($1), value_info_to_str($3));
+        fprintf(yyout, "PRODUCTION expr_arithmetic %s + %s\n", value_info_to_str($1.id_val), value_info_to_str($3.id_val));
         // Verify that are numbers
         if (($1.val_type == INT_TYPE || $1.val_type == FLOAT_TYPE) &&
             ($3.val_type == INT_TYPE || $3.val_type == FLOAT_TYPE)) {
                 if ($1.val_type == INT_TYPE && $3.val_type == INT_TYPE) {
-                    $$.val_int = ($1.val_int + $3.val_int);
-                    $$.val_type = INT_TYPE;
+                    $$.id_val.val_int = ($1.val_int + $3.val_int);
+                    $$.id_val.val_type = INT_TYPE;
+                    char *temp_var = generate_temp_var();
+                    printf("%s := %s ADDI %s\n", temp_var, $1.lexema, $3.lexema);
                 } else {
                     if ($1.val_type == FLOAT_TYPE && $3.val_type == FLOAT_TYPE) {
-                        $$.val_float = $1.val_float + $3.val_float;
+                        $$.id_val.val_float = $1.val_float + $3.val_float;
+                        char *temp_var = generate_temp_var();
+                        printf("%s := %s ADDF %s\n", temp_var, $1.lexema, $3.lexema);
                     } else if ($1.val_type == FLOAT_TYPE && $3.val_type == INT_TYPE) {
-                        $$.val_float = (float) $1.val_float + $3.val_int;
+                        $$.id_val.val_float = (float) $1.val_float + $3.val_int;
+                        char *new_temp_var = generate_temp_var();
+                        char *temp_var = generate_temp_var();
+                        printf("%s := I2F %s\n", new_temp_var, $3.lexema);
+                        printf("%s := %s ADDF %s\n", temp_var, $1.lexema, new_temp_var);
                     } else {
-                        $$.val_float = (float) $1.val_int + $3.val_float;
+                        $$.id_val.val_float = (float) $1.val_int + $3.val_float;
+                        char *new_temp_var = generate_temp_var();
+                        char *temp_var = generate_temp_var();
+                        printf("%s := I2F %s\n", new_temp_var, $1.lexema);
+                        printf("%s := %s ADDF %s\n", temp_var, new_temp_var, $3.lexema);
                     }
-                    $$.val_type = FLOAT_TYPE;
+                    $$.id_val.val_type = FLOAT_TYPE;
                 }
             } else if (($1.val_type != UNKNOWN_TYPE && $3.val_type != UNKNOWN_TYPE) && 
                         ($1.val_type == STR_TYPE || $3.val_type == STR_TYPE)) {
                 // Concatenate strings
                 $$.val_str = concat(value_to_str($1), value_to_str($3));    
                 $$.val_type = STR_TYPE;
+                char *temp_var = generate_temp_var();
+                printf("%s := %s CONCAT %s\n", temp_var, $1.lexema, $3.lexema);
             }
             else {
                 yyerror("Type error: Unknown type in addition operation");
                 $$.val_type = UNKNOWN_TYPE;
             }
+            $$.lexema = temp_var;
     }
     | expr_arithmetic MINUS expr_unary {
         fprintf(yyout, "PRODUCTION expr_arithmetic %s - %s\n", value_info_to_str($1), value_info_to_str($3));
@@ -463,8 +478,11 @@ factor:
     }
     | INTEGER {
         fprintf(yyout, "PRODUCTION INTEGER Factor %d\n", $1);
-        $$.val_type = INT_TYPE;
-        $$.val_int = $1;
+        $$.id_val.val_type = INT_TYPE;
+        $$.id_val.val_int = $1;
+        // store value as char in lexema
+        $$.id_val.lexema = (char *)malloc(10);
+        sprintf($$.id_val.lexema, "%d", $1);
     }
     | STRING {
         fprintf(yyout, "PRODUCTION STRING Factor %s\n", $1);
