@@ -549,12 +549,12 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    75,    75,    79,    80,    84,    85,    90,    91,    92,
-      96,   108,   142,   146,   147,   176,   199,   213,   214,   230,
-     246,   260,   261,   284,   306,   317,   331,   332,   355,   371,
-     387,   403,   419,   436,   455,   464,   469,   474,   479,   484,
-     489,   494,   498,   499,   500,   504,   518,   532,   548,   553,
-     572,   583
+       0,    75,    75,    79,    80,    84,    85,    99,   100,   101,
+     105,   117,   151,   155,   156,   201,   238,   252,   253,   269,
+     291,   305,   306,   343,   379,   394,   408,   409,   432,   448,
+     464,   480,   496,   513,   532,   541,   549,   554,   559,   564,
+     569,   574,   578,   579,   580,   584,   598,   612,   628,   633,
+     652,   663
 };
 #endif
 
@@ -1188,52 +1188,61 @@ yyreduce:
 #line 85 "parser.y"
                  {
         // Print the result of the expression
-        fprintf(yyout, "PRODUCTION Expression %s\n", value_info_to_str((yyvsp[0].ident.id_val)));
-        printf("Expression result: %s\n", value_info_to_str((yyvsp[0].ident.id_val)));
+        fprintf(yyout, "PRODUCTION Expression %s\n", value_info_to_str((yyvsp[0].ident).id_val));
+        printf("PARAM %s\n", (yyvsp[0].ident).lexema);
+        if ((yyvsp[0].ident).id_val.val_type == INT_TYPE) {
+            printf("CALL PUTI %s, 1\n", (yyvsp[0].ident).lexema);
+        } else if ((yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+            printf("CALL PUTF %s, 1\n", (yyvsp[0].ident).lexema);
+        } else if ((yyvsp[0].ident).id_val.val_type == STR_TYPE) {
+            printf("CALL PUTC %s, %d\n", (yyvsp[0].ident).lexema, (yyvsp[0].ident).lenght);
+        } else {
+            yyerror("Unknown type in expression");
+        }
     }
-#line 1195 "build/parser.tab.c"
+#line 1204 "build/parser.tab.c"
     break;
 
   case 10: /* repeat_statement: REPEAT expression DO statement_list DONE  */
-#line 96 "parser.y"
+#line 105 "parser.y"
                                              {
-        if ((yyvsp[-3].ident.id_val).val_type != INT_TYPE) {
+        if ((yyvsp[-3].ident).id_val.val_type != INT_TYPE) {
             yyerror("Repeat count must be an integer");
         } else {
-            int repeat_count = (yyvsp[-3].ident.id_val).val_int;
+            int repeat_count = (yyvsp[-3].ident).id_val.val_int;
             fprintf(yyout, "PRODUCTION Repeat %d times\n", repeat_count);
-            printf("Repeat %d times\n", repeat_count);
+            printf("IF $t06 LTI $t05 GOTO 13\n");
         }
     }
-#line 1209 "build/parser.tab.c"
+#line 1218 "build/parser.tab.c"
     break;
 
   case 11: /* assignment: ID ASSIGN expression  */
-#line 108 "parser.y"
+#line 117 "parser.y"
                          {
-        fprintf(yyout, "PRODUCTION Assignment %s := %s\n", (yyvsp[-2].ident).lexema, value_info_to_str((yyvsp[0].ident.id_val)));
+        fprintf(yyout, "PRODUCTION Assignment %s := %s\n", (yyvsp[-2].ident).lexema, value_info_to_str((yyvsp[0].ident).id_val));
         // Assign only if the type is compatible or if it has not been initialized
-        if ((yyvsp[-2].ident).id_val.val_type == UNKNOWN_TYPE || (yyvsp[-2].ident).id_val.val_type == (yyvsp[0].ident.id_val).val_type) {
-            (yyvsp[-2].ident).id_val.val_type = (yyvsp[0].ident.id_val).val_type;
-            if ((yyvsp[0].ident.id_val).val_type == INT_TYPE) {
-                (yyvsp[-2].ident).id_val.val_int = (yyvsp[0].ident.id_val).val_int;
-            } else if ((yyvsp[0].ident.id_val).val_type == FLOAT_TYPE) {
-                (yyvsp[-2].ident).id_val.val_float = (yyvsp[0].ident.id_val).val_float;
-            } else if ((yyvsp[0].ident.id_val).val_type == STR_TYPE) {
-                (yyvsp[-2].ident).id_val.val_str = (yyvsp[0].ident.id_val).val_str;
-            } else if ((yyvsp[0].ident.id_val).val_type == BOOL_TYPE) {
-                (yyvsp[-2].ident).id_val.val_bool = (yyvsp[0].ident.id_val).val_bool;
+        if ((yyvsp[-2].ident).id_val.val_type == UNKNOWN_TYPE || (yyvsp[-2].ident).id_val.val_type == (yyvsp[0].ident).id_val.val_type) {
+            (yyvsp[-2].ident).id_val.val_type = (yyvsp[0].ident).id_val.val_type;
+            if ((yyvsp[0].ident).id_val.val_type == INT_TYPE) {
+                (yyvsp[-2].ident).id_val.val_int = (yyvsp[0].ident).id_val.val_int;
+            } else if ((yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                (yyvsp[-2].ident).id_val.val_float = (yyvsp[0].ident).id_val.val_float;
+            } else if ((yyvsp[0].ident).id_val.val_type == STR_TYPE) {
+                (yyvsp[-2].ident).id_val.val_str = (yyvsp[0].ident).id_val.val_str;
+            } else if ((yyvsp[0].ident).id_val.val_type == BOOL_TYPE) {
+                (yyvsp[-2].ident).id_val.val_bool = (yyvsp[0].ident).id_val.val_bool;
             }
             value_info value = {
-                .val_type = (yyvsp[0].ident.id_val).val_type,
-                .val_int = (yyvsp[0].ident.id_val).val_int,
-                .val_float = (yyvsp[0].ident.id_val).val_float,
-                .val_bool = (yyvsp[0].ident.id_val).val_bool,
-                .val_str = (yyvsp[0].ident.id_val).val_str
+                .val_type = (yyvsp[0].ident).id_val.val_type,
+                .val_int = (yyvsp[0].ident).id_val.val_int,
+                .val_float = (yyvsp[0].ident).id_val.val_float,
+                .val_bool = (yyvsp[0].ident).id_val.val_bool,
+                .val_str = (yyvsp[0].ident).id_val.val_str
             };
             int symtab_status = sym_enter((yyvsp[-2].ident).lexema, &value);
             if (symtab_status == SYMTAB_OK || symtab_status == SYMTAB_DUPLICATE) {
-                printf("Assignment: %s := %s\n", (yyvsp[-2].ident).lexema, value_info_to_str((yyvsp[-2].ident).id_val));
+                printf("%s := %s\n", (yyvsp[-2].ident).lexema, value_info_to_str((yyvsp[-2].ident).id_val));
             } else {
                 yyerror("Error: Variable could not be entered into the symbol table. Stack overflow.");
             }
@@ -1241,601 +1250,672 @@ yyreduce:
             yyerror("Incompatible types in assignment");
         }
     }
-#line 1245 "build/parser.tab.c"
+#line 1254 "build/parser.tab.c"
     break;
 
   case 14: /* expr_arithmetic: expr_arithmetic PLUS expr_unary  */
-#line 147 "parser.y"
+#line 156 "parser.y"
                                       {
-        fprintf(yyout, "PRODUCTION expr_arithmetic %s + %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
+        fprintf(yyout, "PRODUCTION expr_arithmetic %s + %s\n", value_info_to_str((yyvsp[-2].ident).id_val), value_info_to_str((yyvsp[0].ident).id_val));
+        char *temp_var = NULL;
         // Verify that are numbers
-        if (((yyvsp[-2].ident.id_val).val_type == INT_TYPE || (yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE) &&
-            ((yyvsp[0].ident.id_val).val_type == INT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE)) {
-                if ((yyvsp[-2].ident.id_val).val_type == INT_TYPE && (yyvsp[0].ident.id_val).val_type == INT_TYPE) {
-                    (yyval.ident.id_val).val_int = ((yyvsp[-2].ident.id_val).val_int + (yyvsp[0].ident.id_val).val_int);
-                    (yyval.ident.id_val).val_type = INT_TYPE;
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) &&
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                if ((yyvsp[-2].ident).id_val.val_type == INT_TYPE && (yyvsp[0].ident).id_val.val_type == INT_TYPE) {
+                    (yyval.ident).id_val.val_int = ((yyvsp[-2].ident).id_val.val_int + (yyvsp[0].ident).id_val.val_int);
+                    (yyval.ident).id_val.val_type = INT_TYPE;
+                    temp_var = generate_temp_var();
+                    printf("%s := %s ADDI %s\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
                 } else {
-                    if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE && (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE) {
-                        (yyval.ident.id_val).val_float = (yyvsp[-2].ident.id_val).val_float + (yyvsp[0].ident.id_val).val_float;
-                    } else if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE && (yyvsp[0].ident.id_val).val_type == INT_TYPE) {
-                        (yyval.ident.id_val).val_float = (float) (yyvsp[-2].ident.id_val).val_float + (yyvsp[0].ident.id_val).val_int;
+                    if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE && (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                        (yyval.ident).id_val.val_float = (yyvsp[-2].ident).id_val.val_float + (yyvsp[0].ident).id_val.val_float;
+                        temp_var = generate_temp_var();
+                        printf("%s := %s ADDF %s\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
+                    } else if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE && (yyvsp[0].ident).id_val.val_type == INT_TYPE) {
+                        (yyval.ident).id_val.val_float = (float) (yyvsp[-2].ident).id_val.val_float + (yyvsp[0].ident).id_val.val_int;
+                        *new_temp_var = generate_temp_var();
+                        temp_var = generate_temp_var();
+                        printf("%s := I2F %s\n", new_temp_var, (yyvsp[0].ident).lexema);
+                        printf("%s := %s ADDF %s\n", temp_var, (yyvsp[-2].ident).lexema, new_temp_var);
                     } else {
-                        (yyval.ident.id_val).val_float = (float) (yyvsp[-2].ident.id_val).val_int + (yyvsp[0].ident.id_val).val_float;
+                        (yyval.ident).id_val.val_float = (float) (yyvsp[-2].ident).id_val.val_int + (yyvsp[0].ident).id_val.val_float;
+                        *new_temp_var = generate_temp_var();
+                        temp_var = generate_temp_var();
+                        printf("%s := I2F %s\n", new_temp_var, (yyvsp[-2].ident).lexema);
+                        printf("%s := %s ADDF %s\n", temp_var, new_temp_var, (yyvsp[0].ident).lexema);
                     }
-                    (yyval.ident.id_val).val_type = FLOAT_TYPE;
+                    (yyval.ident).id_val.val_type = FLOAT_TYPE;
                 }
-            } else if (((yyvsp[-2].ident.id_val).val_type != UNKNOWN_TYPE && (yyvsp[0].ident.id_val).val_type != UNKNOWN_TYPE) && 
-                        ((yyvsp[-2].ident.id_val).val_type == STR_TYPE || (yyvsp[0].ident.id_val).val_type == STR_TYPE)) {
+            } else if (((yyvsp[-2].ident).id_val.val_type != UNKNOWN_TYPE && (yyvsp[0].ident).id_val.val_type != UNKNOWN_TYPE) && 
+                        ((yyvsp[-2].ident).id_val.val_type == STR_TYPE || (yyvsp[0].ident).id_val.val_type == STR_TYPE)) {
                 // Concatenate strings
-                (yyval.ident.id_val).val_str = concat(value_to_str((yyvsp[-2].ident.id_val)), value_to_str((yyvsp[0].ident.id_val)));    
-                (yyval.ident.id_val).val_type = STR_TYPE;
+                (yyval.ident).id_val.val_str = concat(value_to_str((yyvsp[-2].ident)), value_to_str((yyvsp[0].ident)));    
+                (yyval.ident).id_val.val_type = STR_TYPE;
+                temp_var = generate_temp_var();
+                printf("%s := %s CONCAT %s\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
             }
             else {
                 yyerror("Type error: Unknown type in addition operation");
-                (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+                (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
             }
+            (yyval.ident).id_val.lexema = temp_var;
     }
-#line 1279 "build/parser.tab.c"
+#line 1304 "build/parser.tab.c"
     break;
 
   case 15: /* expr_arithmetic: expr_arithmetic MINUS expr_unary  */
-#line 176 "parser.y"
+#line 201 "parser.y"
                                        {
-        fprintf(yyout, "PRODUCTION expr_arithmetic %s - %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
+        fprintf(yyout, "PRODUCTION expr_arithmetic %s - %s\n", value_info_to_str((yyvsp[-2].ident)), value_info_to_str((yyvsp[0].ident)));
+        char *temp_var = NULL;
         // Verify that are numbers
-        if (((yyvsp[-2].ident.id_val).val_type == INT_TYPE || (yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE) &&
-            ((yyvsp[0].ident.id_val).val_type == INT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE)) {
-                if ((yyvsp[-2].ident.id_val).val_type == INT_TYPE && (yyvsp[0].ident.id_val).val_type == INT_TYPE) {
-                    (yyval.ident.id_val).val_int = ((yyvsp[-2].ident.id_val).val_int - (yyvsp[0].ident.id_val).val_int);
-                    (yyval.ident.id_val).val_type = INT_TYPE;
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) &&
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                if ((yyvsp[-2].ident).id_val.val_type == INT_TYPE && (yyvsp[0].ident).id_val.val_type == INT_TYPE) {
+                    (yyval.ident).id_val.val_int = ((yyvsp[-2].ident).id_val.val_int - (yyvsp[0].ident).id_val.val_int);
+                    (yyval.ident).id_val.val_type = INT_TYPE;
+                    temp_var = generate_temp_var();
+                    printf("%s := %s SUBI %s\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
                 } else {
-                    if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE && (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE) {
-                        (yyval.ident.id_val).val_float = (yyvsp[-2].ident.id_val).val_float - (yyvsp[0].ident.id_val).val_float;
-                    } else if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE && (yyvsp[0].ident.id_val).val_type == INT_TYPE) {
-                        (yyval.ident.id_val).val_float = (float) (yyvsp[-2].ident.id_val).val_float - (yyvsp[0].ident.id_val).val_int;
+                    if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE && (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                        (yyval.ident).id_val.val_float = (yyvsp[-2].ident).id_val.val_float - (yyvsp[0].ident).id_val.val_float;
+                        temp_var = generate_temp_var();
+                        printf("%s := %s SUBF %s\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
+                    } else if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE && (yyvsp[0].ident).id_val.val_type == INT_TYPE) {
+                        (yyval.ident).id_val.val_float = (float) (yyvsp[-2].ident).id_val.val_float - (yyvsp[0].ident).id_val.val_int;
+                        char *new_temp_var = generate_temp_var();
+                        temp_var = generate_temp_var();
+                        printf("%s := I2F %s\n", new_temp_var, (yyvsp[0].ident).lexema);
+                        printf("%s := %s SUBF %s\n", temp_var, (yyvsp[-2].ident).lexema, new_temp_var);
                     } else {
-                        (yyval.ident.id_val).val_float = (float) (yyvsp[-2].ident.id_val).val_int - (yyvsp[0].ident.id_val).val_float;
+                        (yyval.ident).id_val.val_float = (float) (yyvsp[-2].ident).id_val.val_int - (yyvsp[0].ident).id_val.val_float;
+                        char *new_temp_var = generate_temp_var();
+                        temp_var = generate_temp_var();
+                        printf("%s := I2F %s\n", new_temp_var, (yyvsp[-2].ident).lexema);
+                        printf("%s := %s SUBF %s\n", temp_var, new_temp_var, (yyvsp[0].ident).lexema);
                     }
-                    (yyval.ident.id_val).val_type = FLOAT_TYPE;
+                    (yyval.ident).id_val.val_type = FLOAT_TYPE;
                 }
             } else {
                 yyerror("Type error: Subtraction operation is only allowed between numeric values");
-                (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+                (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
             }
+            (yyval.ident).lexema = temp_var;
     }
-#line 1307 "build/parser.tab.c"
+#line 1346 "build/parser.tab.c"
     break;
 
   case 16: /* expr_arithmetic: expr_arithmetic OR expr_unary  */
-#line 199 "parser.y"
+#line 238 "parser.y"
                                     {
-        fprintf(yyout, "PRODUCTION expr_arithmetic %s OR %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
+        fprintf(yyout, "PRODUCTION expr_arithmetic %s OR %s\n", value_info_to_str((yyvsp[-2].ident)), value_info_to_str((yyvsp[0].ident)));
         // Verify that are booleans
-        if ((yyvsp[-2].ident.id_val).val_type == BOOL_TYPE && (yyvsp[0].ident.id_val).val_type == BOOL_TYPE) {
-            (yyval.ident.id_val).val_bool = (yyvsp[-2].ident.id_val).val_bool || (yyvsp[0].ident.id_val).val_bool;
-            (yyval.ident.id_val).val_type = BOOL_TYPE;
+        if ((yyvsp[-2].ident).id_val.val_type == BOOL_TYPE && (yyvsp[0].ident).id_val.val_type == BOOL_TYPE) {
+            (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_bool || (yyvsp[0].ident).id_val.val_bool;
+            (yyval.ident).id_val.val_type = BOOL_TYPE;
         } else {
             yyerror("Type error: Logical OR operation is only allowed between boolean values");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1323 "build/parser.tab.c"
+#line 1362 "build/parser.tab.c"
     break;
 
   case 18: /* expr_unary: PLUS expr_unary  */
-#line 214 "parser.y"
+#line 253 "parser.y"
                       {
-        fprintf(yyout, "PRODUCTION expr_unary + %s\n", value_info_to_str((yyvsp[0].ident.id_val)));
+        fprintf(yyout, "PRODUCTION expr_unary + %s\n", value_info_to_str((yyvsp[0].ident)));
         // Verify its a number
-        if ((yyvsp[0].ident.id_val).val_type == INT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE) {
-            if ((yyvsp[0].ident.id_val).val_type == INT_TYPE) {
-                (yyval.ident.id_val).val_int = (yyvsp[0].ident.id_val).val_int;
-                (yyval.ident.id_val).val_type = INT_TYPE;
+        if ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+            if ((yyvsp[0].ident).id_val.val_type == INT_TYPE) {
+                (yyval.ident).id_val.val_int = (yyvsp[0].ident).id_val.val_int;
+                (yyval.ident).id_val.val_type = INT_TYPE;
             } else {
-                (yyval.ident.id_val).val_float = (yyvsp[0].ident.id_val).val_float;
-                (yyval.ident.id_val).val_type = FLOAT_TYPE;
+                (yyval.ident).id_val.val_float = (yyvsp[0].ident).val_float;
+                (yyval.ident).id_val.val_type = FLOAT_TYPE;
             }
         } else {
             yyerror("Type error: Unary plus operation is only allowed on numeric values");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1344 "build/parser.tab.c"
+#line 1383 "build/parser.tab.c"
     break;
 
   case 19: /* expr_unary: MINUS expr_unary  */
-#line 230 "parser.y"
+#line 269 "parser.y"
                        {
-        fprintf(yyout, "PRODUCTION expr_unary - %s\n", value_info_to_str((yyvsp[0].ident.id_val)));
+        fprintf(yyout, "PRODUCTION expr_unary - %s\n", value_info_to_str((yyvsp[0].ident)));
+        char *temp_var = NULL;
         // Verify its a number
-        if ((yyvsp[0].ident.id_val).val_type == INT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE) {
-            if ((yyvsp[0].ident.id_val).val_type == INT_TYPE) {
-                (yyval.ident.id_val).val_int = (yyvsp[0].ident.id_val).val_int * -1;
-                (yyval.ident.id_val).val_type = INT_TYPE;
+        if ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+            if ((yyvsp[0].ident).id_val.val_type == INT_TYPE) {
+                (yyval.ident).id_val.val_int = (yyvsp[0].ident).id_val.val_int * -1;
+                (yyval.ident).id_val.val_type = INT_TYPE;
+                temp_var = generate_temp_var();
+                printf("%s := CHSI %s\n", temp_var, (yyvsp[0].ident).lexema);
             } else {
-                (yyval.ident.id_val).val_float = (yyvsp[0].ident.id_val).val_float * -1;
-                (yyval.ident.id_val).val_type = FLOAT_TYPE;
+                (yyval.ident).id_val.val_float = (yyvsp[0].ident).id_val.val_float * -1;
+                (yyval.ident).id_val.val_type = FLOAT_TYPE;
+                temp_var = generate_temp_var();
+                printf("%s := CHSF %s\n", temp_var, (yyvsp[0].ident).lexema);
             }
         } else {
             yyerror("Type error: Unary minus operation is only allowed on numeric values");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
+        (yyval.ident).lexema = temp_var;
     }
-#line 1365 "build/parser.tab.c"
+#line 1410 "build/parser.tab.c"
     break;
 
   case 20: /* expr_unary: expr_unary AND expr_term  */
-#line 246 "parser.y"
+#line 291 "parser.y"
                                {
-        fprintf(yyout, "PRODUCTION expr_unary %s AND %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
+        fprintf(yyout, "PRODUCTION expr_unary %s AND %s\n", value_info_to_str((yyvsp[-2].ident)), value_info_to_str((yyvsp[0].ident)));
         // Verify that are booleans
-        if ((yyvsp[-2].ident.id_val).val_type == BOOL_TYPE && (yyvsp[0].ident.id_val).val_type == BOOL_TYPE) {
-            (yyval.ident.id_val).val_bool = (yyvsp[-2].ident.id_val).val_bool && (yyvsp[0].ident.id_val).val_bool;
-            (yyval.ident.id_val).val_type = BOOL_TYPE;
+        if ((yyvsp[-2].ident).id_val.val_type == BOOL_TYPE && (yyvsp[0].ident).id_val.val_type == BOOL_TYPE) {
+            (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_bool && (yyvsp[0].ident).id_val.val_bool;
+            (yyval.ident).id_val.val_type = BOOL_TYPE;
         } else {
             yyerror("Type error: Logical AND operation is only allowed between boolean values");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1381 "build/parser.tab.c"
+#line 1426 "build/parser.tab.c"
     break;
 
   case 22: /* expr_term: expr_term MULT expr_pow  */
-#line 261 "parser.y"
+#line 306 "parser.y"
                               {
-        fprintf(yyout, "PRODUCTION expr_term %s * %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
+        fprintf(yyout, "PRODUCTION expr_term %s * %s\n", value_info_to_str((yyvsp[-2].ident)), value_info_to_str((yyvsp[0].ident)));
+        char *temp_var = NULL;
         // Verify that are numbers
-        if (((yyvsp[-2].ident.id_val).val_type == INT_TYPE || (yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE) &&
-            ((yyvsp[0].ident.id_val).val_type == INT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE)) {
-                if ((yyvsp[-2].ident.id_val).val_type == INT_TYPE && (yyvsp[0].ident.id_val).val_type == INT_TYPE) {
-                    (yyval.ident.id_val).val_int = ((yyvsp[-2].ident.id_val).val_int * (yyvsp[0].ident.id_val).val_int);
-                    (yyval.ident.id_val).val_type = INT_TYPE;
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) &&
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                if ((yyvsp[-2].ident).id_val.val_type == INT_TYPE && (yyvsp[0].ident).id_val.val_type == INT_TYPE) {
+                    (yyval.ident).id_val.val_int = ((yyvsp[-2].ident).val_int * (yyvsp[0].ident).val_int);
+                    (yyval.ident).id_val.val_type = INT_TYPE;
+                    temp_var = generate_temp_var();
+                    printf("%s := %s MULI %s\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
                 } else {
-                    if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE && (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE) {
-                        (yyval.ident.id_val).val_float = (yyvsp[-2].ident.id_val).val_float * (yyvsp[0].ident.id_val).val_float;
-                    } else if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE && (yyvsp[0].ident.id_val).val_type == INT_TYPE) {
-                        (yyval.ident.id_val).val_float = (float) (yyvsp[-2].ident.id_val).val_float * (yyvsp[0].ident.id_val).val_int;
+                    if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE && (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                        (yyval.ident).id_val.val_float = (yyvsp[-2].ident).val_float * (yyvsp[0].ident).val_float;
+                        temp_var = generate_temp_var();
+                        printf("%s := %s MULF %s\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
+                    } else if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE && (yyvsp[0].ident).id_val.val_type == INT_TYPE) {
+                        (yyval.ident).id_val.val_float = (float) (yyvsp[-2].ident).val_float * (yyvsp[0].ident).val_int;
+                        char *new_temp_var = generate_temp_var();
+                        temp_var = generate_temp_var();
+                        printf("%s := I2F %s\n", new_temp_var, (yyvsp[0].ident).lexema);
+                        printf("%s := %s MULF %s\n", temp_var, (yyvsp[-2].ident).lexema, new_temp_var);
                     } else {
-                        (yyval.ident.id_val).val_float = (float) (yyvsp[-2].ident.id_val).val_int * (yyvsp[0].ident.id_val).val_float;
+                        (yyval.ident).id_val.val_float = (float) (yyvsp[-2].ident).val_int * (yyvsp[0].ident).val_float;
+                        char *new_temp_var = generate_temp_var();
+                        temp_var = generate_temp_var();
+                        printf("%s := I2F %s\n", new_temp_var, (yyvsp[-2].ident).lexema);
+                        printf("%s := %s MULF %s\n", temp_var, new_temp_var, (yyvsp[0].ident).lexema);
                     }
-                    (yyval.ident.id_val).val_type = FLOAT_TYPE;
+                    (yyval.ident).id_val.val_type = FLOAT_TYPE;
                 }
             } else {
                 yyerror("Type error: Multiplication operation is only allowed between numeric values");
-                (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+                (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
             }
-    }
-#line 1409 "build/parser.tab.c"
-    break;
-
-  case 23: /* expr_term: expr_term DIV expr_pow  */
-#line 284 "parser.y"
-                             {
-        fprintf(yyout, "PRODUCTION expr_term %s / %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
-        // Verify that are numbers
-        if (((yyvsp[-2].ident.id_val).val_type == INT_TYPE || (yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE) &&
-            ((yyvsp[0].ident.id_val).val_type == INT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE)) {
-                (yyval.ident.id_val).val_type = FLOAT_TYPE;
-                if ((yyvsp[-2].ident.id_val).val_type == INT_TYPE && (yyvsp[0].ident.id_val).val_type == INT_TYPE) {
-                    (yyval.ident.id_val).val_float = (float) ((yyvsp[-2].ident.id_val).val_int / (yyvsp[0].ident.id_val).val_int);
-                } else {
-                    if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE && (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE) {
-                        (yyval.ident.id_val).val_float = (yyvsp[-2].ident.id_val).val_float / (yyvsp[0].ident.id_val).val_float;
-                    } else if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE && (yyvsp[0].ident.id_val).val_type == INT_TYPE) {
-                        (yyval.ident.id_val).val_float = (float) (yyvsp[-2].ident.id_val).val_float / (yyvsp[0].ident.id_val).val_int;
-                    } else {
-                        (yyval.ident.id_val).val_float = (float) (yyvsp[-2].ident.id_val).val_int / (yyvsp[0].ident.id_val).val_float;
-                    }
-                }
-            } else {
-                yyerror("Type error: Division operation is only allowed between numeric values");
-                (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
-            }
-    }
-#line 1436 "build/parser.tab.c"
-    break;
-
-  case 24: /* expr_term: expr_term MOD expr_pow  */
-#line 306 "parser.y"
-                             {
-        fprintf(yyout, "PRODUCTION expr_term %s %% %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
-        // Verify that both operands are integers
-        if ((yyvsp[-2].ident.id_val).val_type == INT_TYPE && (yyvsp[0].ident.id_val).val_type == INT_TYPE) {
-            (yyval.ident.id_val).val_type = INT_TYPE;
-            (yyval.ident.id_val).val_int = (yyvsp[-2].ident.id_val).val_int % (yyvsp[0].ident.id_val).val_int;
-        } else {
-            yyerror("Type error: Modulus operation is only allowed between integers");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
-        }
-    }
-#line 1452 "build/parser.tab.c"
-    break;
-
-  case 25: /* expr_term: NOT expr_term  */
-#line 317 "parser.y"
-                    {
-        fprintf(yyout, "PRODUCTION NOT %s\n", value_info_to_str((yyvsp[0].ident.id_val)));
-        // Verify that the operand is a boolean
-        if ((yyvsp[0].ident.id_val).val_type == BOOL_TYPE) {
-            (yyval.ident.id_val).val_type = BOOL_TYPE;
-            (yyval.ident.id_val).val_bool = !(yyvsp[0].ident.id_val).val_bool;
-        } else {
-            yyerror("Type error: Logical NOT operation is only allowed on boolean values");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
-        }
+            (yyval.ident).lexema = temp_var;
     }
 #line 1468 "build/parser.tab.c"
     break;
 
+  case 23: /* expr_term: expr_term DIV expr_pow  */
+#line 343 "parser.y"
+                             {
+        fprintf(yyout, "PRODUCTION expr_term %s / %s\n", value_info_to_str((yyvsp[-2].ident)), value_info_to_str((yyvsp[0].ident)));
+        char *temp_var = NULL;
+        // Verify that are numbers
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) &&
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                (yyval.ident).id_val.val_type = FLOAT_TYPE;
+                if ((yyvsp[-2].ident).id_val.val_type == INT_TYPE && (yyvsp[0].ident).id_val.val_type == INT_TYPE) {
+                    (yyval.ident).id_val.val_float = (float) ((yyvsp[-2].ident).val_int / (yyvsp[0].ident).val_int);
+                    temp_var = generate_temp_var();
+                    printf("%s := %s DIVI %s\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
+                } else {
+                    if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE && (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                        (yyval.ident).id_val.val_float = (yyvsp[-2].ident).val_float / (yyvsp[0].ident).val_float;
+                        temp_var = generate_temp_var();
+                        printf("%s := %s DIVF %s\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
+                    } else if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE && (yyvsp[0].ident).id_val.val_type == INT_TYPE) {
+                        (yyval.ident).id_val.val_float = (float) (yyvsp[-2].ident).val_float / (yyvsp[0].ident).val_int;
+                        char *new_temp_var = generate_temp_var();
+                        temp_var = generate_temp_var();
+                        printf("%s := I2F %s\n", new_temp_var, (yyvsp[0].ident).lexema);
+                        printf("%s := %s DIVF %s\n", temp_var, (yyvsp[-2].ident).lexema, new_temp_var);
+                    } else {
+                        (yyval.ident).id_val.val_float = (float) (yyvsp[-2].ident).val_int / (yyvsp[0].ident).val_float;
+                        char *new_temp_var = generate_temp_var();
+                        temp_var = generate_temp_var();
+                        printf("%s := I2F %s\n", new_temp_var, (yyvsp[-2].ident).lexema);
+                        printf("%s := %s DIVF %s\n", temp_var, new_temp_var, (yyvsp[0].ident).lexema);
+                    }
+                }
+            } else {
+                yyerror("Type error: Division operation is only allowed between numeric values");
+                (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
+            }
+            (yyval.ident).lexema = temp_var;
+    }
+#line 1509 "build/parser.tab.c"
+    break;
+
+  case 24: /* expr_term: expr_term MOD expr_pow  */
+#line 379 "parser.y"
+                             {
+        fprintf(yyout, "PRODUCTION expr_term %s %% %s\n", value_info_to_str((yyvsp[-2].ident)), value_info_to_str((yyvsp[0].ident)));
+        char *temp_var = NULL;
+        // Verify that both operands are integers
+        if ((yyvsp[-2].ident).id_val.val_type == INT_TYPE && (yyvsp[0].ident).id_val.val_type == INT_TYPE) {
+            (yyval.ident).id_val.val_type = INT_TYPE;
+            (yyval.ident).id_val.val_int = (yyvsp[-2].ident).val_int % (yyvsp[0].ident).val_int;
+            temp_var = generate_temp_var();
+            printf("%s := %s MODI %s\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
+        } else {
+            yyerror("Type error: Modulus operation is only allowed between integers");
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
+        }
+        (yyval.ident).lexema = temp_var;
+    }
+#line 1529 "build/parser.tab.c"
+    break;
+
+  case 25: /* expr_term: NOT expr_term  */
+#line 394 "parser.y"
+                    {
+        fprintf(yyout, "PRODUCTION NOT %s\n", value_info_to_str((yyvsp[0].ident)));
+        // Verify that the operand is a boolean
+        if ((yyvsp[0].ident).id_val.val_type == BOOL_TYPE) {
+            (yyval.ident).id_val.val_type = BOOL_TYPE;
+            (yyval.ident).id_val.val_bool = !(yyvsp[0].ident).id_val.val_bool;
+        } else {
+            yyerror("Type error: Logical NOT operation is only allowed on boolean values");
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
+        }
+    }
+#line 1545 "build/parser.tab.c"
+    break;
+
   case 27: /* expr_pow: expr_pow POW factor  */
-#line 332 "parser.y"
+#line 409 "parser.y"
                           {
-        fprintf(yyout, "PRODUCTION expr_pow %s ** %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
+        fprintf(yyout, "PRODUCTION expr_pow %s ** %s\n", value_info_to_str((yyvsp[-2].ident)), value_info_to_str((yyvsp[0].ident)));
         // Verify that both operands are numeric (int or float)
-        if (((yyvsp[-2].ident.id_val).val_type == INT_TYPE || (yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE) &&
-            ((yyvsp[0].ident.id_val).val_type == INT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE)) {
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) &&
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
             // Perform the power operation based on the operand types
-            if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE) {
+            if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
                 // Convert to float if either operand is float
-                (yyval.ident.id_val).val_type = FLOAT_TYPE;
-                (yyval.ident.id_val).val_float = pow(
-                    ((yyvsp[-2].ident.id_val).val_type == INT_TYPE) ? (float)(yyvsp[-2].ident.id_val).val_int : (yyvsp[-2].ident.id_val).val_float,
-                    ((yyvsp[0].ident.id_val).val_type == INT_TYPE) ? (float)(yyvsp[0].ident.id_val).val_int : (yyvsp[0].ident.id_val).val_float
+                (yyval.ident).id_val.val_type = FLOAT_TYPE;
+                (yyval.ident).id_val.val_float = pow(
+                    ((yyvsp[-2].ident).id_val.val_type == INT_TYPE) ? (float)(yyvsp[-2].ident).val_int : (yyvsp[-2].ident).val_float,
+                    ((yyvsp[0].ident).id_val.val_type == INT_TYPE) ? (float)(yyvsp[0].ident).val_int : (yyvsp[0].ident).val_float
                 );
             } else {
                 // If both are integers, keep the integer type
-                (yyval.ident.id_val).val_type = INT_TYPE;
-                (yyval.ident.id_val).val_int = (int)pow((yyvsp[-2].ident.id_val).val_int, (yyvsp[0].ident.id_val).val_int);
+                (yyval.ident).id_val.val_type = INT_TYPE;
+                (yyval.ident).id_val.val_int = (int)pow((yyvsp[-2].ident).val_int, (yyvsp[0].ident).val_int);
             }
         } else {
             yyerror("Type error: Power operation is only allowed between numeric values");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1496 "build/parser.tab.c"
+#line 1573 "build/parser.tab.c"
     break;
 
   case 28: /* expr_pow: expr_pow GT factor  */
-#line 355 "parser.y"
+#line 432 "parser.y"
                          {
-        fprintf(yyout, "PRODUCTION expr_pow %s > %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
-        if (((yyvsp[-2].ident.id_val).val_type == INT_TYPE || (yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE) && 
-            ((yyvsp[0].ident.id_val).val_type == INT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE)) {
-                (yyval.ident.id_val).val_type = BOOL_TYPE;
-                if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE) {
-                    (yyval.ident.id_val).val_bool = ((yyvsp[-2].ident.id_val).val_type == INT_TYPE ? (float)(yyvsp[-2].ident.id_val).val_int : (yyvsp[-2].ident.id_val).val_float) > 
-                        ((yyvsp[0].ident.id_val).val_type == INT_TYPE ? (float)(yyvsp[0].ident.id_val).val_int : (yyvsp[0].ident.id_val).val_float);
+        fprintf(yyout, "PRODUCTION expr_pow %s > %s\n", value_info_to_str((yyvsp[-2].ident)), value_info_to_str((yyvsp[0].ident)));
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                (yyval.ident).id_val.val_type = BOOL_TYPE;
+                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).val_int : (yyvsp[-2].ident).val_float) > 
+                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).val_int : (yyvsp[0].ident).val_float);
                 } else {
-                    (yyval.ident.id_val).val_bool = (yyvsp[-2].ident.id_val).val_int > (yyvsp[0].ident.id_val).val_int;
+                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).val_int > (yyvsp[0].ident).val_int;
                 }
         } else {
             yyerror("Type error: Comparison requires numeric types");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1517 "build/parser.tab.c"
+#line 1594 "build/parser.tab.c"
     break;
 
   case 29: /* expr_pow: expr_pow LT factor  */
-#line 371 "parser.y"
+#line 448 "parser.y"
                          {
-        fprintf(yyout, "PRODUCTION expr_pow %s < %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
-        if (((yyvsp[-2].ident.id_val).val_type == INT_TYPE || (yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE) && 
-            ((yyvsp[0].ident.id_val).val_type == INT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE)) {
-                (yyval.ident.id_val).val_type = BOOL_TYPE;
-                if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE) {
-                    (yyval.ident.id_val).val_bool = ((yyvsp[-2].ident.id_val).val_type == INT_TYPE ? (float)(yyvsp[-2].ident.id_val).val_int : (yyvsp[-2].ident.id_val).val_float) < 
-                        ((yyvsp[0].ident.id_val).val_type == INT_TYPE ? (float)(yyvsp[0].ident.id_val).val_int : (yyvsp[0].ident.id_val).val_float);
+        fprintf(yyout, "PRODUCTION expr_pow %s < %s\n", value_info_to_str((yyvsp[-2].ident)), value_info_to_str((yyvsp[0].ident)));
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                (yyval.ident).id_val.val_type = BOOL_TYPE;
+                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).val_int : (yyvsp[-2].ident).val_float) < 
+                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).val_int : (yyvsp[0].ident).val_float);
                 } else {
-                    (yyval.ident.id_val).val_bool = (yyvsp[-2].ident.id_val).val_int < (yyvsp[0].ident.id_val).val_int;
+                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).val_int < (yyvsp[0].ident).val_int;
                 }
         } else {
             yyerror("Type error: Comparison requires numeric types");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1538 "build/parser.tab.c"
+#line 1615 "build/parser.tab.c"
     break;
 
   case 30: /* expr_pow: expr_pow GE factor  */
-#line 387 "parser.y"
+#line 464 "parser.y"
                          {
-        fprintf(yyout, "PRODUCTION expr_pow %s >= %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
-        if (((yyvsp[-2].ident.id_val).val_type == INT_TYPE || (yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE) && 
-            ((yyvsp[0].ident.id_val).val_type == INT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE)) {
-                (yyval.ident.id_val).val_type = BOOL_TYPE;
-                if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE) {
-                    (yyval.ident.id_val).val_bool = ((yyvsp[-2].ident.id_val).val_type == INT_TYPE ? (float)(yyvsp[-2].ident.id_val).val_int : (yyvsp[-2].ident.id_val).val_float) >= 
-                        ((yyvsp[0].ident.id_val).val_type == INT_TYPE ? (float)(yyvsp[0].ident.id_val).val_int : (yyvsp[0].ident.id_val).val_float);
+        fprintf(yyout, "PRODUCTION expr_pow %s >= %s\n", value_info_to_str((yyvsp[-2].ident)), value_info_to_str((yyvsp[0].ident)));
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                (yyval.ident).id_val.val_type = BOOL_TYPE;
+                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).val_int : (yyvsp[-2].ident).val_float) >= 
+                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).val_int : (yyvsp[0].ident).val_float);
                 } else {
-                    (yyval.ident.id_val).val_bool = (yyvsp[-2].ident.id_val).val_int >= (yyvsp[0].ident.id_val).val_int;
+                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).val_int >= (yyvsp[0].ident).val_int;
                 }
         } else {
             yyerror("Type error: Comparison requires numeric types");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1559 "build/parser.tab.c"
+#line 1636 "build/parser.tab.c"
     break;
 
   case 31: /* expr_pow: expr_pow LE factor  */
-#line 403 "parser.y"
+#line 480 "parser.y"
                          {
-        fprintf(yyout, "PRODUCTION expr_pow %s <= %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
-        if (((yyvsp[-2].ident.id_val).val_type == INT_TYPE || (yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE) && 
-            ((yyvsp[0].ident.id_val).val_type == INT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE)) {
-                (yyval.ident.id_val).val_type = BOOL_TYPE;
-                if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE) {
-                    (yyval.ident.id_val).val_bool = ((yyvsp[-2].ident.id_val).val_type == INT_TYPE ? (float)(yyvsp[-2].ident.id_val).val_int : (yyvsp[-2].ident.id_val).val_float) <= 
-                        ((yyvsp[0].ident.id_val).val_type == INT_TYPE ? (float)(yyvsp[0].ident.id_val).val_int : (yyvsp[0].ident.id_val).val_float);
+        fprintf(yyout, "PRODUCTION expr_pow %s <= %s\n", value_info_to_str((yyvsp[-2].ident)), value_info_to_str((yyvsp[0].ident)));
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                (yyval.ident).id_val.val_type = BOOL_TYPE;
+                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).val_int : (yyvsp[-2].ident).val_float) <= 
+                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).val_int : (yyvsp[0].ident).val_float);
                 } else {
-                    (yyval.ident.id_val).val_bool = (yyvsp[-2].ident.id_val).val_int <= (yyvsp[0].ident.id_val).val_int;
+                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).val_int <= (yyvsp[0].ident).val_int;
                 }
         } else {
             yyerror("Type error: Comparison requires numeric types");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1580 "build/parser.tab.c"
+#line 1657 "build/parser.tab.c"
     break;
 
   case 32: /* expr_pow: expr_pow EQ factor  */
-#line 419 "parser.y"
+#line 496 "parser.y"
                          {
-        fprintf(yyout, "PRODUCTION expr_pow %s == %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
-        if (((yyvsp[-2].ident.id_val).val_type == INT_TYPE || (yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE) && 
-            ((yyvsp[0].ident.id_val).val_type == INT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE)) {
-                (yyval.ident.id_val).val_type = BOOL_TYPE;
-                if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE) {
-                    (yyval.ident.id_val).val_bool = ((yyvsp[-2].ident.id_val).val_type == INT_TYPE ? (float)(yyvsp[-2].ident.id_val).val_int : (yyvsp[-2].ident.id_val).val_float) == 
-                        ((yyvsp[0].ident.id_val).val_type == INT_TYPE ? (float)(yyvsp[0].ident.id_val).val_int : (yyvsp[0].ident.id_val).val_float);
+        fprintf(yyout, "PRODUCTION expr_pow %s == %s\n", value_info_to_str((yyvsp[-2].ident)), value_info_to_str((yyvsp[0].ident)));
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                (yyval.ident).id_val.val_type = BOOL_TYPE;
+                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).val_int : (yyvsp[-2].ident).val_float) == 
+                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).val_int : (yyvsp[0].ident).val_float);
                 } else {
-                    (yyval.ident.id_val).val_bool = (yyvsp[-2].ident.id_val).val_int == (yyvsp[0].ident.id_val).val_int;
+                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).val_int == (yyvsp[0].ident).val_int;
                 }
         } else {
             yyerror("Type error: Comparison requires numeric types");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
 
     }
-#line 1602 "build/parser.tab.c"
+#line 1679 "build/parser.tab.c"
     break;
 
   case 33: /* expr_pow: expr_pow NE factor  */
-#line 436 "parser.y"
+#line 513 "parser.y"
                          {
-        fprintf(yyout, "PRODUCTION expr_pow %s != %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
-         if (((yyvsp[-2].ident.id_val).val_type == INT_TYPE || (yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE) && 
-            ((yyvsp[0].ident.id_val).val_type == INT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE)) {
-                (yyval.ident.id_val).val_type = BOOL_TYPE;
-                if ((yyvsp[-2].ident.id_val).val_type == FLOAT_TYPE || (yyvsp[0].ident.id_val).val_type == FLOAT_TYPE) {
-                    (yyval.ident.id_val).val_bool = ((yyvsp[-2].ident.id_val).val_type == INT_TYPE ? (float)(yyvsp[-2].ident.id_val).val_int : (yyvsp[-2].ident.id_val).val_float) != 
-                        ((yyvsp[0].ident.id_val).val_type == INT_TYPE ? (float)(yyvsp[0].ident.id_val).val_int : (yyvsp[0].ident.id_val).val_float);
+        fprintf(yyout, "PRODUCTION expr_pow %s != %s\n", value_info_to_str((yyvsp[-2].ident)), value_info_to_str((yyvsp[0].ident)));
+         if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                (yyval.ident).id_val.val_type = BOOL_TYPE;
+                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).val_int : (yyvsp[-2].ident).val_float) != 
+                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).val_int : (yyvsp[0].ident).val_float);
                 } else {
-                    (yyval.ident.id_val).val_bool = (yyvsp[-2].ident.id_val).val_int != (yyvsp[0].ident.id_val).val_int;
+                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).val_int != (yyvsp[0].ident).val_int;
                 }
         } else {
-            fprintf(yyout, "PRODUCTION ERROR expr_pow %s != %s\n", value_info_to_str((yyvsp[-2].ident.id_val)), value_info_to_str((yyvsp[0].ident.id_val)));
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            fprintf(yyout, "PRODUCTION ERROR expr_pow %s != %s\n", value_info_to_str((yyvsp[-2].ident)), value_info_to_str((yyvsp[0].ident)));
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1623 "build/parser.tab.c"
+#line 1700 "build/parser.tab.c"
     break;
 
   case 34: /* factor: ID  */
-#line 455 "parser.y"
+#line 532 "parser.y"
        {
         fprintf(yyout, "PRODUCTION ID Factor %s\n", (yyvsp[0].ident).lexema);
         value_info value;
         if (sym_lookup((yyvsp[0].ident).lexema, &value) == SYMTAB_NOT_FOUND) {
             yyerror("Variable not found");
         } else {
-                (yyval.ident.id_val) = value;
+                (yyval.ident) = value;
             }
     }
-#line 1637 "build/parser.tab.c"
+#line 1714 "build/parser.tab.c"
     break;
 
   case 35: /* factor: INTEGER  */
-#line 464 "parser.y"
+#line 541 "parser.y"
               {
-        fprintf(yyout, "PRODUCTION INTEGER Factor %d\n", (yyvsp[0].integer));
-        (yyval.ident.id_val).val_type = INT_TYPE;
-        (yyval.ident.id_val).val_int = (yyvsp[0].integer);
+        fprintf(yyout, "PRODUCTION INTEGER Factor %d\n", (yyvsp[0].ident));
+        (yyval.ident).id_val.val_type = INT_TYPE;
+        (yyval.ident).id_val.val_int = (yyvsp[0].ident);
+        // store value as char in lexema
+        (yyval.ident).id_val.lexema = (char *)malloc(10);
+        sprintf((yyval.ident).id_val.lexema, "%d", (yyvsp[0].ident));
     }
-#line 1647 "build/parser.tab.c"
+#line 1727 "build/parser.tab.c"
     break;
 
   case 36: /* factor: STRING  */
-#line 469 "parser.y"
+#line 549 "parser.y"
              {
         fprintf(yyout, "PRODUCTION STRING Factor %s\n", (yyvsp[0].string));
-        (yyval.ident.id_val).val_type = STR_TYPE;
-        (yyval.ident.id_val).val_str = substr((yyvsp[0].string), 1, strlen((yyvsp[0].string)) - 2);
+        (yyval.ident).id_val.val_type = STR_TYPE;
+        (yyval.ident).id_val.val_str = substr((yyvsp[0].string), 1, strlen((yyvsp[0].string)) - 2);
     }
-#line 1657 "build/parser.tab.c"
+#line 1737 "build/parser.tab.c"
     break;
 
   case 37: /* factor: BOOLEAN  */
-#line 474 "parser.y"
+#line 554 "parser.y"
               {
         fprintf(yyout, "PRODUCTION BOOLEAN Factor %d\n", (yyvsp[0].boolean));
-        (yyval.ident.id_val).val_type = BOOL_TYPE;
-        (yyval.ident.id_val).val_bool = (yyvsp[0].boolean);
+        (yyval.ident).id_val.val_type = BOOL_TYPE;
+        (yyval.ident).id_val.val_bool = (yyvsp[0].boolean);
     }
-#line 1667 "build/parser.tab.c"
+#line 1747 "build/parser.tab.c"
     break;
 
   case 38: /* factor: REAL  */
-#line 479 "parser.y"
+#line 559 "parser.y"
            {
         fprintf(yyout, "PRODUCTION REAL Factor %f\n", (yyvsp[0].real));
-        (yyval.ident.id_val).val_type = FLOAT_TYPE;
-        (yyval.ident.id_val).val_float = (yyvsp[0].real);
+        (yyval.ident).id_val.val_type = FLOAT_TYPE;
+        (yyval.ident).id_val.val_float = (yyvsp[0].real);
     }
-#line 1677 "build/parser.tab.c"
+#line 1757 "build/parser.tab.c"
     break;
 
   case 39: /* factor: PI  */
-#line 484 "parser.y"
+#line 564 "parser.y"
          {
         fprintf(yyout, "PRODUCTION PI Factor\n");
-        (yyval.ident.id_val).val_type = FLOAT_TYPE;
-        (yyval.ident.id_val).val_float = 3.141592653589793;
+        (yyval.ident).id_val.val_type = FLOAT_TYPE;
+        (yyval.ident).id_val.val_float = 3.141592653589793;
     }
-#line 1687 "build/parser.tab.c"
+#line 1767 "build/parser.tab.c"
     break;
 
   case 40: /* factor: E  */
-#line 489 "parser.y"
+#line 569 "parser.y"
         {
         fprintf(yyout, "PRODUCTION E Factor\n");
-        (yyval.ident.id_val).val_type = FLOAT_TYPE;
-        (yyval.ident.id_val).val_float = 2.718281828459045;
+        (yyval.ident).id_val.val_type = FLOAT_TYPE;
+        (yyval.ident).id_val.val_float = 2.718281828459045;
     }
-#line 1697 "build/parser.tab.c"
+#line 1777 "build/parser.tab.c"
     break;
 
   case 41: /* factor: LPAREN expression RPAREN  */
-#line 494 "parser.y"
+#line 574 "parser.y"
                                {
-        fprintf(yyout, "PRODUCTION LPAREN expression RPAREN %s\n", value_info_to_str((yyvsp[-1].ident.id_val)));
-        (yyval.ident.id_val) = (yyvsp[-1].ident.id_val);
+        fprintf(yyout, "PRODUCTION LPAREN expression RPAREN %s\n", value_info_to_str((yyvsp[-1].ident)));
+        (yyval.ident) = (yyvsp[-1].ident);
     }
-#line 1706 "build/parser.tab.c"
+#line 1786 "build/parser.tab.c"
     break;
 
   case 45: /* expr_trig: SIN LPAREN expression RPAREN  */
-#line 504 "parser.y"
+#line 584 "parser.y"
                                  {
         // Verify if the parameter is a number
-        fprintf(yyout, "PRODUCTION SIN %s\n", value_info_to_str((yyvsp[-1].ident.id_val)));
-        if ((yyvsp[-1].ident.id_val).val_type == INT_TYPE) {
-            (yyval.ident.id_val).val_float = sin((yyvsp[-1].ident.id_val).val_int);
-            (yyval.ident.id_val).val_type = FLOAT_TYPE;
-        } else if ((yyvsp[-1].ident.id_val).val_type == FLOAT_TYPE) {
-            (yyval.ident.id_val).val_float = sin((yyvsp[-1].ident.id_val).val_float);
-            (yyval.ident.id_val).val_type = FLOAT_TYPE;
+        fprintf(yyout, "PRODUCTION SIN %s\n", value_info_to_str((yyvsp[-1].ident)));
+        if ((yyvsp[-1].ident).id_val.val_type == INT_TYPE) {
+            (yyval.ident).id_val.val_float = sin((yyvsp[-1].ident).val_int);
+            (yyval.ident).id_val.val_type = FLOAT_TYPE;
+        } else if ((yyvsp[-1].ident).id_val.val_type == FLOAT_TYPE) {
+            (yyval.ident).id_val.val_float = sin((yyvsp[-1].ident).val_float);
+            (yyval.ident).id_val.val_type = FLOAT_TYPE;
         } else {
             yyerror("The sine function only applies to numbers.");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1725 "build/parser.tab.c"
+#line 1805 "build/parser.tab.c"
     break;
 
   case 46: /* expr_trig: COS LPAREN expression RPAREN  */
-#line 518 "parser.y"
+#line 598 "parser.y"
                                    {
-        fprintf(yyout, "PRODUCTION COS %s\n", value_info_to_str((yyvsp[-1].ident.id_val)));
-        if ((yyvsp[-1].ident.id_val).val_type == INT_TYPE) {
-            (yyval.ident.id_val).val_float = cos((yyvsp[-1].ident.id_val).val_int);
-            (yyval.ident.id_val).val_type = FLOAT_TYPE;
-        } else if ((yyvsp[-1].ident.id_val).val_type == FLOAT_TYPE) {
-            (yyval.ident.id_val).val_float = cos((yyvsp[-1].ident.id_val).val_float);
-            (yyval.ident.id_val).val_type = FLOAT_TYPE;
+        fprintf(yyout, "PRODUCTION COS %s\n", value_info_to_str((yyvsp[-1].ident)));
+        if ((yyvsp[-1].ident).id_val.val_type == INT_TYPE) {
+            (yyval.ident).id_val.val_float = cos((yyvsp[-1].ident).val_int);
+            (yyval.ident).id_val.val_type = FLOAT_TYPE;
+        } else if ((yyvsp[-1].ident).id_val.val_type == FLOAT_TYPE) {
+            (yyval.ident).id_val.val_float = cos((yyvsp[-1].ident).val_float);
+            (yyval.ident).id_val.val_type = FLOAT_TYPE;
         } else {
             yyerror("The cosine function only applies to numbers.");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
         
     }
-#line 1744 "build/parser.tab.c"
+#line 1824 "build/parser.tab.c"
     break;
 
   case 47: /* expr_trig: TAN LPAREN expression RPAREN  */
-#line 532 "parser.y"
+#line 612 "parser.y"
                                    {
-        fprintf(yyout, "PRODUCTION TAN %s\n", value_info_to_str((yyvsp[-1].ident.id_val)));
-        if ((yyvsp[-1].ident.id_val).val_type == INT_TYPE) {
-            (yyval.ident.id_val).val_float = tan((yyvsp[-1].ident.id_val).val_int);
-            (yyval.ident.id_val).val_type = FLOAT_TYPE;
-        } else if ((yyvsp[-1].ident.id_val).val_type == FLOAT_TYPE) {
-            (yyval.ident.id_val).val_float = tan((yyvsp[-1].ident.id_val).val_float);
-            (yyval.ident.id_val).val_type = FLOAT_TYPE;
+        fprintf(yyout, "PRODUCTION TAN %s\n", value_info_to_str((yyvsp[-1].ident)));
+        if ((yyvsp[-1].ident).id_val.val_type == INT_TYPE) {
+            (yyval.ident).id_val.val_float = tan((yyvsp[-1].ident).val_int);
+            (yyval.ident).id_val.val_type = FLOAT_TYPE;
+        } else if ((yyvsp[-1].ident).id_val.val_type == FLOAT_TYPE) {
+            (yyval.ident).id_val.val_float = tan((yyvsp[-1].ident).val_float);
+            (yyval.ident).id_val.val_type = FLOAT_TYPE;
         } else {
             yyerror("The tangent function only applies to numbers.");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1762 "build/parser.tab.c"
+#line 1842 "build/parser.tab.c"
     break;
 
   case 48: /* expr_len: LEN LPAREN STRING RPAREN  */
-#line 548 "parser.y"
+#line 628 "parser.y"
                              {
         fprintf(yyout, "PRODUCTION STRING LEN %s\n", (yyvsp[-1].string));
-        (yyval.ident.id_val).val_int = strlen((yyvsp[-1].string));
-        (yyval.ident.id_val).val_type = INT_TYPE;
+        (yyval.ident).id_val.val_int = strlen((yyvsp[-1].string));
+        (yyval.ident).id_val.val_type = INT_TYPE;
     }
-#line 1772 "build/parser.tab.c"
+#line 1852 "build/parser.tab.c"
     break;
 
   case 49: /* expr_len: LEN LPAREN ID RPAREN  */
-#line 553 "parser.y"
+#line 633 "parser.y"
                            {
         fprintf(yyout, "PRODUCTION ID LEN %s\n", (yyvsp[-1].ident).lexema);
         value_info value;
         if (sym_lookup((yyvsp[-1].ident).lexema, &value) == SYMTAB_NOT_FOUND) {
             yyerror("Variable not found");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         } else {
             if (value.val_type != STR_TYPE) {
                 yyerror("The len function only applies to strings.");
-                (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+                (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
             } else {
-                (yyval.ident.id_val).val_int = strlen(value.val_str);
-                (yyval.ident.id_val).val_type = INT_TYPE;
+                (yyval.ident).id_val.val_int = strlen(value.val_str);
+                (yyval.ident).id_val.val_type = INT_TYPE;
             }
         }
     }
-#line 1793 "build/parser.tab.c"
+#line 1873 "build/parser.tab.c"
     break;
 
   case 50: /* expr_substr: SUBSTR LPAREN STRING COMMA expression COMMA expression RPAREN  */
-#line 572 "parser.y"
+#line 652 "parser.y"
                                                                   {
         fprintf(yyout, "PRODUCTION STRING SUBSTR %s\n", (yyvsp[-5].string));
         // Verify if the indexes are integers
-        if ((yyvsp[-3].ident.id_val).val_type == INT_TYPE && (yyvsp[-1].ident.id_val).val_type == INT_TYPE) {
-            (yyval.ident.id_val).val_str = substr((yyvsp[-5].string), (yyvsp[-3].ident.id_val).val_int, (yyvsp[-1].ident.id_val).val_int);
-            (yyval.ident.id_val).val_type = STR_TYPE;
+        if ((yyvsp[-3].ident).val_type == INT_TYPE && (yyvsp[-1].ident).val_type == INT_TYPE) {
+            (yyval.ident).id_val.val_str = substr((yyvsp[-5].string), (yyvsp[-3].ident).val_int, (yyvsp[-1].ident).val_int);
+            (yyval.ident).id_val.val_type = STR_TYPE;
         } else {
             yyerror("Substrings indexes must be integers.");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1809 "build/parser.tab.c"
+#line 1889 "build/parser.tab.c"
     break;
 
   case 51: /* expr_substr: SUBSTR LPAREN ID COMMA expression COMMA expression RPAREN  */
-#line 583 "parser.y"
+#line 663 "parser.y"
                                                                 {
         fprintf(yyout, "PRODUCTION ID SUBSTR %s\n", (yyvsp[-5].ident).lexema);
         value_info value;
         if (sym_lookup((yyvsp[-5].ident).lexema, &value) == SYMTAB_NOT_FOUND) {
             yyerror("Variable not found");
-            (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         } else {
             if (value.val_type != STR_TYPE) {
                 yyerror("The substr function only applies to strings.");
-                (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+                (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
             } else {
-                if ((yyvsp[-3].ident.id_val).val_type == INT_TYPE && (yyvsp[-1].ident.id_val).val_type == INT_TYPE) {
-                    (yyval.ident.id_val).val_str = substr(value.val_str, (yyvsp[-3].ident.id_val).val_int, (yyvsp[-1].ident.id_val).val_int);
-                    (yyval.ident.id_val).val_type = STR_TYPE;
+                if ((yyvsp[-3].ident).val_type == INT_TYPE && (yyvsp[-1].ident).val_type == INT_TYPE) {
+                    (yyval.ident).id_val.val_str = substr(value.val_str, (yyvsp[-3].ident).val_int, (yyvsp[-1].ident).val_int);
+                    (yyval.ident).id_val.val_type = STR_TYPE;
                 } else {
                     yyerror("Substrings indexes must be integers.");
-                    (yyval.ident.id_val).val_type = UNKNOWN_TYPE;
+                    (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
                 }
             }
         }
     }
-#line 1835 "build/parser.tab.c"
+#line 1915 "build/parser.tab.c"
     break;
 
 
-#line 1839 "build/parser.tab.c"
+#line 1919 "build/parser.tab.c"
 
       default: break;
     }
@@ -2028,5 +2108,5 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 606 "parser.y"
+#line 686 "parser.y"
 

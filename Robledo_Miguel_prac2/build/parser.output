@@ -73,7 +73,7 @@ Terminals, with rules where they appear
     error (256)
     ASSIGN <no_value> (258) 10
     ENDLINE <no_value> (259) 2
-    INTEGER <integer> (260) 34
+    INTEGER <ident> (260) 34
     ID <ident> (261) 10 33 48 50
     REAL <real> (262) 37
     STRING <string> (263) 35 47 49
@@ -128,31 +128,31 @@ Nonterminals, with rules where they appear
     assignment (44)
         on left: 10
         on right: 4
-    expression <ident.id_val> (45)
+    expression <ident> (45)
         on left: 11
         on right: 5 9 10 40 44 45 46 49 50
-    expr_arithmetic <ident.id_val> (46)
+    expr_arithmetic <ident> (46)
         on left: 12 13 14 15
         on right: 11 13 14 15
-    expr_unary <ident.id_val> (47)
+    expr_unary <ident> (47)
         on left: 16 17 18 19
         on right: 12 13 14 15 17 18 19
-    expr_term <ident.id_val> (48)
+    expr_term <ident> (48)
         on left: 20 21 22 23 24
         on right: 16 19 21 22 23 24
-    expr_pow <ident.id_val> (49)
+    expr_pow <ident> (49)
         on left: 25 26 27 28 29 30 31 32
         on right: 20 21 22 23 26 27 28 29 30 31 32
-    factor <ident.id_val> (50)
+    factor <ident> (50)
         on left: 33 34 35 36 37 38 39 40 41 42 43
         on right: 25 26 27 28 29 30 31 32
-    expr_trig <ident.id_val> (51)
+    expr_trig <ident> (51)
         on left: 44 45 46
         on right: 41
-    expr_len <ident.id_val> (52)
+    expr_len <ident> (52)
         on left: 47 48
         on right: 42
-    expr_substr <ident.id_val> (53)
+    expr_substr <ident> (53)
         on left: 49 50
         on right: 43
 
