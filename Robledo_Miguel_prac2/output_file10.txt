@@ -19,6 +19,9 @@ PRODUCTION Assignment i := 2
 PRODUCTION ID Factor n
 PRODUCTION INTEGER Factor 1
 PRODUCTION expr_arithmetic 10 - 1
+PRODUCTION ID Factor n
+PRODUCTION INTEGER Factor 1
+PRODUCTION expr_arithmetic 10 - 1
 PRODUCTION ID Factor fact
 PRODUCTION ID Factor i
 PRODUCTION expr_term 1 * 2
@@ -27,6 +30,7 @@ PRODUCTION ID Factor i
 PRODUCTION INTEGER Factor 1
 PRODUCTION expr_arithmetic 2 + 1
 PRODUCTION Assignment i := 3
+PRODUCTION Repeat 9 times
 PRODUCTION Repeat 9 times
 PRODUCTION ID Factor fact
 PRODUCTION Expression 2

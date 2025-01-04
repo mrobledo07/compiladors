@@ -7,6 +7,9 @@
     extern int yylineno;
     void yyerror(char *s);
     extern FILE *yyout;
+
+    char *repeat_counter_name;
+    char *repeat_expression_name;
 %}
 
 %code requires {
@@ -50,6 +53,7 @@
 %token DONE
 
 %type <ident> expression
+%type <ident> repeat_expression
 %type <ident> expr_arithmetic
 %type <ident> expr_term
 %type <ident> expr_pow
@@ -102,16 +106,28 @@ statement:
     ;
 
 repeat_statement:
-    REPEAT expression DO statement_list DONE {
+    REPEAT repeat_expression DO statement_list DONE {
         if ($2.id_val.val_type != INT_TYPE) {
             yyerror("Repeat count must be an integer");
         } else {
             int repeat_count = $2.id_val.val_int;
             fprintf(yyout, "PRODUCTION Repeat %d times\n", repeat_count);
-            char *temp_var = generate_temp_var();
-            printf("%s := 0\n", temp_var);
-            printf("IF $t06 LTI $t05 GOTO %d\n", $1.line + 2);
+            printf("$t06 := $t06 ADDI 1\n");
+            printf("IF %s LTI %s GOTO %d\n", repeat_counter_name, repeat_expression_name, $1.line + 3);
         }
+    }
+    ;
+
+repeat_expression:
+    expression {
+        char *temp_var = generate_temp_var();
+        printf("%s := 0\n", temp_var);
+        repeat_counter_name = temp_var;
+        // store the previous temp var in repeat_expression_name
+        int previous_number = atoi(temp_var + 2) - 1;
+        char *previous_temp_var = (char *)malloc(14);
+        sprintf(previous_temp_var, "$t%02d", previous_number);
+        repeat_expression_name = previous_temp_var;
     }
     ;
 
