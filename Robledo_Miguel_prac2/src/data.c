@@ -49,7 +49,7 @@ char *value_to_str(value_info value)
     if (value.val_type == INT_TYPE) {
         snprintf(buffer, sizeof(buffer), "%d", value.val_int);
     } else if (value.val_type == FLOAT_TYPE) {
-        snprintf(buffer, sizeof(buffer), "%f", value.val_float);
+        snprintf(buffer, sizeof(buffer), "%.1f", value.val_float);
     } else if (value.val_type == BOOL_TYPE) {
         if (value.val_bool == 0) {
             snprintf(buffer, sizeof(buffer), "false");

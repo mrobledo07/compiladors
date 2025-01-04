@@ -1,32 +1,6 @@
 PRODUCTION REAL Factor 5.000000
-PRODUCTION Assignment x := Float: 5.000000
+PRODUCTION Assignment x := 5.0
 PRODUCTION INTEGER Factor 3
-PRODUCTION Assignment i := Integer: 3
-PRODUCTION ID Factor i
-PRODUCTION ID Factor i
-PRODUCTION INTEGER Factor 3
-PRODUCTION expr_term Integer: 3 * Integer: 3
-PRODUCTION expr_arithmetic Integer: 3 + Integer: 9
+PRODUCTION Assignment i := 3
 PRODUCTION ID Factor x
-PRODUCTION expr_arithmetic Integer: 12 - Float: 5.000000
-PRODUCTION Assignment y := Float: 7.000000
-PRODUCTION INTEGER Factor 10
-PRODUCTION Assignment n := Integer: 10
-PRODUCTION INTEGER Factor 1
-PRODUCTION Assignment fact := Integer: 1
-PRODUCTION INTEGER Factor 2
-PRODUCTION Assignment i := Integer: 2
-PRODUCTION ID Factor n
-PRODUCTION INTEGER Factor 1
-PRODUCTION expr_arithmetic Integer: 10 - Integer: 1
-PRODUCTION ID Factor fact
-PRODUCTION ID Factor i
-PRODUCTION expr_term Integer: 1 * Integer: 2
-PRODUCTION Assignment fact := Integer: 2
-PRODUCTION ID Factor i
-PRODUCTION INTEGER Factor 1
-PRODUCTION expr_arithmetic Integer: 2 + Integer: 1
-PRODUCTION Assignment i := Integer: 3
-PRODUCTION Repeat 9 times
-PRODUCTION ID Factor fact
-PRODUCTION Expression Integer: 2
+PRODUCTION Expression 5.0
