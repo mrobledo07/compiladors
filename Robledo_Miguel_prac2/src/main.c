@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
         error = semantic_analysis();
 
         if (error == EXIT_SUCCESS) {
-          printf("The compilation has been successful\n");
+          printf("HALT\n");
         } else {
           printf("ERROR");
         }

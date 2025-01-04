@@ -45,7 +45,7 @@
 %token LPAREN RPAREN
 %token COMMA
 %token COMMENT
-%token REPEAT
+%token <ident> REPEAT
 %token DO
 %token DONE
 
@@ -87,11 +87,11 @@ statement:
         fprintf(yyout, "PRODUCTION Expression %s\n", value_to_str($1.id_val));
         printf("PARAM %s\n", $1.lexema);
         if ($1.id_val.val_type == INT_TYPE) {
-            printf("CALL PUTI %s, 1\n", $1.lexema);
+            printf("CALL PUTI, 1\n");
         } else if ($1.id_val.val_type == FLOAT_TYPE) {
-            printf("CALL PUTF %s, 1\n", $1.lexema);
+            printf("CALL PUTF, 1\n");
         } else if ($1.id_val.val_type == STR_TYPE) {
-            printf("CALL PUTC %s, %d\n", $1.lexema, $1.lenght);
+            printf("CALL PUTC, %d\n", $1.lenght);
         } else {
             yyerror("Unknown type in expression");
         }
@@ -108,7 +108,9 @@ repeat_statement:
         } else {
             int repeat_count = $2.id_val.val_int;
             fprintf(yyout, "PRODUCTION Repeat %d times\n", repeat_count);
-            printf("IF $t06 LTI $t05 GOTO 13\n");
+            char *temp_var = generate_temp_var();
+            printf("%s := 0\n", temp_var);
+            printf("IF $t06 LTI $t05 GOTO %d\n", $1.line + 2);
         }
     }
     ;
@@ -137,7 +139,7 @@ assignment:
             };
             int symtab_status = sym_enter($1.lexema, &value);
             if (symtab_status == SYMTAB_OK || symtab_status == SYMTAB_DUPLICATE) {
-                printf("%s := %s\n", $1.lexema, value_to_str($1.id_val));
+                printf("%s := %s\n", $1.lexema, $3.lexema);
             } else {
                 yyerror("Error: Variable could not be entered into the symbol table. Stack overflow.");
             }
@@ -536,37 +538,50 @@ factor:
             yyerror("Variable not found");
         } else {
                 $$.id_val = value;
+                $$.lexema = $1.lexema;
             }
     }
     | INTEGER {
         fprintf(yyout, "PRODUCTION INTEGER Factor %d\n", $1);
         $$.id_val.val_type = INT_TYPE;
         $$.id_val.val_int = $1;
+        // store value as a string
+        $$.lexema = (char *)malloc(12);
+        sprintf($$.lexema, "%d", $1);
     }
     | STRING {
         fprintf(yyout, "PRODUCTION STRING Factor %s\n", $1);
         $$.id_val.val_type = STR_TYPE;
         $$.id_val.val_str = substr($1, 1, strlen($1) - 2);
+        $$.lexema = $1;
     }
     | BOOLEAN {
         fprintf(yyout, "PRODUCTION BOOLEAN Factor %d\n", $1);
         $$.id_val.val_type = BOOL_TYPE;
         $$.id_val.val_bool = $1;
+        $$.lexema = $1 ? "true" : "false";
     }
     | REAL {
         fprintf(yyout, "PRODUCTION REAL Factor %f\n", $1);
         $$.id_val.val_type = FLOAT_TYPE;
         $$.id_val.val_float = $1;
+        // store value as a string
+        $$.lexema = (char *)malloc(12);
+        sprintf($$.lexema, "%f", $1);
     }
     | PI {
         fprintf(yyout, "PRODUCTION PI Factor\n");
         $$.id_val.val_type = FLOAT_TYPE;
         $$.id_val.val_float = 3.141592653589793;
+        // store value as a string
+        $$.lexema = "3.141592653589793";
     }
     | E {
         fprintf(yyout, "PRODUCTION E Factor\n");
         $$.id_val.val_type = FLOAT_TYPE;
         $$.id_val.val_float = 2.718281828459045;
+        // store value as a string
+        $$.lexema = "2.718281828459045";
     }
     | LPAREN expression RPAREN {
         fprintf(yyout, "PRODUCTION LPAREN expression RPAREN %s\n", value_to_str($2.id_val));

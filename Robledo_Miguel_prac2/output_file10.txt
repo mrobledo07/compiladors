@@ -2,5 +2,31 @@ PRODUCTION REAL Factor 5.000000
 PRODUCTION Assignment x := 5.0
 PRODUCTION INTEGER Factor 3
 PRODUCTION Assignment i := 3
+PRODUCTION ID Factor i
+PRODUCTION ID Factor i
+PRODUCTION INTEGER Factor 3
+PRODUCTION expr_term 3 * 3
+PRODUCTION expr_arithmetic 3 + 9
 PRODUCTION ID Factor x
-PRODUCTION Expression 5.0
+PRODUCTION expr_arithmetic 12 - 5.0
+PRODUCTION Assignment y := 7.0
+PRODUCTION INTEGER Factor 10
+PRODUCTION Assignment n := 10
+PRODUCTION INTEGER Factor 1
+PRODUCTION Assignment fact := 1
+PRODUCTION INTEGER Factor 2
+PRODUCTION Assignment i := 2
+PRODUCTION ID Factor n
+PRODUCTION INTEGER Factor 1
+PRODUCTION expr_arithmetic 10 - 1
+PRODUCTION ID Factor fact
+PRODUCTION ID Factor i
+PRODUCTION expr_term 1 * 2
+PRODUCTION Assignment fact := 2
+PRODUCTION ID Factor i
+PRODUCTION INTEGER Factor 1
+PRODUCTION expr_arithmetic 2 + 1
+PRODUCTION Assignment i := 3
+PRODUCTION Repeat 9 times
+PRODUCTION ID Factor fact
+PRODUCTION Expression 2

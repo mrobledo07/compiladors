@@ -81,6 +81,7 @@ e         (e|E)
 }
 
 {repeat} {
+    yylval.ident.line = yylineno;
     return REPEAT;
 }
 
