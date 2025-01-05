@@ -8,8 +8,30 @@
     void yyerror(char *s);
     extern FILE *yyout;
 
-    char *repeat_counter_name;
-    char *repeat_expression_name;
+    #define MAX_STACK_SIZE 100
+
+    char *repeat_stack[MAX_STACK_SIZE];
+    int stack_top = -1;  
+
+    void push_repeat_stack(char *temp_var) {
+        if (stack_top < MAX_STACK_SIZE - 1) {
+            repeat_stack[++stack_top] = temp_var;
+        } else {
+            printf("Error: Stack overflow.\n");
+        }
+    }
+
+    char *pop_repeat_stack() {
+        if (stack_top >= 0) {
+            return repeat_stack[stack_top--];
+        } else {
+            printf("Error: Stack empty.\n");
+            return NULL;
+        }
+    }
+
+    int instruction_counter = 1;
+
 %}
 
 %code requires {
@@ -99,6 +121,7 @@ statement:
         } else {
             yyerror("Unknown type in expression");
         }
+        instruction_counter += 2;
     }
     | statement COMMENT
     | repeat_statement
@@ -111,9 +134,13 @@ repeat_statement:
             yyerror("Repeat count must be an integer");
         } else {
             int repeat_count = $2.id_val.val_int;
+            char *repeat_line_number = pop_repeat_stack();
+            char *repeat_counter_name = pop_repeat_stack();
+            char *repeat_expression_name = pop_repeat_stack();
             fprintf(yyout, "PRODUCTION Repeat %d times\n", repeat_count);
-            printf("$t06 := $t06 ADDI 1\n");
-            printf("IF %s LTI %s GOTO %d\n", repeat_counter_name, repeat_expression_name, $1.line + 3);
+            printf("%s := %s ADDI 1\n", repeat_counter_name, repeat_counter_name);
+            printf("IF %s LTI %s GOTO %s\n", repeat_counter_name, repeat_expression_name, repeat_line_number);
+            instruction_counter += 2;
         }
     }
     ;
@@ -122,12 +149,18 @@ repeat_expression:
     expression {
         char *temp_var = generate_temp_var();
         printf("%s := 0\n", temp_var);
-        repeat_counter_name = temp_var;
+        instruction_counter++;
+        char * repeat_counter_name = temp_var;
         // store the previous temp var in repeat_expression_name
         int previous_number = atoi(temp_var + 2) - 1;
         char *previous_temp_var = (char *)malloc(14);
         sprintf(previous_temp_var, "$t%02d", previous_number);
-        repeat_expression_name = previous_temp_var;
+        char *repeat_expression_name = previous_temp_var;
+        push_repeat_stack(repeat_expression_name);
+        push_repeat_stack(repeat_counter_name);
+        char *line_number = (char *)malloc(10); 
+        sprintf(line_number, "%d", instruction_counter);
+        push_repeat_stack(line_number);
     }
     ;
 
@@ -156,6 +189,7 @@ assignment:
             int symtab_status = sym_enter($1.lexema, &value);
             if (symtab_status == SYMTAB_OK || symtab_status == SYMTAB_DUPLICATE) {
                 printf("%s := %s\n", $1.lexema, $3.lexema);
+                instruction_counter++;
             } else {
                 yyerror("Error: Variable could not be entered into the symbol table. Stack overflow.");
             }
@@ -182,23 +216,27 @@ expr_arithmetic:
                     $$.id_val.val_type = INT_TYPE;
                     temp_var = generate_temp_var();
                     printf("%s := %s ADDI %s\n", temp_var, $1.lexema, $3.lexema);
+                    instruction_counter++;
                 } else {
                     if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == FLOAT_TYPE) {
                         $$.id_val.val_float = $1.id_val.val_float + $3.id_val.val_float;
                         temp_var = generate_temp_var();
                         printf("%s := %s ADDF %s\n", temp_var, $1.lexema, $3.lexema);
+                        instruction_counter++;
                     } else if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == INT_TYPE) {
                         $$.id_val.val_float = (float) $1.id_val.val_float + $3.id_val.val_int;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         printf("%s := I2F %s\n", new_temp_var, $3.lexema);
                         printf("%s := %s ADDF %s\n", temp_var, $1.lexema, new_temp_var);
+                        instruction_counter += 2;
                     } else {
                         $$.id_val.val_float = (float) $1.id_val.val_int + $3.id_val.val_float;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         printf("%s := I2F %s\n", new_temp_var, $1.lexema);
                         printf("%s := %s ADDF %s\n", temp_var, new_temp_var, $3.lexema);
+                        instruction_counter += 2;
                     }
                     $$.id_val.val_type = FLOAT_TYPE;
                 }
@@ -209,6 +247,7 @@ expr_arithmetic:
                 $$.id_val.val_type = STR_TYPE;
                 temp_var = generate_temp_var();
                 printf("%s := %s CONCAT %s\n", temp_var, $1.lexema, $3.lexema);
+                instruction_counter++;
             }
             else {
                 yyerror("Type error: Unknown type in addition operation");
@@ -227,23 +266,27 @@ expr_arithmetic:
                     $$.id_val.val_type = INT_TYPE;
                     temp_var = generate_temp_var();
                     printf("%s := %s SUBI %s\n", temp_var, $1.lexema, $3.lexema);
+                    instruction_counter++;
                 } else {
                     if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == FLOAT_TYPE) {
                         $$.id_val.val_float = $1.id_val.val_float - $3.id_val.val_float;
                         temp_var = generate_temp_var();
                         printf("%s := %s SUBF %s\n", temp_var, $1.lexema, $3.lexema);
+                        instruction_counter++;
                     } else if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == INT_TYPE) {
                         $$.id_val.val_float = (float) $1.id_val.val_float - $3.id_val.val_int;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         printf("%s := I2F %s\n", new_temp_var, $3.lexema);
                         printf("%s := %s SUBF %s\n", temp_var, $1.lexema, new_temp_var);
+                        instruction_counter += 2;
                     } else {
                         $$.id_val.val_float = (float) $1.id_val.val_int - $3.id_val.val_float;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         printf("%s := I2F %s\n", new_temp_var, $1.lexema);
                         printf("%s := %s SUBF %s\n", temp_var, new_temp_var, $3.lexema);
+                        instruction_counter += 2;
                     }
                     $$.id_val.val_type = FLOAT_TYPE;
                 }
@@ -294,11 +337,13 @@ expr_unary:
                 $$.id_val.val_type = INT_TYPE;
                 temp_var = generate_temp_var();
                 printf("%s := CHSI %s\n", temp_var, $2.lexema);
+                instruction_counter++;
             } else {
                 $$.id_val.val_float = $2.id_val.val_float * -1;
                 $$.id_val.val_type = FLOAT_TYPE;
                 temp_var = generate_temp_var();
                 printf("%s := CHSF %s\n", temp_var, $2.lexema);
+                instruction_counter++;
             }
         } else {
             yyerror("Type error: Unary minus operation is only allowed on numeric values");
@@ -332,23 +377,27 @@ expr_term:
                     $$.id_val.val_type = INT_TYPE;
                     temp_var = generate_temp_var();
                     printf("%s := %s MULI %s\n", temp_var, $1.lexema, $3.lexema);
+                    instruction_counter++;
                 } else {
                     if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == FLOAT_TYPE) {
                         $$.id_val.val_float = $1.id_val.val_float * $3.id_val.val_float;
                         temp_var = generate_temp_var();
                         printf("%s := %s MULF %s\n", temp_var, $1.lexema, $3.lexema);
+                        instruction_counter++;
                     } else if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == INT_TYPE) {
                         $$.id_val.val_float = (float) $1.id_val.val_float * $3.id_val.val_int;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         printf("%s := I2F %s\n", new_temp_var, $3.lexema);
                         printf("%s := %s MULF %s\n", temp_var, $1.lexema, new_temp_var);
+                        instruction_counter += 2;
                     } else {
                         $$.id_val.val_float = (float) $1.id_val.val_int * $3.id_val.val_float;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         printf("%s := I2F %s\n", new_temp_var, $1.lexema);
                         printf("%s := %s MULF %s\n", temp_var, new_temp_var, $3.lexema);
+                        instruction_counter += 2;
                     }
                     $$.id_val.val_type = FLOAT_TYPE;
                 }
@@ -369,23 +418,27 @@ expr_term:
                     $$.id_val.val_float = (float) ($1.id_val.val_int / $3.id_val.val_int);
                     temp_var = generate_temp_var();
                     printf("%s := %s DIVI %s\n", temp_var, $1.lexema, $3.lexema);
+                    instruction_counter++;
                 } else {
                     if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == FLOAT_TYPE) {
                         $$.id_val.val_float = $1.id_val.val_float / $3.id_val.val_float;
                         temp_var = generate_temp_var();
                         printf("%s := %s DIVF %s\n", temp_var, $1.lexema, $3.lexema);
+                        instruction_counter++;
                     } else if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == INT_TYPE) {
                         $$.id_val.val_float = (float) $1.id_val.val_float / $3.id_val.val_int;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         printf("%s := I2F %s\n", new_temp_var, $3.lexema);
                         printf("%s := %s DIVF %s\n", temp_var, $1.lexema, new_temp_var);
+                        instruction_counter += 2;
                     } else {
                         $$.id_val.val_float = (float) $1.id_val.val_int / $3.id_val.val_float;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         printf("%s := I2F %s\n", new_temp_var, $1.lexema);
                         printf("%s := %s DIVF %s\n", temp_var, new_temp_var, $3.lexema);
+                        instruction_counter += 2;
                     }
                 }
             } else {
@@ -403,6 +456,7 @@ expr_term:
             $$.id_val.val_int = $1.id_val.val_int % $3.id_val.val_int;
             temp_var = generate_temp_var();
             printf("%s := %s MODI %s\n", temp_var, $1.lexema, $3.lexema);
+            instruction_counter++;
         } else {
             yyerror("Type error: Modulus operation is only allowed between integers");
             $$.id_val.val_type = UNKNOWN_TYPE;

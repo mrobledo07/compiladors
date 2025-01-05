@@ -1,0 +1,29 @@
+x := 5.000000
+i := 3
+$t01 := i MULI 3
+$t02 := i ADDI $t01
+$t03 := I2F $t02
+$t04 := $t03 SUBF x
+y := $t04
+n := 10
+fact := 1
+i := 2
+$t05 := n SUBI 1
+$t06 := 0
+$t07 := n SUBI 1
+$t08 := 0
+$t09 := n SUBI 1
+$t10 := 0
+$t11 := fact MULI i
+fact := $t11
+$t12 := i ADDI 1
+i := $t12
+$t10 := $t10 ADDI 1
+IF $t10 LTI $t09 GOTO 17
+$t08 := $t08 ADDI 1
+IF $t08 LTI $t07 GOTO 15
+$t06 := $t06 ADDI 1
+IF $t06 LTI $t05 GOTO 13
+PARAM fact
+CALL PUTI, 1
+HALT
