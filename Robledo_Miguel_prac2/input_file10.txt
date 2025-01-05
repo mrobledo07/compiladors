@@ -1,7 +1,10 @@
 // expressions 
 x := 5.0 
 i := 3
-y := i + i * 3 - x 
+y := i + i * 3 - x
+z := "Hola"
+w := " Pepsicola"
+z := z + w
  
 // factorial 
 n := 10  
@@ -15,4 +18,4 @@ repeat n - 1 do
         done
     done
 done 
-fact
+z

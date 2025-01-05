@@ -609,6 +609,9 @@ factor:
         } else {
                 $$.id_val = value;
                 $$.lexema = $1.lexema;
+                if (value.val_type == STR_TYPE) {
+                    $$.lenght = strlen(value.val_str);
+                }
             }
     }
     | INTEGER {
@@ -624,6 +627,7 @@ factor:
         $$.id_val.val_type = STR_TYPE;
         $$.id_val.val_str = substr($1, 1, strlen($1) - 2);
         $$.lexema = $1;
+        $$.lenght = strlen($1) - 2;
     }
     | BOOLEAN {
         fprintf(yyout, "PRODUCTION BOOLEAN Factor %d\n", $1);
