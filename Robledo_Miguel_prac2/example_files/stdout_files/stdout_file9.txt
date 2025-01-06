@@ -1,5 +1,43 @@
-arr := "Ha", "o", "l", "a"
+arr := ["Ha", "o", "l", "a"]
 $t01 := 2 MULI 4
 $t02 := &arr ADDI $t01
 PARAM [$t02]
 CALL PUTC, 1
+arr1 := [4, 2, 6, 8]
+$t03 := 1 MULI 4
+$t04 := &arr1 ADDI $t03
+PARAM [$t04]
+CALL PUTI, 1
+$t05 := 2 MULI 4
+$t06 := &arr1 ADDI $t05
+PARAM [$t06]
+CALL PUTI, 1
+arr2 := [3.500000, 3.600000, 3.700000, 3.800000]
+$t07 := 1 MULI 4
+$t08 := &arr2 ADDI $t07
+PARAM [$t08]
+CALL PUTF, 1
+$t09 := 2 MULI 4
+$t10 := &arr2 ADDI $t09
+PARAM [$t10]
+CALL PUTF, 1
+$t11 := 4 MULI 4
+$t12 := &arr2 ADDI $t11
+PARAM [$t12]
+CALL PUTF, 1
+$t13 := 1 MULI 4
+$t14 := &arr2 ADDI $t13
+x := $t14
+$t15 := 4 MULI 4
+$t16 := &arr2 ADDI $t15
+y := $t16
+$t17 := 1 MULI 4
+$t18 := &arr1 ADDI $t17
+z := $t18
+$t19 := x ADDF y
+$t20 := I2F z
+$t21 := $t19 ADDF $t20
+w := $t21
+PARAM w
+CALL PUTF, 1
+HALT

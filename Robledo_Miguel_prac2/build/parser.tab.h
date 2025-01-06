@@ -45,12 +45,13 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 41 "parser.y"
+#line 39 "parser.y"
 
+    #include "../include/data.h"
     #include "../include/functions.h"
     #include "../include/symtab.h"
 
-#line 54 "build/parser.tab.h"
+#line 55 "build/parser.tab.h"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -91,7 +92,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 46 "parser.y"
+#line 45 "parser.y"
 
     struct {
         char *lexema;
@@ -108,7 +109,7 @@ union YYSTYPE
     int boolean;
     void *no_value;
 
-#line 112 "build/parser.tab.h"
+#line 113 "build/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -190,8 +190,10 @@ assignment:
             };
             int symtab_status = sym_enter($1.lexema, &value);
             if (symtab_status == SYMTAB_OK || symtab_status == SYMTAB_DUPLICATE) {
-                if ($3.array_name != NULL) {
+                if (array_size > 1) {
                     printf("%s := [%s]\n", $1.lexema, $3.lexema);
+                    array_size = 1;
+                    array_elems = NULL;
                 } else { 
                     printf("%s := %s\n", $1.lexema, $3.lexema);
                 }
@@ -281,6 +283,7 @@ array_access:
             }
         }
     }
+    ;
 
 expression_list:
     expression_list COMMA expr_arithmetic {
@@ -311,6 +314,8 @@ expression_list:
        } else {
             char *new_elem = $3.lexema;
             if ($3.id_val.val_type != $$.id_val.val_array_type) {
+                                printf("PIPERO\n");
+
                 yyerror("Type error: Incompatible types in array");
             }
             array_elems = concat_str(array_elems, ", ");
