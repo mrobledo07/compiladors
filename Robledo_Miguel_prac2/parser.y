@@ -305,15 +305,7 @@ expr_arithmetic:
             $$.is_literal = 0;
     }
     | expr_arithmetic OR expr_unary {
-        fprintf(yyout, "PRODUCTION expr_arithmetic %s OR %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
-        // Verify that are booleans
-        if ($1.id_val.val_type == BOOL_TYPE && $3.id_val.val_type == BOOL_TYPE) {
-            $$.id_val.val_bool = $1.id_val.val_bool || $3.id_val.val_bool;
-            $$.id_val.val_type = BOOL_TYPE;
-        } else {
-            yyerror("Type error: Logical OR operation is only allowed between boolean values");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
+        yyerror("C3A generator does not support logical OR operation");
     }
     ;
 
@@ -321,14 +313,21 @@ expr_unary:
     expr_term
     | PLUS expr_unary {
         fprintf(yyout, "PRODUCTION expr_unary + %s\n", value_to_str($2.id_val));
+        char *temp_var = NULL;
         // Verify its a number
         if ($2.id_val.val_type == INT_TYPE || $2.id_val.val_type == FLOAT_TYPE) {
             if ($2.id_val.val_type == INT_TYPE) {
                 $$.id_val.val_int = $2.id_val.val_int;
                 $$.id_val.val_type = INT_TYPE;
+                temp_var = generate_temp_var();
+                printf("%s := %s\n", temp_var, $2.lexema);
+                instruction_counter++;
             } else {
                 $$.id_val.val_float = $2.id_val.val_float;
                 $$.id_val.val_type = FLOAT_TYPE;
+                temp_var = generate_temp_var();
+                printf("%s := %s\n", temp_var, $2.lexema);
+                instruction_counter++;
             }
         } else {
             yyerror("Type error: Unary plus operation is only allowed on numeric values");
@@ -361,15 +360,7 @@ expr_unary:
         $$.is_literal = 0;
     }
     | expr_unary AND expr_term {
-        fprintf(yyout, "PRODUCTION expr_unary %s AND %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
-        // Verify that are booleans
-        if ($1.id_val.val_type == BOOL_TYPE && $3.id_val.val_type == BOOL_TYPE) {
-            $$.id_val.val_bool = $1.id_val.val_bool && $3.id_val.val_bool;
-            $$.id_val.val_type = BOOL_TYPE;
-        } else {
-            yyerror("Type error: Logical AND operation is only allowed between boolean values");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
+        yyerror("C3A generator does not support logical AND operation");
     }
     ;
 
@@ -476,139 +467,32 @@ expr_term:
         $$.is_literal = 0;
     }
     | NOT expr_term {
-        fprintf(yyout, "PRODUCTION NOT %s\n", value_to_str($2.id_val));
-        // Verify that the operand is a boolean
-        if ($2.id_val.val_type == BOOL_TYPE) {
-            $$.id_val.val_type = BOOL_TYPE;
-            $$.id_val.val_bool = !$2.id_val.val_bool;
-        } else {
-            yyerror("Type error: Logical NOT operation is only allowed on boolean values");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
+        yyerror("C3A generator does not support logical NOT operation");
     }
     ;
 
 expr_pow:
     factor 
     | expr_pow POW factor {
-        fprintf(yyout, "PRODUCTION expr_pow %s ** %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
-        // Verify that both operands are numeric (int or float)
-        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) &&
-            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
-            // Perform the power operation based on the operand types
-            if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
-                // Convert to float if either operand is float
-                $$.id_val.val_type = FLOAT_TYPE;
-                $$.id_val.val_float = pow(
-                    ($1.id_val.val_type == INT_TYPE) ? (float)$1.id_val.val_int : $1.id_val.val_float,
-                    ($3.id_val.val_type == INT_TYPE) ? (float)$3.id_val.val_int : $3.id_val.val_float
-                );
-            } else {
-                // If both are integers, keep the integer type
-                $$.id_val.val_type = INT_TYPE;
-                $$.id_val.val_int = (int)pow($1.id_val.val_int, $3.id_val.val_int);
-            }
-        } else {
-            yyerror("Type error: Power operation is only allowed between numeric values");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
+        yyerror("C3A generator does not support exponentiation operation");
     }
     | expr_pow GT factor {
-        fprintf(yyout, "PRODUCTION expr_pow %s > %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
-        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
-            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
-                $$.id_val.val_type = BOOL_TYPE;
-                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
-                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) > 
-                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
-                } else {
-                    $$.id_val.val_bool = $1.id_val.val_int > $3.id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
+        yyerror("C3A generator does not support greater than operation");
     }
     | expr_pow LT factor {
-        fprintf(yyout, "PRODUCTION expr_pow %s < %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
-        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
-            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
-                $$.id_val.val_type = BOOL_TYPE;
-                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
-                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) < 
-                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
-                } else {
-                    $$.id_val.val_bool = $1.id_val.val_int < $3.id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
+        yyerror("C3A generator does not support less than operation");
     }
     | expr_pow GE factor {
-        fprintf(yyout, "PRODUCTION expr_pow %s >= %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
-        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
-            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
-                $$.id_val.val_type = BOOL_TYPE;
-                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
-                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) >= 
-                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
-                } else {
-                    $$.id_val.val_bool = $1.id_val.val_int >= $3.id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
+        yyerror("C3A generator does not support greater or equal operation");
     }
     | expr_pow LE factor {
-        fprintf(yyout, "PRODUCTION expr_pow %s <= %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
-        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
-            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
-                $$.id_val.val_type = BOOL_TYPE;
-                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
-                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) <= 
-                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
-                } else {
-                    $$.id_val.val_bool = $1.id_val.val_int <= $3.id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
+        yyerror("C3A generator does not support less or equal operation");
     }
     | expr_pow EQ factor {
-        fprintf(yyout, "PRODUCTION expr_pow %s == %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
-        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
-            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
-                $$.id_val.val_type = BOOL_TYPE;
-                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
-                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) == 
-                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
-                } else {
-                    $$.id_val.val_bool = $1.id_val.val_int == $3.id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
-
+        yyerror("C3A generator does not support equal operation");
     }
     | expr_pow NE factor {
-        fprintf(yyout, "PRODUCTION expr_pow %s != %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
-         if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
-            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
-                $$.id_val.val_type = BOOL_TYPE;
-                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
-                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) != 
-                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
-                } else {
-                    $$.id_val.val_bool = $1.id_val.val_int != $3.id_val.val_int;
-                }
-        } else {
-            fprintf(yyout, "PRODUCTION ERROR expr_pow %s != %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
+        yyerror("C3A generator does not support not equal operation");
     }
     ;
 
@@ -682,104 +566,31 @@ factor:
 
 expr_trig:
     SIN LPAREN expression RPAREN {
-        // Verify if the parameter is a number
-        fprintf(yyout, "PRODUCTION SIN %s\n", value_to_str($3.id_val));
-        if ($3.id_val.val_type == INT_TYPE) {
-            $$.id_val.val_float = sin($3.id_val.val_int);
-            $$.id_val.val_type = FLOAT_TYPE;
-        } else if ($3.id_val.val_type == FLOAT_TYPE) {
-            $$.id_val.val_float = sin($3.id_val.val_float);
-            $$.id_val.val_type = FLOAT_TYPE;
-        } else {
-            yyerror("The sine function only applies to numbers.");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
+        yyerror("C3A generator does not support trigonometric functions");
     }
     | COS LPAREN expression RPAREN {
-        fprintf(yyout, "PRODUCTION COS %s\n", value_to_str($3.id_val));
-        if ($3.id_val.val_type == INT_TYPE) {
-            $$.id_val.val_float = cos($3.id_val.val_int);
-            $$.id_val.val_type = FLOAT_TYPE;
-        } else if ($3.id_val.val_type == FLOAT_TYPE) {
-            $$.id_val.val_float = cos($3.id_val.val_float);
-            $$.id_val.val_type = FLOAT_TYPE;
-        } else {
-            yyerror("The cosine function only applies to numbers.");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
-        
+       yyerror("C3A generator does not support trigonometric functions");
     }
     | TAN LPAREN expression RPAREN {
-        fprintf(yyout, "PRODUCTION TAN %s\n", value_to_str($3.id_val));
-        if ($3.id_val.val_type == INT_TYPE) {
-            $$.id_val.val_float = tan($3.id_val.val_int);
-            $$.id_val.val_type = FLOAT_TYPE;
-        } else if ($3.id_val.val_type == FLOAT_TYPE) {
-            $$.id_val.val_float = tan($3.id_val.val_float);
-            $$.id_val.val_type = FLOAT_TYPE;
-        } else {
-            yyerror("The tangent function only applies to numbers.");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
+        yyerror("C3A generator does not support trigonometric functions");
     }
     ;
     
 expr_len:
     LEN LPAREN STRING RPAREN {
-        fprintf(yyout, "PRODUCTION STRING LEN %s\n", $3);
-        $$.id_val.val_int = strlen($3);
-        $$.id_val.val_type = INT_TYPE;
+        yyerror("C3A generator does not support string length function");
     }
     | LEN LPAREN ID RPAREN {
-        fprintf(yyout, "PRODUCTION ID LEN %s\n", $3.lexema);
-        value_info value;
-        if (sym_lookup($3.lexema, &value) == SYMTAB_NOT_FOUND) {
-            yyerror("Variable not found");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        } else {
-            if (value.val_type != STR_TYPE) {
-                yyerror("The len function only applies to strings.");
-                $$.id_val.val_type = UNKNOWN_TYPE;
-            } else {
-                $$.id_val.val_int = strlen(value.val_str);
-                $$.id_val.val_type = INT_TYPE;
-            }
-        }
+        yyerror("C3A generator does not support string length function");
     }
     ;
 
 expr_substr:
     SUBSTR LPAREN STRING COMMA expression COMMA expression RPAREN {
-        fprintf(yyout, "PRODUCTION STRING SUBSTR %s\n", $3);
-        // Verify if the indexes are integers
-        if ($5.id_val.val_type == INT_TYPE && $7.id_val.val_type == INT_TYPE) {
-            $$.id_val.val_str = substr($3, $5.id_val.val_int, $7.id_val.val_int);
-            $$.id_val.val_type = STR_TYPE;
-        } else {
-            yyerror("Substrings indexes must be integers.");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
+        yyerror("C3A generator does not support substring function");
     }
     | SUBSTR LPAREN ID COMMA expression COMMA expression RPAREN {
-        fprintf(yyout, "PRODUCTION ID SUBSTR %s\n", $3.lexema);
-        value_info value;
-        if (sym_lookup($3.lexema, &value) == SYMTAB_NOT_FOUND) {
-            yyerror("Variable not found");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        } else {
-            if (value.val_type != STR_TYPE) {
-                yyerror("The substr function only applies to strings.");
-                $$.id_val.val_type = UNKNOWN_TYPE;
-            } else {
-                if ($5.id_val.val_type == INT_TYPE && $7.id_val.val_type == INT_TYPE) {
-                    $$.id_val.val_str = substr(value.val_str, $5.id_val.val_int, $7.id_val.val_int);
-                    $$.id_val.val_type = STR_TYPE;
-                } else {
-                    yyerror("Substrings indexes must be integers.");
-                    $$.id_val.val_type = UNKNOWN_TYPE;
-                }
-            }
-        }
+        yyerror("C3A generator does not support substring function");
     }
     ;
 
