@@ -1,0 +1,7 @@
+Assignment: a := Integer: 3
+Assignment: b := Integer: 7
+Assignment: c := Integer: 5
+Assignment: d := Integer: 2
+Assignment: result := Float: -3.446557
+Expression result: Float: -3.446557
+The compilation has been successful
