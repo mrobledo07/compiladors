@@ -46,6 +46,7 @@
         int lenght;
         int line;
         value_info id_val;
+        int is_literal;
     } ident;
     int integer;
     float real;
@@ -147,6 +148,11 @@ repeat_statement:
 
 repeat_expression:
     expression {
+        if ($1.is_literal) {
+            char *new_var = generate_temp_var();
+            printf("%s := %s\n", new_var, $1.lexema);
+            instruction_counter++;
+        } 
         char *temp_var = generate_temp_var();
         printf("%s := 0\n", temp_var);
         instruction_counter++;
@@ -254,6 +260,7 @@ expr_arithmetic:
                 $$.id_val.val_type = UNKNOWN_TYPE;
             }
             $$.lexema = temp_var;
+            $$.is_literal = 0;
     }
     | expr_arithmetic MINUS expr_unary {
         fprintf(yyout, "PRODUCTION expr_arithmetic %s - %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
@@ -294,7 +301,8 @@ expr_arithmetic:
                 yyerror("Type error: Subtraction operation is only allowed between numeric values");
                 $$.id_val.val_type = UNKNOWN_TYPE;
             }
-            $$.lexema = temp_var;
+            $$.lexema = temp_var;$$.is_literal = 0;
+            $$.is_literal = 0;
     }
     | expr_arithmetic OR expr_unary {
         fprintf(yyout, "PRODUCTION expr_arithmetic %s OR %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
@@ -350,6 +358,7 @@ expr_unary:
             $$.id_val.val_type = UNKNOWN_TYPE;
         }
         $$.lexema = temp_var;
+        $$.is_literal = 0;
     }
     | expr_unary AND expr_term {
         fprintf(yyout, "PRODUCTION expr_unary %s AND %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
@@ -406,6 +415,7 @@ expr_term:
                 $$.id_val.val_type = UNKNOWN_TYPE;
             }
             $$.lexema = temp_var;
+            $$.is_literal = 0;
     }
     | expr_term DIV expr_pow {
         fprintf(yyout, "PRODUCTION expr_term %s / %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
@@ -446,6 +456,7 @@ expr_term:
                 $$.id_val.val_type = UNKNOWN_TYPE;
             }
             $$.lexema = temp_var;
+            $$.is_literal = 0;
     }
     | expr_term MOD expr_pow {
         fprintf(yyout, "PRODUCTION expr_term %s %% %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
@@ -462,6 +473,7 @@ expr_term:
             $$.id_val.val_type = UNKNOWN_TYPE;
         }
         $$.lexema = temp_var;
+        $$.is_literal = 0;
     }
     | NOT expr_term {
         fprintf(yyout, "PRODUCTION NOT %s\n", value_to_str($2.id_val));
@@ -612,6 +624,7 @@ factor:
                 if (value.val_type == STR_TYPE) {
                     $$.lenght = strlen(value.val_str);
                 }
+                $$.is_literal = 1;
             }
     }
     | INTEGER {
@@ -621,6 +634,7 @@ factor:
         // store value as a string
         $$.lexema = (char *)malloc(12);
         sprintf($$.lexema, "%d", $1);
+        $$.is_literal = 1;
     }
     | STRING {
         fprintf(yyout, "PRODUCTION STRING Factor %s\n", $1);
