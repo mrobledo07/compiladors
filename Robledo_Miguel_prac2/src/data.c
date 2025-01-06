@@ -22,7 +22,7 @@ char *type_to_str(data_type val_type)
   }
 }
 
-char *value_info_to_str(value value) 
+char *value_info_to_str(value_info value) 
 {
     char buffer[STR_MAX_LENGTH+100];
     if (value.val_type == INT_TYPE) {
@@ -39,7 +39,7 @@ char *value_info_to_str(value value)
     return strdup(buffer);
 }
 
-char *value_to_str(value value) 
+char *value_to_str(value_info value) 
 {
     char buffer[STR_MAX_LENGTH+100];
     if (value.val_type == INT_TYPE) {

@@ -206,8 +206,21 @@ expression_list:
             array_elems = concat_str(new_elem1, ", ");
             array_elems = concat_str(array_elems, new_elem2);
             $$.id_val.val_array = (value *)malloc(sizeof(value) * 2);
-            $$.id_val.val_array[0] = $1.id_val;
-            $$.id_val.val_array[1] = $3.id_val;
+            value new_value1 = {
+                .val_type = $1.id_val.val_type,
+                .val_int = $1.id_val.val_int,
+                .val_float = $1.id_val.val_float,
+                .val_str = $1.id_val.val_str
+            };
+
+            value new_value2 = {
+                .val_type = $3.id_val.val_type,
+                .val_int = $3.id_val.val_int,
+                .val_float = $3.id_val.val_float,
+                .val_str = $3.id_val.val_str
+            };
+            $$.id_val.val_array[0] = new_value1;
+            $$.id_val.val_array[1] = new_value2;
        } else {
            array_elems = concat_str(array_elems, ", ");
            array_elems = concat_str(array_elems, new_elem1);
