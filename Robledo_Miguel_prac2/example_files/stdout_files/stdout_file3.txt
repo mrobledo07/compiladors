@@ -1,8 +1,17 @@
-Assignment: name := String: "Calculadora"
-Assignment: length := Integer: 11
-Assignment: substring := String: "cula"
-Assignment: message := String: "Calculadora funciona bé! 7"
-Expression result: Integer: 11
-Expression result: String: "cula"
-Expression result: String: "Calculadora funciona bé! 7"
-The compilation has been successful
+m := 3
+n := 4
+i := 1
+$t01 := 0
+j := 1
+$t02 := 0
+$t03 := i MULI j
+x := $t03
+$t04 := j ADDI 1
+j := $t04
+$t02 := $t02 ADDI 1
+IF $t02 LTI $t01 GOTO 7
+$t05 := i ADDI 1
+i := $t05
+$t01 := $t01 ADDI 1
+IF $t01 LTI $t00 GOTO 5
+HALT

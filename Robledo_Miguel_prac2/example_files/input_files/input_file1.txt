@@ -1,20 +1,21 @@
-// assignacions
-x := 1.5
-x := 2
-i := 5
-z := i * (x + i) - i / 4.0
-s := "Hola"
-b := z > 33.75 or not (i > 0 and i <= 10) or false
-// expressions bàsiques
-x
-i
+// expressions 
+x := 5.0 
+i := 3
+y := i + i * 3 - x
+z := "Hola"
+w := " Pepsicola"
+z := z + w
+ 
+// factorial 
+n := 10  
+fact := 1 
+i := 2 
+repeat n - 1 do 
+    repeat n - 1 do
+        repeat n - 1 do
+            fact := fact * i  
+            i := i + 1 
+        done
+    done
+done 
 z
-s
-b
-/*
-* expressions
-*/
-i + i * 2
--i + x
-s + (s + i) + "--" + x + b
-b or not b

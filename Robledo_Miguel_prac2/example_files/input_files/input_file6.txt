@@ -1,11 +1,4 @@
-// Assignments with constants
-x := PI
-y := E
-
-// Mathematical operations with constants
-z := x + y
-w := x * 2 + y ** 2
-
-// Display all expressions
-z
-w
+a := 5
+b := -a
+c := -b
+d := -(-c)

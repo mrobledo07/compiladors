@@ -1,11 +1,16 @@
-Assignment: a := Integer: 572
-Assignment: b := Integer: 163
-Assignment: c := Integer: 44865
-Assignment: d := Integer: 157
-Assignment: sum := Integer: 45757
-Expression result: Integer: 572
-Expression result: Integer: 163
-Expression result: Integer: 44865
-Expression result: Integer: 157
-Expression result: Integer: 45757
-The compilation has been successful
+$t01 := 4 ADDI 4
+a := $t01
+$t02 := a SUBI 2
+b := $t02
+$t03 := a MULI b
+c := $t03
+$t04 := a ADDI b
+$t05 := b ADDI c
+$t06 := $t04 ADDI $t05
+$t07 := c ADDI a
+$t08 := $t07 MULI 2
+$t09 := $t06 ADDI $t08
+d := $t09
+PARAM d
+CALL PUTI, 1
+HALT

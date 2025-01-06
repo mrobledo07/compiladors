@@ -1,7 +1,9 @@
-Assignment: x := Float: 3.141593
-Assignment: y := Float: 2.718282
-Assignment: z := Float: 5.859875
-Assignment: w := Float: 13.672241
-Expression result: Float: 5.859875
-Expression result: Float: 13.672241
-The compilation has been successful
+a := 5
+$t01 := CHSI a
+b := $t01
+$t02 := CHSI b
+c := $t02
+$t03 := CHSI c
+$t04 := CHSI $t03
+d := $t04
+HALT

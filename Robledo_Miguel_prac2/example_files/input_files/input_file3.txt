@@ -1,12 +1,11 @@
-// Assignments
-name := "Calculadora"
-length := LEN(name)
-substring := SUBSTR(name, 3, 4)
-
-// Arithmetic with string concatenation
-message := name + " " + "funciona bé!" + " " + (3 + 4)
-
-// Display all expressions
-length
-substring
-message
+m := 3
+n := 4
+i := 1
+repeat m do
+    j := 1
+    repeat n do
+        x := i * j
+        j := j + 1
+    done
+    i := i + 1
+done

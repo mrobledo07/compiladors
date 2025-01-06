@@ -1,35 +1,6 @@
-// Assignments
-a := 3
-b := 4.5
-c := 2
-
-// Expressions with different precedences
-d := a + b * c
-
-// IMPORTANT! e and E ARE RESERVED TO REPRESENT THE NUMBER 2.718281828459045
-e1 := (a + b) * c
-f := a ** b
-g := -(a + b)
-
-// Mixed types and operations
-h := a + 5
-i := b * 2 + a - c
-j := (a + 3) * (b - 2)
-
-// Boolean expressions with relational operators
-p := a > b
-q := c < a or b >= c
-r := not (a == b) and (c <> a)
-
-// Display all expressions
-d
-e
-e1
-f
-g
-h
-i
-j
-p
-q
-r
+a := 2 
+b := 3
+c := a + b * 5
+d := (a + b) * 5
+z := d / c - a
+f := -z

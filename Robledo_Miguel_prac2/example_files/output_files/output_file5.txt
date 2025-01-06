@@ -1,16 +1,12 @@
-PRODUCTION INTEGER Factor 5
-PRODUCTION Assignment x := Integer: 5
-PRODUCTION INTEGER Factor 10
-PRODUCTION Assignment y := Integer: 10
-PRODUCTION ID Factor x
-PRODUCTION STRING Factor "hello"
-PRODUCTION expr_arithmetic Integer: 5 + String: "hello"
-PRODUCTION Assignment z := String: "5hello"
-PRODUCTION ID Factor x
-PRODUCTION ID Factor y
-PRODUCTION expr_arithmetic Integer: 5 + Integer: 10
-PRODUCTION Assignment c := Integer: 15
-PRODUCTION ID Factor c
-PRODUCTION Expression Integer: 15
-PRODUCTION ID Factor z
-PRODUCTION Expression String: "5hello"
+PRODUCTION INTEGER Factor 2
+PRODUCTION Assignment base := 2
+PRODUCTION INTEGER Factor 3
+PRODUCTION Assignment exponent := 3
+PRODUCTION INTEGER Factor 1
+PRODUCTION Assignment result := 1
+PRODUCTION ID Factor exponent
+PRODUCTION ID Factor result
+PRODUCTION ID Factor base
+PRODUCTION expr_term 1 * 2
+PRODUCTION Assignment result := 2
+PRODUCTION Repeat 3 times

@@ -1,7 +1,9 @@
-Assignment: x := Integer: 5
-Assignment: y := Integer: 10
-Assignment: z := String: "5hello"
-Assignment: c := Integer: 15
-Expression result: Integer: 15
-Expression result: String: "5hello"
-The compilation has been successful
+base := 2
+exponent := 3
+result := 1
+$t01 := 0
+$t02 := result MULI base
+result := $t02
+$t01 := $t01 ADDI 1
+IF $t01 LTI $t00 GOTO 5
+HALT

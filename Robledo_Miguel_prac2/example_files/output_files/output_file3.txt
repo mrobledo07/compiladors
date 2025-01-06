@@ -1,27 +1,24 @@
-PRODUCTION STRING Factor "Calculadora"
-PRODUCTION Assignment name := String: "Calculadora"
-PRODUCTION ID LEN name
-PRODUCTION Assignment length := Integer: 11
 PRODUCTION INTEGER Factor 3
+PRODUCTION Assignment m := 3
 PRODUCTION INTEGER Factor 4
-PRODUCTION ID SUBSTR name
-PRODUCTION Assignment substring := String: "cula"
-PRODUCTION ID Factor name
-PRODUCTION STRING Factor " "
-PRODUCTION expr_arithmetic String: "Calculadora" + String: " "
-PRODUCTION STRING Factor "funciona bé!"
-PRODUCTION expr_arithmetic String: "Calculadora " + String: "funciona bé!"
-PRODUCTION STRING Factor " "
-PRODUCTION expr_arithmetic String: "Calculadora funciona bé!" + String: " "
-PRODUCTION INTEGER Factor 3
-PRODUCTION INTEGER Factor 4
-PRODUCTION expr_arithmetic Integer: 3 + Integer: 4
-PRODUCTION LPAREN expression RPAREN Integer: 7
-PRODUCTION expr_arithmetic String: "Calculadora funciona bé! " + Integer: 7
-PRODUCTION Assignment message := String: "Calculadora funciona bé! 7"
-PRODUCTION ID Factor length
-PRODUCTION Expression Integer: 11
-PRODUCTION ID Factor substring
-PRODUCTION Expression String: "cula"
-PRODUCTION ID Factor message
-PRODUCTION Expression String: "Calculadora funciona bé! 7"
+PRODUCTION Assignment n := 4
+PRODUCTION INTEGER Factor 1
+PRODUCTION Assignment i := 1
+PRODUCTION ID Factor m
+PRODUCTION INTEGER Factor 1
+PRODUCTION Assignment j := 1
+PRODUCTION ID Factor n
+PRODUCTION ID Factor i
+PRODUCTION ID Factor j
+PRODUCTION expr_term 1 * 1
+PRODUCTION Assignment x := 1
+PRODUCTION ID Factor j
+PRODUCTION INTEGER Factor 1
+PRODUCTION expr_arithmetic 1 + 1
+PRODUCTION Assignment j := 2
+PRODUCTION Repeat 4 times
+PRODUCTION ID Factor i
+PRODUCTION INTEGER Factor 1
+PRODUCTION expr_arithmetic 1 + 1
+PRODUCTION Assignment i := 2
+PRODUCTION Repeat 3 times

@@ -1,14 +1,4 @@
-// Assignments
-a := 10
-b := 5
-c := 0
-
-// Expressions with logical operations
-result1 := a > b or c > 10
-result2 := (a < b or c < 10) and b == 5
-result3 := a < b or not c > 10
-
-// Display all expressions
-result1
-result2
-result3
+s1 := "Hello"
+s2 := "World"
+s3 := s1 + " " + s2
+s4 := s3 + "!"

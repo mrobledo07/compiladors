@@ -1,74 +1,48 @@
-PRODUCTION REAL Factor 1.500000
-PRODUCTION Assignment x := Float: 1.500000
-PRODUCTION INTEGER Factor 2
-PRODUCTION Assignment x := Integer: 2
-PRODUCTION INTEGER Factor 5
-PRODUCTION Assignment i := Integer: 5
+PRODUCTION REAL Factor 5.000000
+PRODUCTION Assignment x := 5.0
+PRODUCTION INTEGER Factor 3
+PRODUCTION Assignment i := 3
 PRODUCTION ID Factor i
+PRODUCTION ID Factor i
+PRODUCTION INTEGER Factor 3
+PRODUCTION expr_term 3 * 3
+PRODUCTION expr_arithmetic 3 + 9
 PRODUCTION ID Factor x
-PRODUCTION ID Factor i
-PRODUCTION expr_arithmetic Integer: 2 + Integer: 5
-PRODUCTION LPAREN expression RPAREN Integer: 7
-PRODUCTION expr_term Integer: 5 * Integer: 7
-PRODUCTION ID Factor i
-PRODUCTION REAL Factor 4.000000
-PRODUCTION expr_term Integer: 5 / Float: 4.000000
-PRODUCTION expr_arithmetic Integer: 35 - Float: 1.250000
-PRODUCTION Assignment z := Float: 33.750000
+PRODUCTION expr_arithmetic 12 - 5.0
+PRODUCTION Assignment y := 7.0
 PRODUCTION STRING Factor "Hola"
-PRODUCTION Assignment s := String: "Hola"
+PRODUCTION Assignment z := Hola
+PRODUCTION STRING Factor " Pepsicola"
+PRODUCTION Assignment w :=  Pepsicola
 PRODUCTION ID Factor z
-PRODUCTION REAL Factor 33.750000
-PRODUCTION expr_pow Float: 33.750000 > Float: 33.750000
-PRODUCTION ID Factor i
-PRODUCTION INTEGER Factor 0
-PRODUCTION expr_pow Integer: 5 > Integer: 0
-PRODUCTION ID Factor i
+PRODUCTION ID Factor w
+PRODUCTION expr_arithmetic Hola +  Pepsicola
+PRODUCTION Assignment z := Hola Pepsicola
 PRODUCTION INTEGER Factor 10
-PRODUCTION expr_pow Integer: 5 <= Integer: 10
-PRODUCTION expr_unary Bool: true AND Bool: true
-PRODUCTION LPAREN expression RPAREN Bool: true
-PRODUCTION NOT Bool: true
-PRODUCTION expr_arithmetic Bool: false OR Bool: false
-PRODUCTION BOOLEAN Factor 0
-PRODUCTION expr_arithmetic Bool: false OR Bool: false
-PRODUCTION Assignment b := Bool: false
-PRODUCTION ID Factor x
-PRODUCTION Expression Integer: 2
-PRODUCTION ID Factor i
-PRODUCTION Expression Integer: 5
-PRODUCTION ID Factor z
-PRODUCTION Expression Float: 33.750000
-PRODUCTION ID Factor s
-PRODUCTION Expression String: "Hola"
-PRODUCTION ID Factor b
-PRODUCTION Expression Bool: false
-PRODUCTION ID Factor i
-PRODUCTION ID Factor i
+PRODUCTION Assignment n := 10
+PRODUCTION INTEGER Factor 1
+PRODUCTION Assignment fact := 1
 PRODUCTION INTEGER Factor 2
-PRODUCTION expr_term Integer: 5 * Integer: 2
-PRODUCTION expr_arithmetic Integer: 5 + Integer: 10
-PRODUCTION Expression Integer: 15
+PRODUCTION Assignment i := 2
+PRODUCTION ID Factor n
+PRODUCTION INTEGER Factor 1
+PRODUCTION expr_arithmetic 10 - 1
+PRODUCTION ID Factor n
+PRODUCTION INTEGER Factor 1
+PRODUCTION expr_arithmetic 10 - 1
+PRODUCTION ID Factor n
+PRODUCTION INTEGER Factor 1
+PRODUCTION expr_arithmetic 10 - 1
+PRODUCTION ID Factor fact
 PRODUCTION ID Factor i
-PRODUCTION expr_unary - Integer: 5
-PRODUCTION ID Factor x
-PRODUCTION expr_arithmetic Integer: -5 + Integer: 2
-PRODUCTION Expression Integer: -3
-PRODUCTION ID Factor s
-PRODUCTION ID Factor s
+PRODUCTION expr_term 1 * 2
+PRODUCTION Assignment fact := 2
 PRODUCTION ID Factor i
-PRODUCTION expr_arithmetic String: "Hola" + Integer: 5
-PRODUCTION LPAREN expression RPAREN String: "Hola5"
-PRODUCTION expr_arithmetic String: "Hola" + String: "Hola5"
-PRODUCTION STRING Factor "--"
-PRODUCTION expr_arithmetic String: "HolaHola5" + String: "--"
-PRODUCTION ID Factor x
-PRODUCTION expr_arithmetic String: "HolaHola5--" + Integer: 2
-PRODUCTION ID Factor b
-PRODUCTION expr_arithmetic String: "HolaHola5--2" + Bool: false
-PRODUCTION Expression String: "HolaHola5--2false"
-PRODUCTION ID Factor b
-PRODUCTION ID Factor b
-PRODUCTION NOT Bool: false
-PRODUCTION expr_arithmetic Bool: false OR Bool: true
-PRODUCTION Expression Bool: true
+PRODUCTION INTEGER Factor 1
+PRODUCTION expr_arithmetic 2 + 1
+PRODUCTION Assignment i := 3
+PRODUCTION Repeat 9 times
+PRODUCTION Repeat 9 times
+PRODUCTION Repeat 9 times
+PRODUCTION ID Factor z
+PRODUCTION Expression Hola Pepsicola

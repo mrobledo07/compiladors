@@ -1,13 +1,6 @@
-// Assignments with semantic errors
-x := 5
-y := 10
-z := x + "hello" // Error: Type mismatch (cannot add integer and string)
-
-// Undefined variable usage
-c := x + y  // Error: Variable 'a' is not initialized
-c # ALL OK // a /
-/*
- * This is a comment
- * that spans multiple lines
- */
-z
+base := 2
+exponent := 3
+result := 1
+repeat exponent do
+    result := result * base
+done
