@@ -1,0 +1,30 @@
+arr := "Ha", "o", "l", "a"
+$t01 := 1 MULI 4
+$t02 := &arr ADDI $t01
+PARAM [$t02]
+CALL PUTC, 2
+$t03 := 2 MULI 4
+$t04 := &arr ADDI $t03
+PARAM [$t04]
+CALL PUTC, 1
+$t05 := 3 MULI 4
+$t06 := &arr ADDI $t05
+PARAM [$t06]
+CALL PUTC, 1
+$t07 := 4 MULI 4
+$t08 := &arr ADDI $t07
+PARAM [$t08]
+CALL PUTC, 1
+$t09 := 1 MULI 4
+$t10 := &arr ADDI $t09
+x := [$t10]
+PARAM x
+CALL PUTC, 2
+$t11 := 2 MULI 4
+$t12 := &arr ADDI $t11
+[$t12] := "0"
+$t13 := 2 MULI 4
+$t14 := &arr ADDI $t13
+PARAM [$t14]
+CALL PUTC, 1
+HALT

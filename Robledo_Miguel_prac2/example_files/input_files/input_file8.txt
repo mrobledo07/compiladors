@@ -5,3 +5,5 @@ arr[3]
 arr[4]
 x := arr[1]
 x
+arr[2] := "0"
+arr[2]

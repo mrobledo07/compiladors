@@ -49,6 +49,8 @@
         int line;
         value_info id_val;
         int is_literal;
+        char *array_name;
+        int index;
     } ident;
     int integer;
     float real;
@@ -102,7 +104,11 @@ statement:
     | expression {
         // Print the result of the expression
         fprintf(yyout, "PRODUCTION Expression %s\n", value_to_str($1.id_val));
-        printf("PARAM %s\n", $1.lexema);
+        if ($1.array_name != NULL) {
+            printf("PARAM [%s]\n", $1.lexema);
+        } else {
+            printf("PARAM %s\n", $1.lexema);
+        }
         if ($1.id_val.val_type == INT_TYPE) {
             printf("CALL PUTI, 1\n");
         } else if ($1.id_val.val_type == FLOAT_TYPE) {
@@ -184,13 +190,48 @@ assignment:
             };
             int symtab_status = sym_enter($1.lexema, &value);
             if (symtab_status == SYMTAB_OK || symtab_status == SYMTAB_DUPLICATE) {
-                printf("%s := %s\n", $1.lexema, $3.lexema);
+                if ($3.array_name != NULL) {
+                    printf("%s := [%s]\n", $1.lexema, $3.lexema);
+                } else { 
+                    printf("%s := %s\n", $1.lexema, $3.lexema);
+                }
                 instruction_counter++;
             } else {
                 yyerror("Error: Variable could not be entered into the symbol table. Stack overflow.");
             }
         } else {
             yyerror("Incompatible types in assignment");
+        }
+    }
+    | array_access ASSIGN expression {
+        fprintf(yyout, "PRODUCTION Assignment %s[%d] := %s\n", $1.lexema, $3.id_val.val_int, value_to_str($3.id_val));
+
+        value_info val1;
+        if (sym_lookup($1.array_name, &val1) == SYMTAB_NOT_FOUND) {
+            yyerror("Variable not found");
+        } else if (val1.val_type != ARRAY_TYPE) {
+            yyerror("Variable is not an array");
+        } else if ($1.id_val.val_type != $3.id_val.val_type) {
+            yyerror("Type error: Incompatible types in assignment");
+        } else {
+            int index = $1.index; 
+            if (index < 0 || index > val1.val_int) {
+                yyerror("Array index out of bounds");
+            } else {
+                val1.val_array[index] = (value){
+                    .val_type = $3.id_val.val_type,
+                    .val_int = $3.id_val.val_int,
+                    .val_float = $3.id_val.val_float,
+                    .val_str = $3.id_val.val_str ? strdup($3.id_val.val_str) : NULL
+                };
+                int symtab_status = sym_enter($1.lexema, &val1);
+                if (symtab_status == SYMTAB_OK || symtab_status == SYMTAB_DUPLICATE) {
+                    printf("[%s] := %s\n", $1.lexema, $3.lexema);
+                    instruction_counter++;
+                } else {
+                    yyerror("Error: Variable could not be entered into the symbol table. Stack overflow.");
+                } 
+            }
         }
     }
     ;
@@ -220,8 +261,10 @@ array_access:
                         int index = $3.id_val.val_int;
                         printf("%s := %d MULI 4\n", temp_var, index);
                         char *temp_var2 = generate_temp_var();
-                        printf("%s := %s ADDI %s\n", temp_var2, $1.lexema, temp_var);
+                        printf("%s := &%s ADDI %s\n", temp_var2, $1.lexema, temp_var);
                         $$.lexema = temp_var2;
+                        $$.array_name = $1.lexema;
+                        $$.index = index;
                         $$.id_val = (value_info){
                             .val_type = val2.val_type,
                             .val_int = val2.val_int,
@@ -232,6 +275,7 @@ array_access:
                         if (val2.val_type == STR_TYPE) {
                             $$.lenght = strlen(val2.val_str);
                         }
+                        instruction_counter += 2;
                     }
                 }
             }

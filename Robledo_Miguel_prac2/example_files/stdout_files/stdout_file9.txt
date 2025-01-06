@@ -1,0 +1,5 @@
+arr := "Ha", "o", "l", "a"
+$t01 := 2 MULI 4
+$t02 := &arr ADDI $t01
+PARAM [$t02]
+CALL PUTC, 1
