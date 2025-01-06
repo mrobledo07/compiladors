@@ -31,6 +31,8 @@
     }
 
     int instruction_counter = 1;
+    int array_size = 0;
+    char *array_elems = NULL;
 
 %}
 
@@ -60,14 +62,9 @@
 %token <ident> ID
 %token <real> REAL
 %token <string> STRING
-%token <boolean> BOOLEAN
-%token COS SIN TAN
-%token PLUS MINUS MULT DIV MOD POW 
-%token GT GE LT LE EQ NE 
-%token NOT AND OR 
+%token PLUS MINUS MULT DIV MOD 
 %token PI 
 %token E
-%token LEN SUBSTR
 %token LPAREN RPAREN
 %token COMMA
 %token COMMENT
@@ -76,24 +73,15 @@
 %token DONE
 
 %type <ident> expression
+%type <ident> expression_list
 %type <ident> repeat_expression
 %type <ident> expr_arithmetic
 %type <ident> expr_term
-%type <ident> expr_pow
 %type <ident> factor
-%type <ident> expr_trig
-%type <ident> expr_len
-%type <ident> expr_substr
 %type <ident> expr_unary
 
-%left OR
-%left AND
-%left EQ NE
-%left GT GE LT LE
 %left PLUS MINUS
 %left MULT DIV MOD
-%right POW
-%right NOT
 
 %start program
 
@@ -182,15 +170,15 @@ assignment:
                 $1.id_val.val_float = $3.id_val.val_float;
             } else if ($3.id_val.val_type == STR_TYPE) {
                 $1.id_val.val_str = $3.id_val.val_str;
-            } else if ($3.id_val.val_type == BOOL_TYPE) {
-                $1.id_val.val_bool = $3.id_val.val_bool;
+            } else if ($3.id_val.val_type == ARRAY_TYPE) {
+                $1.id_val.val_array = $3.id_val.val_array;
             }
             value_info value = {
                 .val_type = $3.id_val.val_type,
                 .val_int = $3.id_val.val_int,
                 .val_float = $3.id_val.val_float,
-                .val_bool = $3.id_val.val_bool,
-                .val_str = $3.id_val.val_str
+                .val_str = $3.id_val.val_str,
+                .val_array = $3.id_val.val_array
             };
             int symtab_status = sym_enter($1.lexema, &value);
             if (symtab_status == SYMTAB_OK || symtab_status == SYMTAB_DUPLICATE) {
@@ -206,7 +194,44 @@ assignment:
     ;
 
 expression:
-    expr_arithmetic
+    expression_list
+    ;
+
+expression_list:
+    expression_list COMMA expr_arithmetic {
+       array_size += 2;
+       char *new_elem1 = $1.lexema;
+       char *new_elem2 = $3.lexema;
+       if (array_size == 2) {
+            array_elems = concat_str(new_elem1, ", ");
+            array_elems = concat_str(array_elems, new_elem2);
+            $$.id_val.val_array = (value *)malloc(sizeof(value) * 2);
+            $$.id_val.val_array[0] = $1.id_val;
+            $$.id_val.val_array[1] = $3.id_val;
+       } else {
+           array_elems = concat_str(array_elems, ", ");
+           array_elems = concat_str(array_elems, new_elem1);
+              array_elems = concat_str(array_elems, ", ");
+              array_elems = concat_str(array_elems, new_elem2);
+       }
+       $$.lexema = array_elems;
+
+       $$.id_val.val_type = ARRAY_TYPE;
+       $$.id_val.val_int = array_size;
+        value new_value = {
+           .val_type = $3.id_val.val_type,
+           .val_int = $3.id_val.val_int,
+           .val_float = $3.id_val.val_float,
+           .val_str = $3.id_val.val_str
+        };
+        value *new_array = (value *)malloc(array_size * sizeof(value));
+        for (int i = 0; i < array_size - 1; i++) {
+            new_array[i] = $$.id_val.val_array[i];
+        }
+        $$.id_val.val_array[array_size - 1] = new_value;
+
+    }
+    | expr_arithmetic
     ;
 
 expr_arithmetic:
@@ -249,7 +274,7 @@ expr_arithmetic:
             } else if (($1.id_val.val_type != UNKNOWN_TYPE && $3.id_val.val_type != UNKNOWN_TYPE) && 
                         ($1.id_val.val_type == STR_TYPE || $3.id_val.val_type == STR_TYPE)) {
                 // Concatenate strings
-                $$.id_val.val_str = concat(value_to_str($1.id_val), value_to_str($3.id_val));    
+                $$.id_val.val_str = concat_str(value_to_str($1.id_val), value_to_str($3.id_val));    
                 $$.id_val.val_type = STR_TYPE;
                 temp_var = generate_temp_var();
                 printf("%s := %s CONCAT %s\n", temp_var, $1.lexema, $3.lexema);
@@ -304,9 +329,6 @@ expr_arithmetic:
             $$.lexema = temp_var;$$.is_literal = 0;
             $$.is_literal = 0;
     }
-    | expr_arithmetic OR expr_unary {
-        yyerror("C3A generator does not support logical OR operation");
-    }
     ;
 
 expr_unary:
@@ -359,14 +381,11 @@ expr_unary:
         $$.lexema = temp_var;
         $$.is_literal = 0;
     }
-    | expr_unary AND expr_term {
-        yyerror("C3A generator does not support logical AND operation");
-    }
     ;
 
 expr_term:
-    expr_pow
-    | expr_term MULT expr_pow {
+    factor
+    | expr_term MULT factor {
         fprintf(yyout, "PRODUCTION expr_term %s * %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
         char *temp_var = NULL;
         // Verify that are numbers
@@ -408,7 +427,7 @@ expr_term:
             $$.lexema = temp_var;
             $$.is_literal = 0;
     }
-    | expr_term DIV expr_pow {
+    | expr_term DIV factor {
         fprintf(yyout, "PRODUCTION expr_term %s / %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
         char *temp_var = NULL;
         // Verify that are numbers
@@ -449,7 +468,7 @@ expr_term:
             $$.lexema = temp_var;
             $$.is_literal = 0;
     }
-    | expr_term MOD expr_pow {
+    | expr_term MOD factor {
         fprintf(yyout, "PRODUCTION expr_term %s %% %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
         char *temp_var = NULL;
         // Verify that both operands are integers
@@ -466,35 +485,8 @@ expr_term:
         $$.lexema = temp_var;
         $$.is_literal = 0;
     }
-    | NOT expr_term {
-        yyerror("C3A generator does not support logical NOT operation");
-    }
     ;
 
-expr_pow:
-    factor 
-    | expr_pow POW factor {
-        yyerror("C3A generator does not support exponentiation operation");
-    }
-    | expr_pow GT factor {
-        yyerror("C3A generator does not support greater than operation");
-    }
-    | expr_pow LT factor {
-        yyerror("C3A generator does not support less than operation");
-    }
-    | expr_pow GE factor {
-        yyerror("C3A generator does not support greater or equal operation");
-    }
-    | expr_pow LE factor {
-        yyerror("C3A generator does not support less or equal operation");
-    }
-    | expr_pow EQ factor {
-        yyerror("C3A generator does not support equal operation");
-    }
-    | expr_pow NE factor {
-        yyerror("C3A generator does not support not equal operation");
-    }
-    ;
 
 factor: 
     ID {
@@ -527,12 +519,6 @@ factor:
         $$.lexema = $1;
         $$.lenght = strlen($1) - 2;
     }
-    | BOOLEAN {
-        fprintf(yyout, "PRODUCTION BOOLEAN Factor %d\n", $1);
-        $$.id_val.val_type = BOOL_TYPE;
-        $$.id_val.val_bool = $1;
-        $$.lexema = $1 ? "true" : "false";
-    }
     | REAL {
         fprintf(yyout, "PRODUCTION REAL Factor %f\n", $1);
         $$.id_val.val_type = FLOAT_TYPE;
@@ -558,39 +544,6 @@ factor:
     | LPAREN expression RPAREN {
         fprintf(yyout, "PRODUCTION LPAREN expression RPAREN %s\n", value_to_str($2.id_val));
         $$ = $2;
-    }
-    | expr_trig
-    | expr_len
-    | expr_substr
-    ;
-
-expr_trig:
-    SIN LPAREN expression RPAREN {
-        yyerror("C3A generator does not support trigonometric functions");
-    }
-    | COS LPAREN expression RPAREN {
-       yyerror("C3A generator does not support trigonometric functions");
-    }
-    | TAN LPAREN expression RPAREN {
-        yyerror("C3A generator does not support trigonometric functions");
-    }
-    ;
-    
-expr_len:
-    LEN LPAREN STRING RPAREN {
-        yyerror("C3A generator does not support string length function");
-    }
-    | LEN LPAREN ID RPAREN {
-        yyerror("C3A generator does not support string length function");
-    }
-    ;
-
-expr_substr:
-    SUBSTR LPAREN STRING COMMA expression COMMA expression RPAREN {
-        yyerror("C3A generator does not support substring function");
-    }
-    | SUBSTR LPAREN ID COMMA expression COMMA expression RPAREN {
-        yyerror("C3A generator does not support substring function");
     }
     ;
 

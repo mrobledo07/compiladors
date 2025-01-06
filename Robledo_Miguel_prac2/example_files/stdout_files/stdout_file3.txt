@@ -1,17 +1,19 @@
 m := 3
 n := 4
 i := 1
-$t01 := 0
-j := 1
+$t01 := m
 $t02 := 0
-$t03 := i MULI j
-x := $t03
-$t04 := j ADDI 1
-j := $t04
+j := 1
+$t03 := n
+$t04 := 0
+$t05 := i MULI j
+x := $t05
+$t06 := j ADDI 1
+j := $t06
+$t04 := $t04 ADDI 1
+IF $t04 LTI $t03 GOTO 9
+$t07 := i ADDI 1
+i := $t07
 $t02 := $t02 ADDI 1
-IF $t02 LTI $t01 GOTO 7
-$t05 := i ADDI 1
-i := $t05
-$t01 := $t01 ADDI 1
-IF $t01 LTI $t00 GOTO 5
+IF $t02 LTI $t01 GOTO 6
 HALT

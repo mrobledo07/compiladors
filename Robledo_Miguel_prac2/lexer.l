@@ -19,13 +19,8 @@ binary 0[bB][01]+
 hexadecimal 0[xX][0-9a-fA-F]+
 letter [a-zA-Z]
 float {decimal}"."{decimal}
-boolean (true|false|TRUE|FALSE)
 string \"([^\\\"]|\\.)*\"
 
-trig_func (cos|sin|tan|COS|SIN|TAN)
-
-len (len|LEN)
-substr (substr|SUBSTR)
 
 repeat (repeat)
 do (do)
@@ -36,18 +31,6 @@ minus     \-
 mult      \*
 div       \/
 mod       %
-pow       \*\*
-
-gt        >
-ge        >=
-lt        <
-le        <=
-eq        ==
-ne        <>
-
-not       (not|NOT)
-and       (and|AND)
-or        (or|OR)
 
 pi        (pi|PI)
 e         (e|E)
@@ -55,30 +38,10 @@ e         (e|E)
 %%
 
 
-
 "//".* { return COMMENT; }
 "#".* { return COMMENT; }
 "/*"([^\*]|\*+[^"/"])*\*+"/" { return COMMENT; }
 
-
-{boolean} {
-    yylval.boolean = (strcmp(yytext, "true") == 0 || strcmp(yytext, "TRUE") == 0) ? 1 : 0;
-    return BOOLEAN;
-}
-
-{trig_func} {
-        return (strcmp(yytext, "cos") == 0 || strcmp(yytext, "COS") == 0) ? COS :
-               (strcmp(yytext, "sin") == 0 || strcmp(yytext, "SIN") == 0) ? SIN :
-               (strcmp(yytext, "tan") == 0 || strcmp(yytext, "TAN") == 0) ? TAN : -1;
-}
-
-{len} {
-    return LEN;
-}
-
-{substr} {
-    return SUBSTR;
-}
 
 {repeat} {
     yylval.ident.line = yylineno;
@@ -91,18 +54,6 @@ e         (e|E)
 
 {done} {
     return DONE;
-}
-
-{not} {
-    return NOT;
-}
-
-{and} {
-    return AND;
-}
-
-{or} {
-    return OR;
 }
 
 {pi} {
@@ -174,33 +125,6 @@ e         (e|E)
     return MOD;
 }
 
-{pow} {
-    return POW;
-}
-
-{gt} {
-    return GT;
-}
-
-{ge} {
-    return GE;
-}
-
-{lt} {
-    return LT;
-}
-
-{le} {
-    return LE;
-}
-
-{eq} {
-    return EQ;
-}
-
-{ne} {
-    return NE;
-}
 
 \( { return LPAREN; }
 

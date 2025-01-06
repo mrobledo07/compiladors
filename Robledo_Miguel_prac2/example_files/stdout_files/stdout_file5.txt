@@ -1,9 +1,10 @@
 base := 2
 exponent := 3
 result := 1
-$t01 := 0
-$t02 := result MULI base
-result := $t02
-$t01 := $t01 ADDI 1
-IF $t01 LTI $t00 GOTO 5
+$t01 := exponent
+$t02 := 0
+$t03 := result MULI base
+result := $t03
+$t02 := $t02 ADDI 1
+IF $t02 LTI $t01 GOTO 6
 HALT

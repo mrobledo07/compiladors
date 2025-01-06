@@ -1,0 +1,3 @@
+PRODUCTION INTEGER Factor 4
+PRODUCTION INTEGER Factor 2
+PRODUCTION Assignment arr := Array: size=1
