@@ -31,7 +31,7 @@
     }
 
     int instruction_counter = 1;
-    int array_size = 0;
+    int array_size = 1;
     char *array_elems = NULL;
 
 %}
@@ -65,6 +65,7 @@
 %token PLUS MINUS MULT DIV MOD 
 %token PI 
 %token E
+%token LBRACKET RBRACKET
 %token LPAREN RPAREN
 %token COMMA
 %token COMMENT
@@ -74,6 +75,7 @@
 
 %type <ident> expression
 %type <ident> expression_list
+%type <ident> array_access
 %type <ident> repeat_expression
 %type <ident> expr_arithmetic
 %type <ident> expr_term
@@ -195,14 +197,55 @@ assignment:
 
 expression:
     expression_list
+    | array_access
     ;
+
+array_access:
+    ID LBRACKET expr_arithmetic RBRACKET {
+        value_info val1;
+        if (sym_lookup($1.lexema, &val1) == SYMTAB_NOT_FOUND) {
+            yyerror("Variable not found");
+        } else {
+            if (val1.val_type != ARRAY_TYPE) {
+                yyerror("Variable is not an array");
+            } else {
+                if ($3.id_val.val_type != INT_TYPE) {
+                    yyerror("Array index must be an integer");
+                } else {
+                    if ($3.id_val.val_int <= 0 || $3.id_val.val_int > val1.val_int) {
+                        yyerror("Array index out of bounds");
+                    } else {
+                        value val2 = val1.val_array[$3.id_val.val_int - 1];
+                        if (val2.val_type == INT_TYPE) {
+                            printf("VALUE %s[%d] = %d\n", $1.lexema, $3.id_val.val_int, val2.val_int);
+                        } else if (val2.val_type == FLOAT_TYPE) {
+                            printf("VALUE %s[%d] = %.2f\n", $1.lexema, $3.id_val.val_int, val2.val_float);
+                        } else {
+                            printf("VALUE %s[%d] = %s\n", $1.lexema, $3.id_val.val_int, val2.val_str);
+                        }
+                        $$.id_val = (value_info){
+                            .val_type = val2.val_type,
+                            .val_int = val2.val_int,
+                            .val_float = val2.val_float,
+                            .val_str = val2.val_str,
+                            .val_array = NULL
+                        };
+                        $$.lexema = strdup($1.lexema);
+                    }
+                }
+            }
+        }
+    }
 
 expression_list:
     expression_list COMMA expr_arithmetic {
-       array_size += 2;
-       char *new_elem1 = $1.lexema;
-       char *new_elem2 = $3.lexema;
-       if (array_size == 2) {
+       if (array_size == 1) {
+            char *new_elem1 = $1.lexema;
+            char *new_elem2 = $3.lexema;
+            if ($1.id_val.val_type != $3.id_val.val_type) {
+                yyerror("Type error: Incompatible types in array");
+            }
+            $$.id_val.val_array_type = $1.id_val.val_type;
             array_elems = concat_str(new_elem1, ", ");
             array_elems = concat_str(array_elems, new_elem2);
             $$.id_val.val_array = (value *)malloc(sizeof(value) * 2);
@@ -212,7 +255,6 @@ expression_list:
                 .val_float = $1.id_val.val_float,
                 .val_str = $1.id_val.val_str
             };
-
             value new_value2 = {
                 .val_type = $3.id_val.val_type,
                 .val_int = $3.id_val.val_int,
@@ -222,13 +264,15 @@ expression_list:
             $$.id_val.val_array[0] = new_value1;
             $$.id_val.val_array[1] = new_value2;
        } else {
-           array_elems = concat_str(array_elems, ", ");
-           array_elems = concat_str(array_elems, new_elem1);
-              array_elems = concat_str(array_elems, ", ");
-              array_elems = concat_str(array_elems, new_elem2);
+            char *new_elem = $3.lexema;
+            if ($3.id_val.val_type != $$.id_val.val_array_type) {
+                yyerror("Type error: Incompatible types in array");
+            }
+            array_elems = concat_str(array_elems, ", ");
+            array_elems = concat_str(array_elems, new_elem);    
        }
+       array_size++;
        $$.lexema = array_elems;
-
        $$.id_val.val_type = ARRAY_TYPE;
        $$.id_val.val_int = array_size;
         value new_value = {
@@ -241,7 +285,8 @@ expression_list:
         for (int i = 0; i < array_size - 1; i++) {
             new_array[i] = $$.id_val.val_array[i];
         }
-        $$.id_val.val_array[array_size - 1] = new_value;
+        new_array[array_size - 1] = new_value;
+        $$.id_val.val_array = new_array;
 
     }
     | expr_arithmetic

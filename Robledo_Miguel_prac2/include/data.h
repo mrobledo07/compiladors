@@ -20,6 +20,7 @@ typedef struct {
 
 typedef struct {
   data_type val_type;
+  data_type val_array_type;
   int val_int;
   float val_float;
   char *val_str;

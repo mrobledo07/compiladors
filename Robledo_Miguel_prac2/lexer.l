@@ -125,6 +125,8 @@ e         (e|E)
     return MOD;
 }
 
+\[ { return LBRACKET; }
+\] { return RBRACKET; }
 
 \( { return LPAREN; }
 
