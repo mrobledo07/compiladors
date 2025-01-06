@@ -216,13 +216,12 @@ array_access:
                         yyerror("Array index out of bounds");
                     } else {
                         value val2 = val1.val_array[$3.id_val.val_int - 1];
-                        if (val2.val_type == INT_TYPE) {
-                            printf("VALUE %s[%d] = %d\n", $1.lexema, $3.id_val.val_int, val2.val_int);
-                        } else if (val2.val_type == FLOAT_TYPE) {
-                            printf("VALUE %s[%d] = %.2f\n", $1.lexema, $3.id_val.val_int, val2.val_float);
-                        } else {
-                            printf("VALUE %s[%d] = %s\n", $1.lexema, $3.id_val.val_int, val2.val_str);
-                        }
+                        char *temp_var = generate_temp_var();
+                        int index = $3.id_val.val_int;
+                        printf("%s := %d MULI 4\n", temp_var, index);
+                        char *temp_var2 = generate_temp_var();
+                        printf("%s := %s ADDI %s\n", temp_var2, $1.lexema, temp_var);
+                        $$.lexema = temp_var2;
                         $$.id_val = (value_info){
                             .val_type = val2.val_type,
                             .val_int = val2.val_int,
@@ -230,7 +229,9 @@ array_access:
                             .val_str = val2.val_str,
                             .val_array = NULL
                         };
-                        $$.lexema = strdup($1.lexema);
+                        if (val2.val_type == STR_TYPE) {
+                            $$.lenght = strlen(val2.val_str);
+                        }
                     }
                 }
             }

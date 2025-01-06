@@ -1,5 +1,7 @@
-arr := "H", "o", "l", "a"
+arr := "Ha", "o", "l", "a"
 arr[1]
 arr[2]
 arr[3]
 arr[4]
+x := arr[1]
+x
