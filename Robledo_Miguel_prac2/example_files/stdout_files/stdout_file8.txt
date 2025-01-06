@@ -17,7 +17,7 @@ PARAM [$t08]
 CALL PUTC, 1
 $t09 := 1 MULI 4
 $t10 := &arr ADDI $t09
-x := $t10
+x := [$t10]
 PARAM x
 CALL PUTC, 2
 $t11 := 2 MULI 4

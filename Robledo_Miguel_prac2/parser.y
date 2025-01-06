@@ -77,15 +77,12 @@
 
 %type <ident> expression
 %type <ident> expression_list
-%type <ident> array_access
 %type <ident> repeat_expression
 %type <ident> expr_arithmetic
 %type <ident> expr_term
 %type <ident> factor
+%type <ident> array_access
 %type <ident> expr_unary
-
-%left PLUS MINUS
-%left MULT DIV MOD
 
 %start program
 
@@ -190,7 +187,7 @@ assignment:
             };
             int symtab_status = sym_enter($1.lexema, &value);
             if (symtab_status == SYMTAB_OK || symtab_status == SYMTAB_DUPLICATE) {
-                if (array_size > 1) {
+                if (array_size > 1 || $3.array_name != NULL) {
                     printf("%s := [%s]\n", $1.lexema, $3.lexema);
                     array_size = 1;
                     array_elems = NULL;
@@ -240,49 +237,6 @@ assignment:
 
 expression:
     expression_list
-    | array_access
-    ;
-
-array_access:
-    ID LBRACKET expr_arithmetic RBRACKET {
-        value_info val1;
-        if (sym_lookup($1.lexema, &val1) == SYMTAB_NOT_FOUND) {
-            yyerror("Variable not found");
-        } else {
-            if (val1.val_type != ARRAY_TYPE) {
-                yyerror("Variable is not an array");
-            } else {
-                if ($3.id_val.val_type != INT_TYPE) {
-                    yyerror("Array index must be an integer");
-                } else {
-                    if ($3.id_val.val_int <= 0 || $3.id_val.val_int > val1.val_int) {
-                        yyerror("Array index out of bounds");
-                    } else {
-                        value val2 = val1.val_array[$3.id_val.val_int - 1];
-                        char *temp_var = generate_temp_var();
-                        int index = $3.id_val.val_int;
-                        printf("%s := %d MULI 4\n", temp_var, index);
-                        char *temp_var2 = generate_temp_var();
-                        printf("%s := &%s ADDI %s\n", temp_var2, $1.lexema, temp_var);
-                        $$.lexema = temp_var2;
-                        $$.array_name = $1.lexema;
-                        $$.index = index;
-                        $$.id_val = (value_info){
-                            .val_type = val2.val_type,
-                            .val_int = val2.val_int,
-                            .val_float = val2.val_float,
-                            .val_str = val2.val_str,
-                            .val_array = NULL
-                        };
-                        if (val2.val_type == STR_TYPE) {
-                            $$.lenght = strlen(val2.val_str);
-                        }
-                        instruction_counter += 2;
-                    }
-                }
-            }
-        }
-    }
     ;
 
 expression_list:
@@ -314,8 +268,6 @@ expression_list:
        } else {
             char *new_elem = $3.lexema;
             if ($3.id_val.val_type != $$.id_val.val_array_type) {
-                                printf("PIPERO\n");
-
                 yyerror("Type error: Incompatible types in array");
             }
             array_elems = concat_str(array_elems, ", ");
@@ -354,26 +306,50 @@ expr_arithmetic:
                     $$.id_val.val_int = ($1.id_val.val_int + $3.id_val.val_int);
                     $$.id_val.val_type = INT_TYPE;
                     temp_var = generate_temp_var();
-                    printf("%s := %s ADDI %s\n", temp_var, $1.lexema, $3.lexema);
+                    if ($1.array_name != NULL && $3.array_name != NULL) {
+                        printf("%s := [%s] ADDI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                    } else if ($1.array_name != NULL) {
+                        printf("%s := [%s] ADDI %s\n", temp_var, $1.lexema, $3.lexema);
+                    } else if ($3.array_name != NULL) {
+                        printf("%s := %s ADDI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                    } else {
+                        printf("%s := %s ADDI %s\n", temp_var, $1.lexema, $3.lexema);
+                    }
                     instruction_counter++;
                 } else {
                     if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == FLOAT_TYPE) {
                         $$.id_val.val_float = $1.id_val.val_float + $3.id_val.val_float;
                         temp_var = generate_temp_var();
-                        printf("%s := %s ADDF %s\n", temp_var, $1.lexema, $3.lexema);
+                        if ($1.array_name != NULL && $3.array_name != NULL) {
+                            printf("%s := [%s] ADDF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        } else if ($1.array_name != NULL) {
+                            printf("%s := [%s] ADDF %s\n", temp_var, $1.lexema, $3.lexema);
+                        } else if ($3.array_name != NULL) {
+                            printf("%s := %s ADDF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        } else {
+                            printf("%s := %s ADDF %s\n", temp_var, $1.lexema, $3.lexema);
+                        }
                         instruction_counter++;
                     } else if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == INT_TYPE) {
                         $$.id_val.val_float = (float) $1.id_val.val_float + $3.id_val.val_int;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
-                        printf("%s := I2F %s\n", new_temp_var, $3.lexema);
+                        if ($3.array_name != NULL) {
+                            printf("%s := I2F [%s]\n", new_temp_var, $3.lexema);
+                        } else {
+                            printf("%s := I2F %s\n", new_temp_var, $3.lexema);
+                        }
                         printf("%s := %s ADDF %s\n", temp_var, $1.lexema, new_temp_var);
                         instruction_counter += 2;
                     } else {
                         $$.id_val.val_float = (float) $1.id_val.val_int + $3.id_val.val_float;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
-                        printf("%s := I2F %s\n", new_temp_var, $1.lexema);
+                        if ($1.array_name != NULL) {
+                            printf("%s := I2F [%s]\n", new_temp_var, $1.lexema);
+                        } else {
+                            printf("%s := I2F %s\n", new_temp_var, $1.lexema);
+                        }
                         printf("%s := %s ADDF %s\n", temp_var, new_temp_var, $3.lexema);
                         instruction_counter += 2;
                     }
@@ -385,7 +361,16 @@ expr_arithmetic:
                 $$.id_val.val_str = concat_str(value_to_str($1.id_val), value_to_str($3.id_val));    
                 $$.id_val.val_type = STR_TYPE;
                 temp_var = generate_temp_var();
-                printf("%s := %s CONCAT %s\n", temp_var, $1.lexema, $3.lexema);
+
+                if ($1.array_name != NULL && $3.array_name != NULL) {
+                    printf("%s := [%s] CONCAT [%s]\n", temp_var, $1.lexema, $3.lexema);
+                } else if ($1.array_name != NULL) {
+                    printf("%s := [%s] CONCAT %s\n", temp_var, $1.lexema, $3.lexema);
+                } else if ($3.array_name != NULL) {
+                    printf("%s := %s CONCAT [%s]\n", temp_var, $1.lexema, $3.lexema);
+                } else {
+                    printf("%s := %s CONCAT %s\n", temp_var, $1.lexema, $3.lexema);
+                }
                 instruction_counter++;
             }
             else {
@@ -405,26 +390,50 @@ expr_arithmetic:
                     $$.id_val.val_int = ($1.id_val.val_int - $3.id_val.val_int);
                     $$.id_val.val_type = INT_TYPE;
                     temp_var = generate_temp_var();
-                    printf("%s := %s SUBI %s\n", temp_var, $1.lexema, $3.lexema);
+                    if ($1.array_name != NULL && $3.array_name != NULL) {
+                        printf("%s := [%s] SUBI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                    } else if ($1.array_name != NULL) {
+                        printf("%s := [%s] SUBI %s\n", temp_var, $1.lexema, $3.lexema);
+                    } else if ($3.array_name != NULL) {
+                        printf("%s := %s SUBI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                    } else {
+                        printf("%s := %s SUBI %s\n", temp_var, $1.lexema, $3.lexema);
+                    }
                     instruction_counter++;
                 } else {
                     if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == FLOAT_TYPE) {
                         $$.id_val.val_float = $1.id_val.val_float - $3.id_val.val_float;
                         temp_var = generate_temp_var();
-                        printf("%s := %s SUBF %s\n", temp_var, $1.lexema, $3.lexema);
+                        if ($1.array_name != NULL && $3.array_name != NULL) {
+                            printf("%s := [%s] SUBF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        } else if ($1.array_name != NULL) {
+                            printf("%s := [%s] SUBF %s\n", temp_var, $1.lexema, $3.lexema);
+                        } else if ($3.array_name != NULL) {
+                            printf("%s := %s SUBF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        } else {
+                            printf("%s := %s SUBF %s\n", temp_var, $1.lexema, $3.lexema);
+                        }
                         instruction_counter++;
                     } else if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == INT_TYPE) {
                         $$.id_val.val_float = (float) $1.id_val.val_float - $3.id_val.val_int;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
-                        printf("%s := I2F %s\n", new_temp_var, $3.lexema);
+                        if ($3.array_name != NULL) {
+                            printf("%s := I2F [%s]\n", new_temp_var, $3.lexema);
+                        } else {
+                            printf("%s := I2F %s\n", new_temp_var, $3.lexema);
+                        }
                         printf("%s := %s SUBF %s\n", temp_var, $1.lexema, new_temp_var);
                         instruction_counter += 2;
                     } else {
                         $$.id_val.val_float = (float) $1.id_val.val_int - $3.id_val.val_float;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
-                        printf("%s := I2F %s\n", new_temp_var, $1.lexema);
+                        if ($1.array_name != NULL) {
+                            printf("%s := I2F [%s]\n", new_temp_var, $1.lexema);
+                        } else {
+                            printf("%s := I2F %s\n", new_temp_var, $1.lexema);
+                        }
                         printf("%s := %s SUBF %s\n", temp_var, new_temp_var, $3.lexema);
                         instruction_counter += 2;
                     }
@@ -450,13 +459,21 @@ expr_unary:
                 $$.id_val.val_int = $2.id_val.val_int;
                 $$.id_val.val_type = INT_TYPE;
                 temp_var = generate_temp_var();
-                printf("%s := %s\n", temp_var, $2.lexema);
+                if ($2.array_name != NULL) {
+                    printf("%s := [%s]\n", temp_var, $2.lexema);
+                } else {
+                    printf("%s := %s\n", temp_var, $2.lexema);
+                }
                 instruction_counter++;
             } else {
                 $$.id_val.val_float = $2.id_val.val_float;
                 $$.id_val.val_type = FLOAT_TYPE;
                 temp_var = generate_temp_var();
-                printf("%s := %s\n", temp_var, $2.lexema);
+                if ($2.array_name != NULL) {
+                    printf("%s := [%s]\n", temp_var, $2.lexema);
+                } else {
+                    printf("%s := %s\n", temp_var, $2.lexema);
+                }
                 instruction_counter++;
             }
         } else {
@@ -473,13 +490,21 @@ expr_unary:
                 $$.id_val.val_int = $2.id_val.val_int * -1;
                 $$.id_val.val_type = INT_TYPE;
                 temp_var = generate_temp_var();
-                printf("%s := CHSI %s\n", temp_var, $2.lexema);
+                if ($2.array_name != NULL) {
+                    printf("%s := CHSI [%s]\n", temp_var, $2.lexema);
+                } else {
+                    printf("%s := CHSI %s\n", temp_var, $2.lexema);
+                }
                 instruction_counter++;
             } else {
                 $$.id_val.val_float = $2.id_val.val_float * -1;
                 $$.id_val.val_type = FLOAT_TYPE;
                 temp_var = generate_temp_var();
-                printf("%s := CHSF %s\n", temp_var, $2.lexema);
+                if ($2.array_name != NULL) {
+                    printf("%s := CHSF [%s]\n", temp_var, $2.lexema);
+                } else {
+                    printf("%s := CHSF %s\n", temp_var, $2.lexema);
+                }
                 instruction_counter++;
             }
         } else {
@@ -503,26 +528,50 @@ expr_term:
                     $$.id_val.val_int = ($1.id_val.val_int * $3.id_val.val_int);
                     $$.id_val.val_type = INT_TYPE;
                     temp_var = generate_temp_var();
-                    printf("%s := %s MULI %s\n", temp_var, $1.lexema, $3.lexema);
+                    if ($1.array_name != NULL && $3.array_name != NULL) {
+                        printf("%s := [%s] MULI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                    } else if ($1.array_name != NULL) {
+                        printf("%s := [%s] MULI %s\n", temp_var, $1.lexema, $3.lexema);
+                    } else if ($3.array_name != NULL) {
+                        printf("%s := %s MULI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                    } else {
+                        printf("%s := %s MULI %s\n", temp_var, $1.lexema, $3.lexema);
+                    }
                     instruction_counter++;
                 } else {
                     if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == FLOAT_TYPE) {
                         $$.id_val.val_float = $1.id_val.val_float * $3.id_val.val_float;
                         temp_var = generate_temp_var();
-                        printf("%s := %s MULF %s\n", temp_var, $1.lexema, $3.lexema);
+                        if ($1.array_name != NULL && $3.array_name != NULL) {
+                            printf("%s := [%s] MULF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        } else if ($1.array_name != NULL) {
+                            printf("%s := [%s] MULF %s\n", temp_var, $1.lexema, $3.lexema);
+                        } else if ($3.array_name != NULL) {
+                            printf("%s := %s MULF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        } else {
+                            printf("%s := %s MULF %s\n", temp_var, $1.lexema, $3.lexema);
+                        }
                         instruction_counter++;
                     } else if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == INT_TYPE) {
                         $$.id_val.val_float = (float) $1.id_val.val_float * $3.id_val.val_int;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
-                        printf("%s := I2F %s\n", new_temp_var, $3.lexema);
+                        if ($3.array_name != NULL) {
+                            printf("%s := I2F [%s]\n", new_temp_var, $3.lexema);
+                        } else {
+                            printf("%s := I2F %s\n", new_temp_var, $3.lexema);
+                        }
                         printf("%s := %s MULF %s\n", temp_var, $1.lexema, new_temp_var);
                         instruction_counter += 2;
                     } else {
                         $$.id_val.val_float = (float) $1.id_val.val_int * $3.id_val.val_float;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
-                        printf("%s := I2F %s\n", new_temp_var, $1.lexema);
+                        if ($1.array_name != NULL) {
+                            printf("%s := I2F [%s]\n", new_temp_var, $1.lexema);
+                        } else {
+                            printf("%s := I2F %s\n", new_temp_var, $1.lexema);
+                        }
                         printf("%s := %s MULF %s\n", temp_var, new_temp_var, $3.lexema);
                         instruction_counter += 2;
                     }
@@ -545,26 +594,50 @@ expr_term:
                 if ($1.id_val.val_type == INT_TYPE && $3.id_val.val_type == INT_TYPE) {
                     $$.id_val.val_float = (float) ($1.id_val.val_int / $3.id_val.val_int);
                     temp_var = generate_temp_var();
-                    printf("%s := %s DIVI %s\n", temp_var, $1.lexema, $3.lexema);
+                    if ($1.array_name != NULL && $3.array_name != NULL) {
+                        printf("%s := [%s] DIVI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                    } else if ($1.array_name != NULL) {
+                        printf("%s := [%s] DIVI %s\n", temp_var, $1.lexema, $3.lexema);
+                    } else if ($3.array_name != NULL) {
+                        printf("%s := %s DIVI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                    } else {
+                        printf("%s := %s DIVI %s\n", temp_var, $1.lexema, $3.lexema);
+                    }
                     instruction_counter++;
                 } else {
                     if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == FLOAT_TYPE) {
                         $$.id_val.val_float = $1.id_val.val_float / $3.id_val.val_float;
                         temp_var = generate_temp_var();
-                        printf("%s := %s DIVF %s\n", temp_var, $1.lexema, $3.lexema);
+                        if ($1.array_name != NULL && $3.array_name != NULL) {
+                            printf("%s := [%s] DIVF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        } else if ($1.array_name != NULL) {
+                            printf("%s := [%s] DIVF %s\n", temp_var, $1.lexema, $3.lexema);
+                        } else if ($3.array_name != NULL) {
+                            printf("%s := %s DIVF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        } else {
+                            printf("%s := %s DIVF %s\n", temp_var, $1.lexema, $3.lexema);
+                        }
                         instruction_counter++;
                     } else if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == INT_TYPE) {
                         $$.id_val.val_float = (float) $1.id_val.val_float / $3.id_val.val_int;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
-                        printf("%s := I2F %s\n", new_temp_var, $3.lexema);
+                        if ($3.array_name != NULL) {
+                            printf("%s := I2F [%s]\n", new_temp_var, $3.lexema);
+                        } else {
+                            printf("%s := I2F %s\n", new_temp_var, $3.lexema);
+                        }
                         printf("%s := %s DIVF %s\n", temp_var, $1.lexema, new_temp_var);
                         instruction_counter += 2;
                     } else {
                         $$.id_val.val_float = (float) $1.id_val.val_int / $3.id_val.val_float;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
-                        printf("%s := I2F %s\n", new_temp_var, $1.lexema);
+                        if ($1.array_name != NULL) {
+                            printf("%s := I2F [%s]\n", new_temp_var, $1.lexema);
+                        } else {
+                            printf("%s := I2F %s\n", new_temp_var, $1.lexema);
+                        }
                         printf("%s := %s DIVF %s\n", temp_var, new_temp_var, $3.lexema);
                         instruction_counter += 2;
                     }
@@ -584,7 +657,15 @@ expr_term:
             $$.id_val.val_type = INT_TYPE;
             $$.id_val.val_int = $1.id_val.val_int % $3.id_val.val_int;
             temp_var = generate_temp_var();
-            printf("%s := %s MODI %s\n", temp_var, $1.lexema, $3.lexema);
+            if ($1.array_name != NULL && $3.array_name != NULL) {
+                printf("%s := [%s] MODI [%s]\n", temp_var, $1.lexema, $3.lexema);
+            } else if ($1.array_name != NULL) {
+                printf("%s := [%s] MODI %s\n", temp_var, $1.lexema, $3.lexema);
+            } else if ($3.array_name != NULL) {
+                printf("%s := %s MODI [%s]\n", temp_var, $1.lexema, $3.lexema);
+            } else {
+                printf("%s := %s MODI %s\n", temp_var, $1.lexema, $3.lexema);
+            }
             instruction_counter++;
         } else {
             yyerror("Type error: Modulus operation is only allowed between integers");
@@ -597,7 +678,8 @@ expr_term:
 
 
 factor: 
-    ID {
+    array_access 
+    | ID {
         fprintf(yyout, "PRODUCTION ID Factor %s\n", $1.lexema);
         value_info value;
         if (sym_lookup($1.lexema, &value) == SYMTAB_NOT_FOUND) {
@@ -654,5 +736,46 @@ factor:
         $$ = $2;
     }
     ;
+
+array_access:
+    ID LBRACKET expr_arithmetic RBRACKET {
+    value_info val1;
+        if (sym_lookup($1.lexema, &val1) == SYMTAB_NOT_FOUND) {
+            yyerror("Variable not found");
+        } else {
+            if (val1.val_type != ARRAY_TYPE) {
+                yyerror("Variable is not an array");
+            } else {
+                if ($3.id_val.val_type != INT_TYPE) {
+                    yyerror("Array index must be an integer");
+                } else {
+                    if ($3.id_val.val_int <= 0 || $3.id_val.val_int > val1.val_int) {
+                        yyerror("Array index out of bounds");
+                    } else {
+                        value val2 = val1.val_array[$3.id_val.val_int - 1];
+                        char *temp_var = generate_temp_var();
+                        int index = $3.id_val.val_int;
+                        printf("%s := %d MULI 4\n", temp_var, index);
+                        char *temp_var2 = generate_temp_var();
+                        printf("%s := &%s ADDI %s\n", temp_var2, $1.lexema, temp_var);
+                        $$.lexema = temp_var2;
+                        $$.array_name = $1.lexema;
+                        $$.index = index;
+                        $$.id_val = (value_info){
+                            .val_type = val2.val_type,
+                            .val_int = val2.val_int,
+                            .val_float = val2.val_float,
+                            .val_str = val2.val_str,
+                            .val_array = NULL
+                        };
+                        if (val2.val_type == STR_TYPE) {
+                            $$.lenght = strlen(val2.val_str);
+                        }
+                        instruction_counter += 2;
+                    }
+                }
+            }
+        }
+    }
 
 %%

@@ -39,3 +39,11 @@ PRODUCTION expr_arithmetic 7.3 + 4
 PRODUCTION Assignment w := 11.3
 PRODUCTION ID Factor w
 PRODUCTION Expression 11.3
+PRODUCTION INTEGER Factor 1
+PRODUCTION INTEGER Factor 4
+PRODUCTION expr_arithmetic 3.5 + 3.8
+PRODUCTION INTEGER Factor 1
+PRODUCTION expr_arithmetic 7.3 + 4
+PRODUCTION Assignment var := 11.3
+PRODUCTION ID Factor var
+PRODUCTION Expression 11.3

@@ -21,33 +21,33 @@ Grammar
    12           | array_access ASSIGN expression
 
    13 expression: expression_list
-   14           | array_access
 
-   15 array_access: ID LBRACKET expr_arithmetic RBRACKET
+   14 expression_list: expression_list COMMA expr_arithmetic
+   15                | expr_arithmetic
 
-   16 expression_list: expression_list COMMA expr_arithmetic
-   17                | expr_arithmetic
+   16 expr_arithmetic: expr_unary
+   17                | expr_arithmetic PLUS expr_unary
+   18                | expr_arithmetic MINUS expr_unary
 
-   18 expr_arithmetic: expr_unary
-   19                | expr_arithmetic PLUS expr_unary
-   20                | expr_arithmetic MINUS expr_unary
+   19 expr_unary: expr_term
+   20           | PLUS expr_unary
+   21           | MINUS expr_unary
 
-   21 expr_unary: expr_term
-   22           | PLUS expr_unary
-   23           | MINUS expr_unary
+   22 expr_term: factor
+   23          | expr_term MULT factor
+   24          | expr_term DIV factor
+   25          | expr_term MOD factor
 
-   24 expr_term: factor
-   25          | expr_term MULT factor
-   26          | expr_term DIV factor
-   27          | expr_term MOD factor
+   26 factor: array_access
+   27       | ID
+   28       | INTEGER
+   29       | STRING
+   30       | REAL
+   31       | PI
+   32       | E
+   33       | LPAREN expression RPAREN
 
-   28 factor: ID
-   29       | INTEGER
-   30       | STRING
-   31       | REAL
-   32       | PI
-   33       | E
-   34       | LPAREN expression RPAREN
+   34 array_access: ID LBRACKET expr_arithmetic RBRACKET
 
 
 Terminals, with rules where they appear
@@ -56,22 +56,22 @@ Terminals, with rules where they appear
     error (256)
     ASSIGN <no_value> (258) 11 12
     ENDLINE <no_value> (259) 2
-    INTEGER <integer> (260) 29
-    ID <ident> (261) 11 15 28
-    REAL <real> (262) 31
-    STRING <string> (263) 30
-    PLUS (264) 19 22
-    MINUS (265) 20 23
-    MULT (266) 25
-    DIV (267) 26
-    MOD (268) 27
-    PI (269) 32
-    E (270) 33
-    LBRACKET (271) 15
-    RBRACKET (272) 15
-    LPAREN (273) 34
-    RPAREN (274) 34
-    COMMA (275) 16
+    INTEGER <integer> (260) 28
+    ID <ident> (261) 11 27 34
+    REAL <real> (262) 30
+    STRING <string> (263) 29
+    PLUS (264) 17 20
+    MINUS (265) 18 21
+    MULT (266) 23
+    DIV (267) 24
+    MOD (268) 25
+    PI (269) 31
+    E (270) 32
+    LBRACKET (271) 34
+    RBRACKET (272) 34
+    LPAREN (273) 33
+    RPAREN (274) 33
+    COMMA (275) 14
     COMMENT (276) 6
     REPEAT <ident> (277) 9
     DO (278) 9
@@ -101,26 +101,26 @@ Nonterminals, with rules where they appear
         on left: 11 12
         on right: 4
     expression <ident> (32)
-        on left: 13 14
-        on right: 5 10 11 12 34
-    array_access <ident> (33)
-        on left: 15
-        on right: 12 14
-    expression_list <ident> (34)
-        on left: 16 17
-        on right: 13 16
-    expr_arithmetic <ident> (35)
-        on left: 18 19 20
-        on right: 15 16 17 19 20
-    expr_unary <ident> (36)
-        on left: 21 22 23
-        on right: 18 19 20 22 23
-    expr_term <ident> (37)
-        on left: 24 25 26 27
-        on right: 21 25 26 27
-    factor <ident> (38)
-        on left: 28 29 30 31 32 33 34
-        on right: 24 25 26 27
+        on left: 13
+        on right: 5 10 11 12 33
+    expression_list <ident> (33)
+        on left: 14 15
+        on right: 13 14
+    expr_arithmetic <ident> (34)
+        on left: 16 17 18
+        on right: 14 15 17 18 34
+    expr_unary <ident> (35)
+        on left: 19 20 21
+        on right: 16 17 18 20 21
+    expr_term <ident> (36)
+        on left: 22 23 24 25
+        on right: 19 23 24 25
+    factor <ident> (37)
+        on left: 26 27 28 29 30 31 32 33
+        on right: 22 23 24 25
+    array_access <ident> (38)
+        on left: 34
+        on right: 12 26
 
 
 State 0
@@ -146,50 +146,50 @@ State 0
     repeat_statement  go to state 14
     assignment        go to state 15
     expression        go to state 16
-    array_access      go to state 17
-    expression_list   go to state 18
-    expr_arithmetic   go to state 19
-    expr_unary        go to state 20
-    expr_term         go to state 21
-    factor            go to state 22
+    expression_list   go to state 17
+    expr_arithmetic   go to state 18
+    expr_unary        go to state 19
+    expr_term         go to state 20
+    factor            go to state 21
+    array_access      go to state 22
 
 
 State 1
 
-   29 factor: INTEGER •
+   28 factor: INTEGER •
 
-    $default  reduce using rule 29 (factor)
+    $default  reduce using rule 28 (factor)
 
 
 State 2
 
    11 assignment: ID • ASSIGN expression
-   15 array_access: ID • LBRACKET expr_arithmetic RBRACKET
-   28 factor: ID •
+   27 factor: ID •
+   34 array_access: ID • LBRACKET expr_arithmetic RBRACKET
 
     ASSIGN    shift, and go to state 23
     LBRACKET  shift, and go to state 24
 
-    $default  reduce using rule 28 (factor)
+    $default  reduce using rule 27 (factor)
 
 
 State 3
 
-   31 factor: REAL •
-
-    $default  reduce using rule 31 (factor)
-
-
-State 4
-
-   30 factor: STRING •
+   30 factor: REAL •
 
     $default  reduce using rule 30 (factor)
 
 
+State 4
+
+   29 factor: STRING •
+
+    $default  reduce using rule 29 (factor)
+
+
 State 5
 
-   22 expr_unary: PLUS • expr_unary
+   20 expr_unary: PLUS • expr_unary
 
     INTEGER  shift, and go to state 1
     ID       shift, and go to state 25
@@ -201,14 +201,15 @@ State 5
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
 
-    expr_unary  go to state 26
-    expr_term   go to state 21
-    factor      go to state 22
+    expr_unary    go to state 26
+    expr_term     go to state 20
+    factor        go to state 21
+    array_access  go to state 27
 
 
 State 6
 
-   23 expr_unary: MINUS • expr_unary
+   21 expr_unary: MINUS • expr_unary
 
     INTEGER  shift, and go to state 1
     ID       shift, and go to state 25
@@ -220,31 +221,32 @@ State 6
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
 
-    expr_unary  go to state 27
-    expr_term   go to state 21
-    factor      go to state 22
+    expr_unary    go to state 28
+    expr_term     go to state 20
+    factor        go to state 21
+    array_access  go to state 27
 
 
 State 7
 
-   32 factor: PI •
+   31 factor: PI •
 
-    $default  reduce using rule 32 (factor)
+    $default  reduce using rule 31 (factor)
 
 
 State 8
 
-   33 factor: E •
+   32 factor: E •
 
-    $default  reduce using rule 33 (factor)
+    $default  reduce using rule 32 (factor)
 
 
 State 9
 
-   34 factor: LPAREN • expression RPAREN
+   33 factor: LPAREN • expression RPAREN
 
     INTEGER  shift, and go to state 1
-    ID       shift, and go to state 28
+    ID       shift, and go to state 25
     REAL     shift, and go to state 3
     STRING   shift, and go to state 4
     PLUS     shift, and go to state 5
@@ -254,12 +256,12 @@ State 9
     LPAREN   shift, and go to state 9
 
     expression       go to state 29
-    array_access     go to state 30
-    expression_list  go to state 18
-    expr_arithmetic  go to state 19
-    expr_unary       go to state 20
-    expr_term        go to state 21
-    factor           go to state 22
+    expression_list  go to state 17
+    expr_arithmetic  go to state 18
+    expr_unary       go to state 19
+    expr_term        go to state 20
+    factor           go to state 21
+    array_access     go to state 27
 
 
 State 10
@@ -267,7 +269,7 @@ State 10
     9 repeat_statement: REPEAT • repeat_expression DO statement_list DONE
 
     INTEGER  shift, and go to state 1
-    ID       shift, and go to state 28
+    ID       shift, and go to state 25
     REAL     shift, and go to state 3
     STRING   shift, and go to state 4
     PLUS     shift, and go to state 5
@@ -276,21 +278,21 @@ State 10
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
 
-    repeat_expression  go to state 31
-    expression         go to state 32
-    array_access       go to state 30
-    expression_list    go to state 18
-    expr_arithmetic    go to state 19
-    expr_unary         go to state 20
-    expr_term          go to state 21
-    factor             go to state 22
+    repeat_expression  go to state 30
+    expression         go to state 31
+    expression_list    go to state 17
+    expr_arithmetic    go to state 18
+    expr_unary         go to state 19
+    expr_term          go to state 20
+    factor             go to state 21
+    array_access       go to state 27
 
 
 State 11
 
     0 $accept: program • $end
 
-    $end  shift, and go to state 33
+    $end  shift, and go to state 32
 
 
 State 12
@@ -306,8 +308,8 @@ State 13
     3               | statement •
     6 statement: statement • COMMENT
 
-    ENDLINE  shift, and go to state 34
-    COMMENT  shift, and go to state 35
+    ENDLINE  shift, and go to state 33
+    COMMENT  shift, and go to state 34
 
     $default  reduce using rule 3 (statement_list)
 
@@ -335,90 +337,67 @@ State 16
 
 State 17
 
-   12 assignment: array_access • ASSIGN expression
-   14 expression: array_access •
-
-    ASSIGN  shift, and go to state 36
-
-    $default  reduce using rule 14 (expression)
-
-
-State 18
-
    13 expression: expression_list •
-   16 expression_list: expression_list • COMMA expr_arithmetic
+   14 expression_list: expression_list • COMMA expr_arithmetic
 
-    COMMA  shift, and go to state 37
+    COMMA  shift, and go to state 35
 
     $default  reduce using rule 13 (expression)
 
 
+State 18
+
+   15 expression_list: expr_arithmetic •
+   17 expr_arithmetic: expr_arithmetic • PLUS expr_unary
+   18                | expr_arithmetic • MINUS expr_unary
+
+    PLUS   shift, and go to state 36
+    MINUS  shift, and go to state 37
+
+    $default  reduce using rule 15 (expression_list)
+
+
 State 19
 
-   17 expression_list: expr_arithmetic •
-   19 expr_arithmetic: expr_arithmetic • PLUS expr_unary
-   20                | expr_arithmetic • MINUS expr_unary
+   16 expr_arithmetic: expr_unary •
 
-    PLUS   shift, and go to state 38
-    MINUS  shift, and go to state 39
-
-    $default  reduce using rule 17 (expression_list)
+    $default  reduce using rule 16 (expr_arithmetic)
 
 
 State 20
 
-   18 expr_arithmetic: expr_unary •
+   19 expr_unary: expr_term •
+   23 expr_term: expr_term • MULT factor
+   24          | expr_term • DIV factor
+   25          | expr_term • MOD factor
 
-    $default  reduce using rule 18 (expr_arithmetic)
+    MULT  shift, and go to state 38
+    DIV   shift, and go to state 39
+    MOD   shift, and go to state 40
+
+    $default  reduce using rule 19 (expr_unary)
 
 
 State 21
 
-   21 expr_unary: expr_term •
-   25 expr_term: expr_term • MULT factor
-   26          | expr_term • DIV factor
-   27          | expr_term • MOD factor
+   22 expr_term: factor •
 
-    MULT  shift, and go to state 40
-    DIV   shift, and go to state 41
-    MOD   shift, and go to state 42
-
-    $default  reduce using rule 21 (expr_unary)
+    $default  reduce using rule 22 (expr_term)
 
 
 State 22
 
-   24 expr_term: factor •
+   12 assignment: array_access • ASSIGN expression
+   26 factor: array_access •
 
-    $default  reduce using rule 24 (expr_term)
+    ASSIGN  shift, and go to state 41
+
+    $default  reduce using rule 26 (factor)
 
 
 State 23
 
    11 assignment: ID ASSIGN • expression
-
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 28
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-
-    expression       go to state 43
-    array_access     go to state 30
-    expression_list  go to state 18
-    expr_arithmetic  go to state 19
-    expr_unary       go to state 20
-    expr_term        go to state 21
-    factor           go to state 22
-
-
-State 24
-
-   15 array_access: ID LBRACKET • expr_arithmetic RBRACKET
 
     INTEGER  shift, and go to state 1
     ID       shift, and go to state 25
@@ -430,79 +409,96 @@ State 24
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
 
-    expr_arithmetic  go to state 44
-    expr_unary       go to state 20
-    expr_term        go to state 21
-    factor           go to state 22
+    expression       go to state 42
+    expression_list  go to state 17
+    expr_arithmetic  go to state 18
+    expr_unary       go to state 19
+    expr_term        go to state 20
+    factor           go to state 21
+    array_access     go to state 27
+
+
+State 24
+
+   34 array_access: ID LBRACKET • expr_arithmetic RBRACKET
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 25
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    expr_arithmetic  go to state 43
+    expr_unary       go to state 19
+    expr_term        go to state 20
+    factor           go to state 21
+    array_access     go to state 27
 
 
 State 25
 
-   28 factor: ID •
+   27 factor: ID •
+   34 array_access: ID • LBRACKET expr_arithmetic RBRACKET
 
-    $default  reduce using rule 28 (factor)
+    LBRACKET  shift, and go to state 24
+
+    $default  reduce using rule 27 (factor)
 
 
 State 26
 
-   22 expr_unary: PLUS expr_unary •
+   20 expr_unary: PLUS expr_unary •
 
-    $default  reduce using rule 22 (expr_unary)
+    $default  reduce using rule 20 (expr_unary)
 
 
 State 27
 
-   23 expr_unary: MINUS expr_unary •
+   26 factor: array_access •
 
-    $default  reduce using rule 23 (expr_unary)
+    $default  reduce using rule 26 (factor)
 
 
 State 28
 
-   15 array_access: ID • LBRACKET expr_arithmetic RBRACKET
-   28 factor: ID •
+   21 expr_unary: MINUS expr_unary •
 
-    LBRACKET  shift, and go to state 24
-
-    $default  reduce using rule 28 (factor)
+    $default  reduce using rule 21 (expr_unary)
 
 
 State 29
 
-   34 factor: LPAREN expression • RPAREN
+   33 factor: LPAREN expression • RPAREN
 
-    RPAREN  shift, and go to state 45
+    RPAREN  shift, and go to state 44
 
 
 State 30
 
-   14 expression: array_access •
+    9 repeat_statement: REPEAT repeat_expression • DO statement_list DONE
 
-    $default  reduce using rule 14 (expression)
+    DO  shift, and go to state 45
 
 
 State 31
-
-    9 repeat_statement: REPEAT repeat_expression • DO statement_list DONE
-
-    DO  shift, and go to state 46
-
-
-State 32
 
    10 repeat_expression: expression •
 
     $default  reduce using rule 10 (repeat_expression)
 
 
-State 33
+State 32
 
     0 $accept: program $end •
 
     $default  accept
 
 
-State 34
+State 33
 
     2 statement_list: statement ENDLINE • statement_list
 
@@ -519,32 +515,32 @@ State 34
 
     $default  reduce using rule 8 (statement)
 
-    statement_list    go to state 47
+    statement_list    go to state 46
     statement         go to state 13
     repeat_statement  go to state 14
     assignment        go to state 15
     expression        go to state 16
-    array_access      go to state 17
-    expression_list   go to state 18
-    expr_arithmetic   go to state 19
-    expr_unary        go to state 20
-    expr_term         go to state 21
-    factor            go to state 22
+    expression_list   go to state 17
+    expr_arithmetic   go to state 18
+    expr_unary        go to state 19
+    expr_term         go to state 20
+    factor            go to state 21
+    array_access      go to state 22
 
 
-State 35
+State 34
 
     6 statement: statement COMMENT •
 
     $default  reduce using rule 6 (statement)
 
 
-State 36
+State 35
 
-   12 assignment: array_access ASSIGN • expression
+   14 expression_list: expression_list COMMA • expr_arithmetic
 
     INTEGER  shift, and go to state 1
-    ID       shift, and go to state 28
+    ID       shift, and go to state 25
     REAL     shift, and go to state 3
     STRING   shift, and go to state 4
     PLUS     shift, and go to state 5
@@ -553,18 +549,36 @@ State 36
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
 
-    expression       go to state 48
-    array_access     go to state 30
-    expression_list  go to state 18
-    expr_arithmetic  go to state 19
-    expr_unary       go to state 20
-    expr_term        go to state 21
-    factor           go to state 22
+    expr_arithmetic  go to state 47
+    expr_unary       go to state 19
+    expr_term        go to state 20
+    factor           go to state 21
+    array_access     go to state 27
+
+
+State 36
+
+   17 expr_arithmetic: expr_arithmetic PLUS • expr_unary
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 25
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    expr_unary    go to state 48
+    expr_term     go to state 20
+    factor        go to state 21
+    array_access  go to state 27
 
 
 State 37
 
-   16 expression_list: expression_list COMMA • expr_arithmetic
+   18 expr_arithmetic: expr_arithmetic MINUS • expr_unary
 
     INTEGER  shift, and go to state 1
     ID       shift, and go to state 25
@@ -576,34 +590,63 @@ State 37
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
 
-    expr_arithmetic  go to state 49
-    expr_unary       go to state 20
-    expr_term        go to state 21
-    factor           go to state 22
+    expr_unary    go to state 49
+    expr_term     go to state 20
+    factor        go to state 21
+    array_access  go to state 27
 
 
 State 38
 
-   19 expr_arithmetic: expr_arithmetic PLUS • expr_unary
+   23 expr_term: expr_term MULT • factor
 
     INTEGER  shift, and go to state 1
     ID       shift, and go to state 25
     REAL     shift, and go to state 3
     STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
     PI       shift, and go to state 7
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
 
-    expr_unary  go to state 50
-    expr_term   go to state 21
-    factor      go to state 22
+    factor        go to state 50
+    array_access  go to state 27
 
 
 State 39
 
-   20 expr_arithmetic: expr_arithmetic MINUS • expr_unary
+   24 expr_term: expr_term DIV • factor
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 25
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    factor        go to state 51
+    array_access  go to state 27
+
+
+State 40
+
+   25 expr_term: expr_term MOD • factor
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 25
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    factor        go to state 52
+    array_access  go to state 27
+
+
+State 41
+
+   12 assignment: array_access ASSIGN • expression
 
     INTEGER  shift, and go to state 1
     ID       shift, and go to state 25
@@ -615,82 +658,41 @@ State 39
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
 
-    expr_unary  go to state 51
-    expr_term   go to state 21
-    factor      go to state 22
-
-
-State 40
-
-   25 expr_term: expr_term MULT • factor
-
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 25
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-
-    factor  go to state 52
-
-
-State 41
-
-   26 expr_term: expr_term DIV • factor
-
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 25
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-
-    factor  go to state 53
+    expression       go to state 53
+    expression_list  go to state 17
+    expr_arithmetic  go to state 18
+    expr_unary       go to state 19
+    expr_term        go to state 20
+    factor           go to state 21
+    array_access     go to state 27
 
 
 State 42
-
-   27 expr_term: expr_term MOD • factor
-
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 25
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-
-    factor  go to state 54
-
-
-State 43
 
    11 assignment: ID ASSIGN expression •
 
     $default  reduce using rule 11 (assignment)
 
 
+State 43
+
+   17 expr_arithmetic: expr_arithmetic • PLUS expr_unary
+   18                | expr_arithmetic • MINUS expr_unary
+   34 array_access: ID LBRACKET expr_arithmetic • RBRACKET
+
+    PLUS      shift, and go to state 36
+    MINUS     shift, and go to state 37
+    RBRACKET  shift, and go to state 54
+
+
 State 44
 
-   15 array_access: ID LBRACKET expr_arithmetic • RBRACKET
-   19 expr_arithmetic: expr_arithmetic • PLUS expr_unary
-   20                | expr_arithmetic • MINUS expr_unary
+   33 factor: LPAREN expression RPAREN •
 
-    PLUS      shift, and go to state 38
-    MINUS     shift, and go to state 39
-    RBRACKET  shift, and go to state 55
+    $default  reduce using rule 33 (factor)
 
 
 State 45
-
-   34 factor: LPAREN expression RPAREN •
-
-    $default  reduce using rule 34 (factor)
-
-
-State 46
 
     9 repeat_statement: REPEAT repeat_expression DO • statement_list DONE
 
@@ -707,95 +709,95 @@ State 46
 
     $default  reduce using rule 8 (statement)
 
-    statement_list    go to state 56
+    statement_list    go to state 55
     statement         go to state 13
     repeat_statement  go to state 14
     assignment        go to state 15
     expression        go to state 16
-    array_access      go to state 17
-    expression_list   go to state 18
-    expr_arithmetic   go to state 19
-    expr_unary        go to state 20
-    expr_term         go to state 21
-    factor            go to state 22
+    expression_list   go to state 17
+    expr_arithmetic   go to state 18
+    expr_unary        go to state 19
+    expr_term         go to state 20
+    factor            go to state 21
+    array_access      go to state 22
 
 
-State 47
+State 46
 
     2 statement_list: statement ENDLINE statement_list •
 
     $default  reduce using rule 2 (statement_list)
 
 
+State 47
+
+   14 expression_list: expression_list COMMA expr_arithmetic •
+   17 expr_arithmetic: expr_arithmetic • PLUS expr_unary
+   18                | expr_arithmetic • MINUS expr_unary
+
+    PLUS   shift, and go to state 36
+    MINUS  shift, and go to state 37
+
+    $default  reduce using rule 14 (expression_list)
+
+
 State 48
 
-   12 assignment: array_access ASSIGN expression •
+   17 expr_arithmetic: expr_arithmetic PLUS expr_unary •
 
-    $default  reduce using rule 12 (assignment)
+    $default  reduce using rule 17 (expr_arithmetic)
 
 
 State 49
 
-   16 expression_list: expression_list COMMA expr_arithmetic •
-   19 expr_arithmetic: expr_arithmetic • PLUS expr_unary
-   20                | expr_arithmetic • MINUS expr_unary
+   18 expr_arithmetic: expr_arithmetic MINUS expr_unary •
 
-    PLUS   shift, and go to state 38
-    MINUS  shift, and go to state 39
-
-    $default  reduce using rule 16 (expression_list)
+    $default  reduce using rule 18 (expr_arithmetic)
 
 
 State 50
 
-   19 expr_arithmetic: expr_arithmetic PLUS expr_unary •
+   23 expr_term: expr_term MULT factor •
 
-    $default  reduce using rule 19 (expr_arithmetic)
+    $default  reduce using rule 23 (expr_term)
 
 
 State 51
 
-   20 expr_arithmetic: expr_arithmetic MINUS expr_unary •
+   24 expr_term: expr_term DIV factor •
 
-    $default  reduce using rule 20 (expr_arithmetic)
+    $default  reduce using rule 24 (expr_term)
 
 
 State 52
 
-   25 expr_term: expr_term MULT factor •
+   25 expr_term: expr_term MOD factor •
 
     $default  reduce using rule 25 (expr_term)
 
 
 State 53
 
-   26 expr_term: expr_term DIV factor •
+   12 assignment: array_access ASSIGN expression •
 
-    $default  reduce using rule 26 (expr_term)
+    $default  reduce using rule 12 (assignment)
 
 
 State 54
 
-   27 expr_term: expr_term MOD factor •
+   34 array_access: ID LBRACKET expr_arithmetic RBRACKET •
 
-    $default  reduce using rule 27 (expr_term)
+    $default  reduce using rule 34 (array_access)
 
 
 State 55
 
-   15 array_access: ID LBRACKET expr_arithmetic RBRACKET •
+    9 repeat_statement: REPEAT repeat_expression DO statement_list • DONE
 
-    $default  reduce using rule 15 (array_access)
+    DONE  shift, and go to state 56
 
 
 State 56
-
-    9 repeat_statement: REPEAT repeat_expression DO statement_list • DONE
-
-    DONE  shift, and go to state 57
-
-
-State 57
 
     9 repeat_statement: REPEAT repeat_expression DO statement_list DONE •
 
