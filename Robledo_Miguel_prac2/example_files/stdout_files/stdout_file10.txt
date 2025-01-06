@@ -1,0 +1,45 @@
+arr := [1, 1, 2, 3, 5, 8, 13]
+arr2 := [2, 2, 4, 6, 10, 16, 26]
+arr_length := 7
+sum := 0
+i := 1
+$t01 := arr_length
+$t02 := 0
+$t03 := i MULI 4
+$t04 := &arr ADDI $t03
+$t05 := i MULI 4
+$t06 := &arr2 ADDI $t05
+$t07 := [$t04] ADDI [$t06]
+sum := [$t07]
+PARAM sum
+CALL PUTI, 1
+$t08 := i ADDI 1
+i := $t08
+$t02 := $t02 ADDI 1
+IF $t02 LTI $t01 GOTO 8
+sum := 0
+sum2 := 0
+i := 1
+$t09 := arr_length
+$t10 := 0
+$t11 := i MULI 4
+$t12 := &arr ADDI $t11
+$t13 := sum ADDI [$t12]
+sum := $t13
+$t14 := i MULI 4
+$t15 := &arr2 ADDI $t14
+$t16 := sum2 ADDI [$t15]
+sum2 := $t16
+$t17 := i ADDI 1
+i := $t17
+$t10 := $t10 ADDI 1
+IF $t10 LTI $t09 GOTO 25
+$t18 := sum DIVI arr_length
+median := $t18
+$t19 := sum2 DIVI arr_length
+median2 := $t19
+PARAM median
+CALL PUTF, 1
+PARAM median2
+CALL PUTF, 1
+HALT

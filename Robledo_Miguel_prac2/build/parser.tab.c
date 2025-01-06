@@ -1876,8 +1876,11 @@ yyreduce:
                     } else {
                         value val2 = val1.val_array[(yyvsp[-1].ident).id_val.val_int - 1];
                         char *temp_var = generate_temp_var();
+                        if ((yyvsp[-1].ident).id_val.val_type != INT_TYPE) {
+                            yyerror("Error. Array index access must be integer.");
+                        }
                         int index = (yyvsp[-1].ident).id_val.val_int;
-                        printf("%s := %d MULI 4\n", temp_var, index);
+                        printf("%s := %s MULI 4\n", temp_var, (yyvsp[-1].ident).lexema);
                         char *temp_var2 = generate_temp_var();
                         printf("%s := &%s ADDI %s\n", temp_var2, (yyvsp[-3].ident).lexema, temp_var);
                         (yyval.ident).lexema = temp_var2;
@@ -1899,11 +1902,11 @@ yyreduce:
             }
         }
     }
-#line 1903 "build/parser.tab.c"
+#line 1906 "build/parser.tab.c"
     break;
 
 
-#line 1907 "build/parser.tab.c"
+#line 1910 "build/parser.tab.c"
 
       default: break;
     }
@@ -2096,5 +2099,5 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 781 "parser.y"
+#line 784 "parser.y"
 

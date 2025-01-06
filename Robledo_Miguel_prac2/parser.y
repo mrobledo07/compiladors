@@ -754,8 +754,11 @@ array_access:
                     } else {
                         value val2 = val1.val_array[$3.id_val.val_int - 1];
                         char *temp_var = generate_temp_var();
+                        if ($3.id_val.val_type != INT_TYPE) {
+                            yyerror("Error. Array index access must be integer.");
+                        }
                         int index = $3.id_val.val_int;
-                        printf("%s := %d MULI 4\n", temp_var, index);
+                        printf("%s := %s MULI 4\n", temp_var, $3.lexema);
                         char *temp_var2 = generate_temp_var();
                         printf("%s := &%s ADDI %s\n", temp_var2, $1.lexema, temp_var);
                         $$.lexema = temp_var2;
