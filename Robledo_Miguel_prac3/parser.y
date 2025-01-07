@@ -33,6 +33,7 @@
     int instruction_counter = 1;
     int array_size = 1;
     char *array_elems = NULL;
+    int while_line = -1;
 
 %}
 
@@ -73,14 +74,30 @@
 %token LBRACKET RBRACKET
 %token LPAREN RPAREN
 %token COMMA
+%token DOT
 %token COMMENT
 %token <ident> REPEAT
 %token DO
 %token DONE
+%token <ident> IF
+%token THEN
+%token ELSE
+%token FI
+%token SWITCH
+%token CASE
+%token DEFAULT
+%token BREAK
+%token FSWITCH
+%token WHILE
+%token UNTIL
+%token FOR
+%token IN
 
 %type <ident> expression
 %type <ident> expression_list
 %type <ident> repeat_expression
+%type <ident> if_statement
+%type <ident> expression_bool
 %type <ident> expr_arithmetic
 %type <ident> expr_term
 %type <ident> expr_bool
@@ -131,8 +148,131 @@ statement:
     }
     | statement COMMENT
     | repeat_statement
+    | if_statement
     |
     ;
+
+if_statement:
+    IF expression_bool THEN statement_list FI {
+        fprintf(yyout, "PRODUCTION If %s THEN\n", value_to_str($2.id_val));
+        printf("IF %s GOTO %d\n", $2.lexema, instruction_counter + 2);
+        printf("GOTO %d\n", instruction_counter + 1);
+        instruction_counter += 2;
+    }
+    ;
+
+expression_bool:
+    expression OR expression {
+        fprintf(yyout, "PRODUCTION Expression %s OR %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
+        if ($1.id_val.val_type == BOOL_TYPE && $3.id_val.val_type == BOOL_TYPE) {
+            $$.id_val.val_bool = $1.id_val.val_bool || $3.id_val.val_bool;
+            $$.id_val.val_type = BOOL_TYPE;
+            printf("IF %s GOTO %d\n", $1.lexema, instruction_counter + 4);
+            printf("GOTO %d\n", instruction_counter + 2);
+            printf("IF %s GOTO %d\n", $3.lexema, instruction_counter + 4);
+            if (while_line != -1) printf("GOTO %d\n", while_line);
+            else printf("GOTO %d\n", instruction_counter + 5);
+            instruction_counter += 4;
+        } else {
+            yyerror("Type error: Logical OR operation is only allowed between boolean values");
+            $$.id_val.val_type = UNKNOWN_TYPE;
+        }
+    }
+    | expression AND expression {
+
+    }
+    | expression EQ expression {
+        fprintf(yyout, "PRODUCTION Expression %s EQ %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
+        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
+            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
+                $$.id_val.val_type = BOOL_TYPE;
+                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
+                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) == 
+                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
+                } else {
+                    $$.id_val.val_bool = $1.id_val.val_int == $3.id_val.val_int;
+                }
+                char *lexema = concat_str($1.lexema, " ");
+                lexema = concat_str(lexema, "EQ");
+                lexema = concat_str(lexema, " ");
+                lexema = concat_str(lexema, $3.lexema);
+                $$.lexema = lexema;
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.id_val.val_type = UNKNOWN_TYPE;
+        }
+    }
+    | expression NE expression {
+
+    }
+    | expression GT expression {
+
+    }
+    | expression GE expression {
+
+    }
+    | expression LT expression {
+
+    }
+    | expression LE expression {
+
+    }
+    | NOT expression {
+
+    }
+    ;
+
+// if_else_statement:
+//     IF expression THEN statement_list ELSE statement_list FI {
+//         fprintf(yyout, "PRODUCTION If %s THEN ELSE\n", value_to_str($2.id_val));
+//         printf("IF %s GOTO %d\n", $2.lexema, instruction_counter + 2);
+//         printf("GOTO %d\n", instruction_counter + 1);
+//         instruction_counter += 2;
+//     }
+//     ;
+
+// switch_statement:
+//     SWITCH expression LBRACKET case_list RBRACKET {
+//         fprintf(yyout, "PRODUCTION Switch %s\n", value_to_str($2.id_val));
+//         printf("GOTO %d\n", instruction_counter + 1);
+//         instruction_counter++;
+//     }
+//     ;
+
+// case_list:
+//     case_list CASE INTEGER COLON statement_list
+//     | case_list DEFAULT COLON statement_list
+//     | CASE INTEGER COLON statement_list
+//     | DEFAULT COLON statement_list
+//     ;
+
+// while_statement:
+//     WHILE expression DO statement_list DONE {
+//         fprintf(yyout, "PRODUCTION While %s DO\n", value_to_str($2.id_val));
+//         printf("IF %s GOTO %d\n", $2.lexema, instruction_counter + 2);
+//         printf("GOTO %d\n", instruction_counter + 1);
+//         instruction_counter += 2;
+//     }
+//     ;
+
+// do_until_statement:
+//     DO statement_list UNTIL expression {
+//         fprintf(yyout, "PRODUCTION Do %s UNTIL\n", value_to_str($4.id_val));
+//         printf("IF %s GOTO %d\n", $4.lexema, instruction_counter + 2);
+//         printf("GOTO %d\n", instruction_counter + 1);
+//         instruction_counter += 2;
+//     }
+//     ;
+
+// for_statement:
+//     FOR ID IN expression DOT DOT expression DO statement_list DONE {
+//         fprintf(yyout, "PRODUCTION For %s IN %s DO\n", $2.lexema, value_to_str($4.id_val));
+//         printf("%s := 0\n", $2.lexema);
+//         printf("IF %s LTI %s GOTO %d\n", $2.lexema, $4.lexema, instruction_counter + 2);
+//         printf("GOTO %d\n", instruction_counter + 1);
+//         instruction_counter += 2;
+//     }
+//     ;
 
 repeat_statement:
     REPEAT repeat_expression DO statement_list DONE {
@@ -464,6 +604,18 @@ expr_arithmetic:
         if ($1.id_val.val_type == BOOL_TYPE && $3.id_val.val_type == BOOL_TYPE) {
             $$.id_val.val_bool = $1.id_val.val_bool || $3.id_val.val_bool;
             $$.id_val.val_type = BOOL_TYPE;
+            char *temp_var = generate_temp_var();
+            if ($1.array_name != NULL && $3.array_name != NULL) {
+                printf("%s := [%s] OR [%s]\n", temp_var, $1.lexema, $3.lexema);
+            } else if ($1.array_name != NULL) {
+                printf("%s := [%s] OR %s\n", temp_var, $1.lexema, $3.lexema);
+            } else if ($3.array_name != NULL) {
+                printf("%s := %s OR [%s]\n", temp_var, $1.lexema, $3.lexema);
+            } else {
+                printf("%s := %s OR %s\n", temp_var, $1.lexema, $3.lexema);
+            }
+            $$.lexema = temp_var;
+            instruction_counter++;
         } else {
             yyerror("Type error: Logical OR operation is only allowed between boolean values");
             $$.id_val.val_type = UNKNOWN_TYPE;
@@ -543,6 +695,18 @@ expr_unary:
         if ($1.id_val.val_type == BOOL_TYPE && $3.id_val.val_type == BOOL_TYPE) {
             $$.id_val.val_bool = $1.id_val.val_bool && $3.id_val.val_bool;
             $$.id_val.val_type = BOOL_TYPE;
+            char *temp_var = generate_temp_var();
+            if ($1.array_name != NULL && $3.array_name != NULL) {
+                printf("%s := [%s] AND [%s]\n", temp_var, $1.lexema, $3.lexema);
+            } else if ($1.array_name != NULL) {
+                printf("%s := [%s] AND %s\n", temp_var, $1.lexema, $3.lexema);
+            } else if ($3.array_name != NULL) {
+                printf("%s := %s AND [%s]\n", temp_var, $1.lexema, $3.lexema);
+            } else {
+                printf("%s := %s AND %s\n", temp_var, $1.lexema, $3.lexema);
+            }
+            $$.lexema = temp_var;
+            instruction_counter++;
         } else {
             yyerror("Type error: Logical AND operation is only allowed between boolean values");
             $$.id_val.val_type = UNKNOWN_TYPE;
@@ -714,6 +878,14 @@ expr_term:
         if ($2.id_val.val_type == BOOL_TYPE) {
             $$.id_val.val_type = BOOL_TYPE;
             $$.id_val.val_bool = !$2.id_val.val_bool;
+            char *temp_var = generate_temp_var();
+            if ($2.array_name != NULL) {
+                printf("%s := NOT [%s]\n", temp_var, $2.lexema);
+            } else {
+                printf("%s := NOT %s\n", temp_var, $2.lexema);
+            }
+            $$.lexema = temp_var;
+            instruction_counter++;
         } else {
             yyerror("Type error: Logical NOT operation is only allowed on boolean values");
             $$.id_val.val_type = UNKNOWN_TYPE;

@@ -90,10 +90,24 @@ extern int yydebug;
     LPAREN = 283,                  /* LPAREN  */
     RPAREN = 284,                  /* RPAREN  */
     COMMA = 285,                   /* COMMA  */
-    COMMENT = 286,                 /* COMMENT  */
-    REPEAT = 287,                  /* REPEAT  */
-    DO = 288,                      /* DO  */
-    DONE = 289                     /* DONE  */
+    DOT = 286,                     /* DOT  */
+    COMMENT = 287,                 /* COMMENT  */
+    REPEAT = 288,                  /* REPEAT  */
+    DO = 289,                      /* DO  */
+    DONE = 290,                    /* DONE  */
+    IF = 291,                      /* IF  */
+    THEN = 292,                    /* THEN  */
+    ELSE = 293,                    /* ELSE  */
+    FI = 294,                      /* FI  */
+    SWITCH = 295,                  /* SWITCH  */
+    CASE = 296,                    /* CASE  */
+    DEFAULT = 297,                 /* DEFAULT  */
+    BREAK = 298,                   /* BREAK  */
+    FSWITCH = 299,                 /* FSWITCH  */
+    WHILE = 300,                   /* WHILE  */
+    UNTIL = 301,                   /* UNTIL  */
+    FOR = 302,                     /* FOR  */
+    IN = 303                       /* IN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -119,7 +133,7 @@ union YYSTYPE
     int boolean;
     void *no_value;
 
-#line 123 "build/parser.tab.h"
+#line 137 "build/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

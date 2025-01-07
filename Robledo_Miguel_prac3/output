@@ -1,0 +1,14 @@
+PRODUCTION INTEGER Factor 400
+PRODUCTION Assignment total := 400
+PRODUCTION INTEGER Factor 0
+PRODUCTION Assignment i := 0
+PRODUCTION ID Factor total
+PRODUCTION INTEGER Factor 400
+PRODUCTION expr_bool Integer: 400 > Integer: 400
+PRODUCTION ID Factor total
+PRODUCTION INTEGER Factor 400
+PRODUCTION expr_bool Integer: 400 == Integer: 400
+PRODUCTION expr_arithmetic Boolean: 0 OR Boolean: 1
+PRODUCTION INTEGER Factor 1
+PRODUCTION Assignment i := 1
+PRODUCTION If 1 THEN

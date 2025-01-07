@@ -1,0 +1,7 @@
+total := 400
+i := 0
+$t01 := total OR total
+i := 1
+IF $t01 GOTO 7
+GOTO 6
+HALT

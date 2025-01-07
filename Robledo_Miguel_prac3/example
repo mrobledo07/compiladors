@@ -1,0 +1,5 @@
+total := 500
+i := 0
+if total == 666.6 or total == 500 then
+  i := 1
+fi

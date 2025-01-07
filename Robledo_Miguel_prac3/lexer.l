@@ -27,6 +27,22 @@ repeat (repeat)
 do (do)
 done (done)
 
+if (if)
+then (then)
+else (else)
+fi (fi)
+
+switch (switch)
+case (case)
+default (default)
+break (break)
+fswitch (fswitch)
+
+while (while)
+until (until)
+for (for)
+in (in)
+
 plus      \+
 minus     \-
 mult      \*
@@ -71,6 +87,63 @@ e         (e|E)
 {done} {
     return DONE;
 }
+
+{if} {
+    yylval.ident.line = yylineno;
+    return IF;
+}
+
+{then} {
+    return THEN;
+}
+
+{else} {
+    return ELSE;
+}
+
+{fi} {
+    return FI;
+}
+
+{switch} {
+    yylval.ident.line = yylineno;
+    return SWITCH;
+}
+
+{case} {
+    return CASE;
+}
+
+{default} {
+    return DEFAULT;
+}
+
+{break} {
+    return BREAK;
+}
+
+{fswitch} {
+    return FSWITCH;
+}
+
+{while} {
+    yylval.ident.line = yylineno;
+    return WHILE;
+}
+
+{until} {
+    return UNTIL;
+}
+
+{for} {
+    yylval.ident.line = yylineno;
+    return FOR;
+}
+
+{in} {
+    return IN;
+}
+
 
 {not} {
     return NOT;
@@ -185,6 +258,7 @@ e         (e|E)
 \) { return RPAREN; }
 
 "," { return COMMA; }
+"." { return DOT; }
 
 
 ^[ \t]*\n { }
