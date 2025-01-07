@@ -36,5 +36,6 @@ char *value_info_to_str(value_info value);
 char *value_to_str(value_info value);
 
 char *generate_temp_var();
+char *generate_fi_if();
 
 #endif

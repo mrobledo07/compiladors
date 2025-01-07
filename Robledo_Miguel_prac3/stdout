@@ -1,7 +1,23 @@
-total := 400
+total := 500
 i := 0
-$t01 := total OR total
-i := 1
-IF $t01 GOTO 7
-GOTO 6
+x := 555
+IF total LEF 400.399994 GOTO 6
+GOTO 8
+IF i LTI 375 GOTO 8
+GOTO 9
+IF total LEF 400.399994 GOTO 6
+GOTO 8
+IF total GEI 500 GOTO 8
+GOTO 9
+IF total LEF 400.399994 GOTO 6
+GOTO 8
+IF i GTI 525 GOTO 8
+GOTO 9
+IF i LTI 350 GOTO 6
+GOTO 8
+IF i GTI 550 GOTO 8
+GOTO 9
+i := 666
+$t01 := x ADDI 1
+x := $t01
 HALT

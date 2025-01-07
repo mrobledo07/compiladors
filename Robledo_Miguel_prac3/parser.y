@@ -33,8 +33,6 @@
     int instruction_counter = 1;
     int array_size = 1;
     char *array_elems = NULL;
-    int while_line = -1;
-
 %}
 
 %code requires {
@@ -98,9 +96,11 @@
 %type <ident> repeat_expression
 %type <ident> if_statement
 %type <ident> expression_bool
+%type <ident> expr_bool_and
+%type <ident> expr_bool_not
+%type <ident> expr_bool
 %type <ident> expr_arithmetic
 %type <ident> expr_term
-%type <ident> expr_bool
 %type <ident> factor
 %type <ident> array_access
 %type <ident> expr_unary
@@ -154,34 +154,67 @@ statement:
 
 if_statement:
     IF expression_bool THEN statement_list FI {
-        fprintf(yyout, "PRODUCTION If %s THEN\n", value_to_str($2.id_val));
-        printf("IF %s GOTO %d\n", $2.lexema, instruction_counter + 2);
-        printf("GOTO %d\n", instruction_counter + 1);
-        instruction_counter += 2;
+        fprintf(yyout, "PRODUCTION If %s = %s THEN\n", $2.lexema, value_to_str($2.id_val));
+        instruction_counter++;
     }
     ;
 
 expression_bool:
-    expression OR expression {
+    expr_bool_and
+    | expression_bool OR expr_bool_and {
         fprintf(yyout, "PRODUCTION Expression %s OR %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
         if ($1.id_val.val_type == BOOL_TYPE && $3.id_val.val_type == BOOL_TYPE) {
             $$.id_val.val_bool = $1.id_val.val_bool || $3.id_val.val_bool;
             $$.id_val.val_type = BOOL_TYPE;
-            printf("IF %s GOTO %d\n", $1.lexema, instruction_counter + 4);
-            printf("GOTO %d\n", instruction_counter + 2);
+            printf("IF %s GOTO %d\n", $1.lexema, instruction_counter + 2);
+            printf("GOTO %d\n", instruction_counter + 4);
             printf("IF %s GOTO %d\n", $3.lexema, instruction_counter + 4);
-            if (while_line != -1) printf("GOTO %d\n", while_line);
-            else printf("GOTO %d\n", instruction_counter + 5);
-            instruction_counter += 4;
+            printf("GOTO %d\n", instruction_counter + 5);
         } else {
             yyerror("Type error: Logical OR operation is only allowed between boolean values");
             $$.id_val.val_type = UNKNOWN_TYPE;
         }
     }
-    | expression AND expression {
-
+    ;
+    
+expr_bool_and:
+    expr_bool_not
+    | expr_bool_and AND expr_bool_not {
+        fprintf(yyout, "PRODUCTION Expression %s AND %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
+        if ($1.id_val.val_type == BOOL_TYPE && $3.id_val.val_type == BOOL_TYPE) {
+            $$.id_val.val_bool = $1.id_val.val_bool && $3.id_val.val_bool;
+            $$.id_val.val_type = BOOL_TYPE;
+            printf("IF %s GOTO %d\n", $1.lexema, instruction_counter + 2);
+            printf("GOTO %d\n", instruction_counter + 4);
+            printf("IF %s GOTO %d\n", $3.lexema, instruction_counter + 4);
+            printf("GOTO %d\n", instruction_counter + 5);
+            instruction_counter += 4;
+        } else {
+            yyerror("Type error: Logical AND operation is only allowed between boolean values");
+            $$.id_val.val_type = UNKNOWN_TYPE;
+        }
     }
-    | expression EQ expression {
+    ;
+
+expr_bool_not:
+    expr_bool
+    | NOT expr_bool {
+        fprintf(yyout, "PRODUCTION NOT %s\n", value_to_str($2.id_val));
+        if ($2.id_val.val_type == BOOL_TYPE) {
+            $$.id_val.val_bool = !$2.id_val.val_bool;
+            $$.id_val.val_type = BOOL_TYPE;
+            printf("IF %s GOTO %d\n", $2.lexema, instruction_counter + 2);
+            printf("GOTO %d\n", instruction_counter + 1);
+            instruction_counter += 2;
+        } else {
+            yyerror("Type error: Logical NOT operation is only allowed on boolean values");
+            $$.id_val.val_type = UNKNOWN_TYPE;
+        }
+    }
+    ;
+
+expr_bool:
+    expression EQ expression {
         fprintf(yyout, "PRODUCTION Expression %s EQ %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
         if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
             ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
@@ -203,22 +236,121 @@ expression_bool:
         }
     }
     | expression NE expression {
-
+        fprintf(yyout, "PRODUCTION Expression %s NE %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
+        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
+            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
+                $$.id_val.val_type = BOOL_TYPE;
+                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
+                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) != 
+                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
+                } else {
+                    $$.id_val.val_bool = $1.id_val.val_int != $3.id_val.val_int;
+                }
+                char *lexema = concat_str($1.lexema, " ");
+                lexema = concat_str(lexema, "NE");
+                lexema = concat_str(lexema, " ");
+                lexema = concat_str(lexema, $3.lexema);
+                $$.lexema = lexema;
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.id_val.val_type = UNKNOWN_TYPE;
+        }
     }
     | expression GT expression {
-
+        fprintf(yyout, "PRODUCTION Expression %s GT %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
+        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
+            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
+                char *comparison = NULL;
+                $$.id_val.val_type = BOOL_TYPE;
+                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
+                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) > 
+                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
+                    comparison = "GTF";
+                } else {
+                    $$.id_val.val_bool = $1.id_val.val_int > $3.id_val.val_int;
+                    comparison = "GTI";
+                }
+                char *lexema = concat_str($1.lexema, " ");
+                lexema = concat_str(lexema, comparison);
+                lexema = concat_str(lexema, " ");
+                lexema = concat_str(lexema, $3.lexema);
+                $$.lexema = lexema;
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.id_val.val_type = UNKNOWN_TYPE;
+        }
     }
     | expression GE expression {
-
+        fprintf(yyout, "PRODUCTION Expression %s GE %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
+        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
+            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
+                char *comparison = NULL;
+                $$.id_val.val_type = BOOL_TYPE;
+                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
+                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) >= 
+                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
+                    comparison = "GEF";
+                } else {
+                    $$.id_val.val_bool = $1.id_val.val_int >= $3.id_val.val_int;
+                    comparison = "GEI";
+                }
+                char *lexema = concat_str($1.lexema, " ");
+                lexema = concat_str(lexema, comparison);
+                lexema = concat_str(lexema, " ");
+                lexema = concat_str(lexema, $3.lexema);
+                $$.lexema = lexema;
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.id_val.val_type = UNKNOWN_TYPE;
+        }
     }
     | expression LT expression {
-
+        fprintf(yyout, "PRODUCTION Expression %s LT %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
+        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
+            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
+                char *comparison = NULL;
+                $$.id_val.val_type = BOOL_TYPE;
+                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
+                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) < 
+                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
+                    comparison = "LTF";
+                } else {
+                    $$.id_val.val_bool = $1.id_val.val_int < $3.id_val.val_int;
+                    comparison = "LTI";
+                }
+                char *lexema = concat_str($1.lexema, " ");
+                lexema = concat_str(lexema, comparison);
+                lexema = concat_str(lexema, " ");
+                lexema = concat_str(lexema, $3.lexema);
+                $$.lexema = lexema;
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.id_val.val_type = UNKNOWN_TYPE;
+        }
     }
     | expression LE expression {
-
-    }
-    | NOT expression {
-
+        fprintf(yyout, "PRODUCTION Expression %s LE %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
+        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
+            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
+                char *comparison = NULL;
+                $$.id_val.val_type = BOOL_TYPE;
+                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
+                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) <= 
+                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
+                    comparison = "LEF";
+                } else {
+                    $$.id_val.val_bool = $1.id_val.val_int <= $3.id_val.val_int;
+                    comparison = "LEI";
+                }
+                char *lexema = concat_str($1.lexema, " ");
+                lexema = concat_str(lexema, comparison);
+                lexema = concat_str(lexema, " ");
+                lexema = concat_str(lexema, $3.lexema);
+                $$.lexema = lexema;
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            $$.id_val.val_type = UNKNOWN_TYPE;
+        }
     }
     ;
 
@@ -598,29 +730,6 @@ expr_arithmetic:
             $$.lexema = temp_var;$$.is_literal = 0;
             $$.is_literal = 0;
     }
-    | expr_arithmetic OR expr_unary {
-        fprintf(yyout, "PRODUCTION expr_arithmetic %s OR %s\n", value_info_to_str($1.id_val), value_info_to_str($3.id_val));
-        // Verify that are booleans
-        if ($1.id_val.val_type == BOOL_TYPE && $3.id_val.val_type == BOOL_TYPE) {
-            $$.id_val.val_bool = $1.id_val.val_bool || $3.id_val.val_bool;
-            $$.id_val.val_type = BOOL_TYPE;
-            char *temp_var = generate_temp_var();
-            if ($1.array_name != NULL && $3.array_name != NULL) {
-                printf("%s := [%s] OR [%s]\n", temp_var, $1.lexema, $3.lexema);
-            } else if ($1.array_name != NULL) {
-                printf("%s := [%s] OR %s\n", temp_var, $1.lexema, $3.lexema);
-            } else if ($3.array_name != NULL) {
-                printf("%s := %s OR [%s]\n", temp_var, $1.lexema, $3.lexema);
-            } else {
-                printf("%s := %s OR %s\n", temp_var, $1.lexema, $3.lexema);
-            }
-            $$.lexema = temp_var;
-            instruction_counter++;
-        } else {
-            yyerror("Type error: Logical OR operation is only allowed between boolean values");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
     ;
 
 expr_unary:
@@ -689,34 +798,11 @@ expr_unary:
         $$.lexema = temp_var;
         $$.is_literal = 0;
     }
-    | expr_unary AND expr_term {
-        fprintf(yyout, "PRODUCTION expr_unary %s AND %s\n", value_info_to_str($1.id_val), value_info_to_str($3.id_val));
-        // Verify that are booleans
-        if ($1.id_val.val_type == BOOL_TYPE && $3.id_val.val_type == BOOL_TYPE) {
-            $$.id_val.val_bool = $1.id_val.val_bool && $3.id_val.val_bool;
-            $$.id_val.val_type = BOOL_TYPE;
-            char *temp_var = generate_temp_var();
-            if ($1.array_name != NULL && $3.array_name != NULL) {
-                printf("%s := [%s] AND [%s]\n", temp_var, $1.lexema, $3.lexema);
-            } else if ($1.array_name != NULL) {
-                printf("%s := [%s] AND %s\n", temp_var, $1.lexema, $3.lexema);
-            } else if ($3.array_name != NULL) {
-                printf("%s := %s AND [%s]\n", temp_var, $1.lexema, $3.lexema);
-            } else {
-                printf("%s := %s AND %s\n", temp_var, $1.lexema, $3.lexema);
-            }
-            $$.lexema = temp_var;
-            instruction_counter++;
-        } else {
-            yyerror("Type error: Logical AND operation is only allowed between boolean values");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
     ;
 
 expr_term:
-    expr_bool
-    | expr_term MULT expr_bool {
+    factor
+    | expr_term MULT factor {
         fprintf(yyout, "PRODUCTION expr_term %s * %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
         char *temp_var = NULL;
         // Verify that are numbers
@@ -782,7 +868,7 @@ expr_term:
             $$.lexema = temp_var;
             $$.is_literal = 0;
     }
-    | expr_term DIV expr_bool {
+    | expr_term DIV factor {
         fprintf(yyout, "PRODUCTION expr_term %s / %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
         char *temp_var = NULL;
         // Verify that are numbers
@@ -847,7 +933,7 @@ expr_term:
             $$.lexema = temp_var;
             $$.is_literal = 0;
     }
-    | expr_term MOD expr_bool {
+    | expr_term MOD factor {
         fprintf(yyout, "PRODUCTION expr_term %s %% %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
         char *temp_var = NULL;
         // Verify that both operands are integers
@@ -871,126 +957,6 @@ expr_term:
         }
         $$.lexema = temp_var;
         $$.is_literal = 0;
-    }
-    | NOT expr_bool {
-        fprintf(yyout, "PRODUCTION NOT %s\n", value_info_to_str($2.id_val));
-        // Verify that the operand is a boolean
-        if ($2.id_val.val_type == BOOL_TYPE) {
-            $$.id_val.val_type = BOOL_TYPE;
-            $$.id_val.val_bool = !$2.id_val.val_bool;
-            char *temp_var = generate_temp_var();
-            if ($2.array_name != NULL) {
-                printf("%s := NOT [%s]\n", temp_var, $2.lexema);
-            } else {
-                printf("%s := NOT %s\n", temp_var, $2.lexema);
-            }
-            $$.lexema = temp_var;
-            instruction_counter++;
-        } else {
-            yyerror("Type error: Logical NOT operation is only allowed on boolean values");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
-    ;
-
-expr_bool: 
-    factor
-    | expr_bool GT factor {
-        fprintf(yyout, "PRODUCTION expr_bool %s > %s\n", value_info_to_str($1.id_val), value_info_to_str($3.id_val));
-        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
-            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
-                $$.id_val.val_type = BOOL_TYPE;
-                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
-                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) > 
-                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
-                } else {
-                    $$.id_val.val_bool = $1.id_val.val_int > $3.id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
-    | expr_bool LT factor {
-        fprintf(yyout, "PRODUCTION expr_bool %s < %s\n", value_info_to_str($1.id_val), value_info_to_str($3.id_val));
-        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
-            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
-                $$.id_val.val_type = BOOL_TYPE;
-                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
-                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) < 
-                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
-                } else {
-                    $$.id_val.val_bool = $1.id_val.val_int < $3.id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
-    | expr_bool GE factor {
-        fprintf(yyout, "PRODUCTION expr_bool %s >= %s\n", value_info_to_str($1.id_val), value_info_to_str($3.id_val));
-        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
-            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
-                $$.id_val.val_type = BOOL_TYPE;
-                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
-                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) >= 
-                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
-                } else {
-                    $$.id_val.val_bool = $1.id_val.val_int >= $3.id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
-    | expr_bool LE factor {
-        fprintf(yyout, "PRODUCTION expr_bool %s <= %s\n", value_info_to_str($1.id_val), value_info_to_str($3.id_val));
-        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
-            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
-                $$.id_val.val_type = BOOL_TYPE;
-                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
-                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) <= 
-                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
-                } else {
-                    $$.id_val.val_bool = $1.id_val.val_int <= $3.id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
-    | expr_bool EQ factor {
-        fprintf(yyout, "PRODUCTION expr_bool %s == %s\n", value_info_to_str($1.id_val), value_info_to_str($3.id_val));
-        if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
-            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
-                $$.id_val.val_type = BOOL_TYPE;
-                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
-                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) == 
-                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
-                } else {
-                    $$.id_val.val_bool = $1.id_val.val_int == $3.id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
-
-    }
-    | expr_bool NE factor {
-        fprintf(yyout, "PRODUCTION expr_bool %s != %s\n", value_info_to_str($1.id_val), value_info_to_str($3.id_val));
-         if (($1.id_val.val_type == INT_TYPE || $1.id_val.val_type == FLOAT_TYPE) && 
-            ($3.id_val.val_type == INT_TYPE || $3.id_val.val_type == FLOAT_TYPE)) {
-                $$.id_val.val_type = BOOL_TYPE;
-                if ($1.id_val.val_type == FLOAT_TYPE || $3.id_val.val_type == FLOAT_TYPE) {
-                    $$.id_val.val_bool = ($1.id_val.val_type == INT_TYPE ? (float)$1.id_val.val_int : $1.id_val.val_float) != 
-                        ($3.id_val.val_type == INT_TYPE ? (float)$3.id_val.val_int : $3.id_val.val_float);
-                } else {
-                    $$.id_val.val_bool = $1.id_val.val_int != $3.id_val.val_int;
-                }
-        } else {
-            fprintf(yyout, "PRODUCTION ERROR expr_bool %s != %s\n", value_info_to_str($1.id_val), value_info_to_str($3.id_val));
-            $$.id_val.val_type = UNKNOWN_TYPE;
-        }
     }
     ;
 

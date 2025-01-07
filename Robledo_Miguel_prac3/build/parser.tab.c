@@ -104,8 +104,7 @@
     int array_size = 1;
     char *array_elems = NULL;
 
-
-#line 109 "build/parser.tab.c"
+#line 108 "build/parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -187,17 +186,20 @@ enum yysymbol_kind_t
   YYSYMBOL_statement_list = 51,            /* statement_list  */
   YYSYMBOL_statement = 52,                 /* statement  */
   YYSYMBOL_if_statement = 53,              /* if_statement  */
-  YYSYMBOL_repeat_statement = 54,          /* repeat_statement  */
-  YYSYMBOL_repeat_expression = 55,         /* repeat_expression  */
-  YYSYMBOL_assignment = 56,                /* assignment  */
-  YYSYMBOL_expression = 57,                /* expression  */
-  YYSYMBOL_expression_list = 58,           /* expression_list  */
-  YYSYMBOL_expr_arithmetic = 59,           /* expr_arithmetic  */
-  YYSYMBOL_expr_unary = 60,                /* expr_unary  */
-  YYSYMBOL_expr_term = 61,                 /* expr_term  */
-  YYSYMBOL_expr_bool = 62,                 /* expr_bool  */
-  YYSYMBOL_factor = 63,                    /* factor  */
-  YYSYMBOL_array_access = 64               /* array_access  */
+  YYSYMBOL_expression_bool = 54,           /* expression_bool  */
+  YYSYMBOL_expr_bool_and = 55,             /* expr_bool_and  */
+  YYSYMBOL_expr_bool_not = 56,             /* expr_bool_not  */
+  YYSYMBOL_expr_bool = 57,                 /* expr_bool  */
+  YYSYMBOL_repeat_statement = 58,          /* repeat_statement  */
+  YYSYMBOL_repeat_expression = 59,         /* repeat_expression  */
+  YYSYMBOL_assignment = 60,                /* assignment  */
+  YYSYMBOL_expression = 61,                /* expression  */
+  YYSYMBOL_expression_list = 62,           /* expression_list  */
+  YYSYMBOL_expr_arithmetic = 63,           /* expr_arithmetic  */
+  YYSYMBOL_expr_unary = 64,                /* expr_unary  */
+  YYSYMBOL_expr_term = 65,                 /* expr_term  */
+  YYSYMBOL_factor = 66,                    /* factor  */
+  YYSYMBOL_array_access = 67               /* array_access  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -523,18 +525,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  38
+#define YYFINAL  40
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   122
+#define YYLAST   106
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  49
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  16
+#define YYNNTS  19
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  47
+#define YYNRULES  49
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  82
+#define YYNSTATES  85
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   303
@@ -588,11 +590,11 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   118,   118,   122,   123,   127,   128,   147,   148,   149,
-     150,   154,   215,   232,   256,   294,   328,   332,   383,   387,
-     388,   472,   538,   564,   565,   596,   629,   655,   656,   722,
-     787,   812,   834,   835,   851,   867,   883,   899,   916,   935,
-     936,   950,   959,   966,   974,   981,   988,   995
+       0,   120,   120,   124,   125,   129,   130,   149,   150,   151,
+     152,   156,   163,   164,   181,   182,   200,   201,   217,   238,
+     259,   283,   307,   331,   410,   427,   451,   489,   523,   527,
+     578,   582,   583,   667,   736,   737,   768,   804,   805,   871,
+     936,   964,   965,   979,   988,   995,  1003,  1010,  1017,  1024
 };
 #endif
 
@@ -615,9 +617,10 @@ static const char *const yytname[] =
   "COMMENT", "REPEAT", "DO", "DONE", "IF", "THEN", "ELSE", "FI", "SWITCH",
   "CASE", "DEFAULT", "BREAK", "FSWITCH", "WHILE", "UNTIL", "FOR", "IN",
   "$accept", "program", "statement_list", "statement", "if_statement",
+  "expression_bool", "expr_bool_and", "expr_bool_not", "expr_bool",
   "repeat_statement", "repeat_expression", "assignment", "expression",
   "expression_list", "expr_arithmetic", "expr_unary", "expr_term",
-  "expr_bool", "factor", "array_access", YY_NULLPTR
+  "factor", "array_access", YY_NULLPTR
 };
 
 static const char *
@@ -627,7 +630,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-33)
+#define YYPACT_NINF (-20)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -641,15 +644,15 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      30,   -33,     3,   -33,   -33,    62,    62,    94,   -33,   -33,
-      62,    62,    62,    12,   -33,     1,   -33,   -33,   -33,   -33,
-     -13,     9,     8,     2,    88,   -33,    19,    62,    62,    16,
-     -33,   -33,   -33,    88,    -6,   -10,   -33,    13,   -33,    30,
-     -33,    62,    62,    62,    62,    70,    94,    94,    94,    94,
-      94,    94,    94,    94,    94,    62,   -33,    -2,   -33,    30,
-      30,   -33,     9,     8,     8,     8,     2,    88,    88,    88,
-     -33,   -33,   -33,   -33,   -33,   -33,   -33,   -33,    -4,    -5,
-     -33,   -33
+      61,   -20,    -1,   -20,   -20,    68,    68,   -20,   -20,    68,
+      68,     9,    18,   -20,    -3,   -20,   -20,   -20,   -20,    -9,
+      21,   -20,    -4,   -20,    25,    68,    68,    13,   -20,   -20,
+     -20,    23,    16,   -20,    68,     3,    32,   -20,   -20,    29,
+     -20,    61,   -20,    68,    68,    68,    75,    75,    75,    68,
+     -20,    -5,   -20,    61,   -20,     9,    61,     9,    68,    68,
+      68,    68,    68,    68,   -20,    21,   -20,   -20,   -20,   -20,
+     -20,   -20,   -20,    20,    32,    19,   -20,   -20,   -20,   -20,
+     -20,   -20,   -20,   -20,   -20
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -657,29 +660,29 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-      10,    41,    40,    43,    42,     0,     0,     0,    44,    45,
-       0,     0,     0,     0,     2,     4,     9,     8,     5,     6,
-      16,    18,    19,    23,    27,    32,    39,     0,     0,    40,
-      24,    39,    25,    31,     0,     0,    13,     0,     1,    10,
-       7,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,    14,     0,    46,    10,
-      10,     3,    17,    20,    21,    22,    26,    28,    29,    30,
-      33,    35,    34,    36,    37,    38,    15,    47,     0,     0,
-      12,    11
+      10,    43,    42,    45,    44,     0,     0,    46,    47,     0,
+       0,     0,     0,     2,     4,     9,     8,     5,     6,    28,
+      30,    31,    34,    37,    41,     0,     0,    42,    35,    41,
+      36,     0,     0,    25,     0,     0,    12,    14,    16,     0,
+       1,    10,     7,     0,     0,     0,     0,     0,     0,     0,
+      26,     0,    48,    10,    17,     0,    10,     0,     0,     0,
+       0,     0,     0,     0,     3,    29,    32,    33,    38,    39,
+      40,    27,    49,     0,    13,     0,    15,    20,    21,    22,
+      23,    18,    19,    24,    11
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -33,   -33,   -32,   -33,   -33,   -33,   -33,   -33,    -9,   -33,
-     -15,     5,     7,    -3,    60,     0
+     -20,   -20,   -18,   -20,   -20,   -20,    15,    27,    43,   -20,
+     -20,   -20,     2,   -20,   -19,    -2,   -20,    58,     0
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,    13,    14,    15,    16,    17,    35,    18,    19,    20,
-      21,    22,    23,    24,    25,    31
+       0,    12,    13,    14,    15,    35,    36,    37,    38,    16,
+      32,    17,    18,    19,    20,    21,    22,    23,    29
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -687,71 +690,67 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      26,    34,    36,    37,    33,    39,    27,    61,    42,    43,
-      30,    32,    38,    57,    46,    47,    48,    41,    56,    42,
-      43,    44,    55,    58,    59,    77,    62,    78,    79,    28,
-      45,    80,    44,    40,    81,     1,     2,     3,     4,    26,
-       5,     6,    28,    67,    68,    69,    76,    63,    64,    65,
-      60,     7,    66,     0,     8,     9,     0,     0,    10,    26,
-      26,     0,     0,    11,     0,     0,    12,     1,    29,     3,
-       4,     0,     5,     6,     0,     1,    29,     3,     4,     0,
-       0,     0,     0,     7,     0,     0,     8,     9,     0,     0,
-      10,     7,     0,     0,     8,     9,     0,     0,    10,     1,
-      29,     3,     4,    49,    50,    51,    52,    53,    54,    70,
-      71,    72,    73,    74,    75,     0,     0,     0,     8,     9,
-       0,     0,    10
+      24,    41,    25,    28,    30,    44,    45,    51,    46,    47,
+      48,    31,    33,    39,     1,    27,     3,     4,    40,     5,
+       6,    43,    72,    64,    65,    26,    55,    50,    49,    42,
+      34,    44,    45,     7,     8,    73,    39,     9,    75,    26,
+      56,    24,    66,    67,    58,    59,    60,    61,    62,    63,
+      53,    71,    52,    24,    57,    83,    24,    39,    84,    39,
+      77,    78,    79,    80,    81,    82,     1,     2,     3,     4,
+      74,     5,     6,     1,    27,     3,     4,    54,     5,     6,
+       1,    27,     3,     4,    76,     7,     8,     0,     0,     9,
+       0,     0,     7,     8,    10,     0,     9,    11,     0,     7,
+       8,     0,     0,     9,    68,    69,    70
 };
 
 static const yytype_int8 yycheck[] =
 {
-       0,    10,    11,    12,     7,     4,     3,    39,    10,    11,
-       5,     6,     0,    28,    12,    13,    14,    30,    27,    10,
-      11,    23,     3,    29,    34,    27,    41,    59,    60,    26,
-      22,    35,    23,    32,    39,     5,     6,     7,     8,    39,
-      10,    11,    26,    46,    47,    48,    55,    42,    43,    44,
-      37,    21,    45,    -1,    24,    25,    -1,    -1,    28,    59,
-      60,    -1,    -1,    33,    -1,    -1,    36,     5,     6,     7,
-       8,    -1,    10,    11,    -1,     5,     6,     7,     8,    -1,
-      -1,    -1,    -1,    21,    -1,    -1,    24,    25,    -1,    -1,
-      28,    21,    -1,    -1,    24,    25,    -1,    -1,    28,     5,
-       6,     7,     8,    15,    16,    17,    18,    19,    20,    49,
-      50,    51,    52,    53,    54,    -1,    -1,    -1,    24,    25,
-      -1,    -1,    28
+       0,     4,     3,     5,     6,    10,    11,    26,    12,    13,
+      14,     9,    10,    11,     5,     6,     7,     8,     0,    10,
+      11,    30,    27,    41,    43,    26,    23,    25,     3,    32,
+      21,    10,    11,    24,    25,    53,    34,    28,    56,    26,
+      37,    41,    44,    45,    15,    16,    17,    18,    19,    20,
+      34,    49,    29,    53,    22,    35,    56,    55,    39,    57,
+      58,    59,    60,    61,    62,    63,     5,     6,     7,     8,
+      55,    10,    11,     5,     6,     7,     8,    34,    10,    11,
+       5,     6,     7,     8,    57,    24,    25,    -1,    -1,    28,
+      -1,    -1,    24,    25,    33,    -1,    28,    36,    -1,    24,
+      25,    -1,    -1,    28,    46,    47,    48
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     5,     6,     7,     8,    10,    11,    21,    24,    25,
-      28,    33,    36,    50,    51,    52,    53,    54,    56,    57,
-      58,    59,    60,    61,    62,    63,    64,     3,    26,     6,
-      60,    64,    60,    62,    57,    55,    57,    57,     0,     4,
-      32,    30,    10,    11,    23,    22,    12,    13,    14,    15,
-      16,    17,    18,    19,    20,     3,    57,    59,    29,    34,
-      37,    51,    59,    60,    60,    60,    61,    62,    62,    62,
-      63,    63,    63,    63,    63,    63,    57,    27,    51,    51,
-      35,    39
+       0,     5,     6,     7,     8,    10,    11,    24,    25,    28,
+      33,    36,    50,    51,    52,    53,    58,    60,    61,    62,
+      63,    64,    65,    66,    67,     3,    26,     6,    64,    67,
+      64,    61,    59,    61,    21,    54,    55,    56,    57,    61,
+       0,     4,    32,    30,    10,    11,    12,    13,    14,     3,
+      61,    63,    29,    34,    57,    23,    37,    22,    15,    16,
+      17,    18,    19,    20,    51,    63,    64,    64,    66,    66,
+      66,    61,    27,    51,    55,    51,    56,    61,    61,    61,
+      61,    61,    61,    35,    39
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
        0,    49,    50,    51,    51,    52,    52,    52,    52,    52,
-      52,    53,    54,    55,    56,    56,    57,    58,    58,    59,
-      59,    59,    59,    60,    60,    60,    60,    61,    61,    61,
-      61,    61,    62,    62,    62,    62,    62,    62,    62,    63,
-      63,    63,    63,    63,    63,    63,    63,    64
+      52,    53,    54,    54,    55,    55,    56,    56,    57,    57,
+      57,    57,    57,    57,    58,    59,    60,    60,    61,    62,
+      62,    63,    63,    63,    64,    64,    64,    65,    65,    65,
+      65,    66,    66,    66,    66,    66,    66,    66,    66,    67
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
        0,     2,     1,     3,     1,     1,     1,     2,     1,     1,
-       0,     5,     5,     1,     3,     3,     1,     3,     1,     1,
-       3,     3,     3,     1,     2,     2,     3,     1,     3,     3,
-       3,     2,     1,     3,     3,     3,     3,     3,     3,     1,
-       1,     1,     1,     1,     1,     1,     3,     4
+       0,     5,     1,     3,     1,     3,     1,     2,     3,     3,
+       3,     3,     3,     3,     5,     1,     3,     3,     1,     3,
+       1,     1,     3,     3,     1,     2,     2,     1,     3,     3,
+       3,     1,     1,     1,     1,     1,     1,     1,     3,     4
 };
 
 
@@ -1215,7 +1214,7 @@ yyreduce:
   switch (yyn)
     {
   case 6: /* statement: expression  */
-#line 128 "parser.y"
+#line 130 "parser.y"
                  {
         // Print the result of the expression
         fprintf(yyout, "PRODUCTION Expression %s\n", value_to_str((yyvsp[0].ident).id_val));
@@ -1235,22 +1234,245 @@ yyreduce:
         }
         instruction_counter += 2;
     }
-#line 1239 "build/parser.tab.c"
+#line 1238 "build/parser.tab.c"
     break;
 
-  case 11: /* if_statement: IF expression THEN statement_list FI  */
-#line 154 "parser.y"
-                                         {
-        fprintf(yyout, "PRODUCTION If %s THEN\n", value_to_str((yyvsp[-3].ident).id_val));
-        printf("IF %s GOTO %d\n", (yyvsp[-3].ident).lexema, instruction_counter + 2);
-        printf("GOTO %d\n", instruction_counter + 1);
-        instruction_counter += 2;
+  case 11: /* if_statement: IF expression_bool THEN statement_list FI  */
+#line 156 "parser.y"
+                                              {
+        fprintf(yyout, "PRODUCTION If %s = %s THEN\n", (yyvsp[-3].ident).lexema, value_to_str((yyvsp[-3].ident).id_val));
+        instruction_counter++;
     }
-#line 1250 "build/parser.tab.c"
+#line 1247 "build/parser.tab.c"
     break;
 
-  case 12: /* repeat_statement: REPEAT repeat_expression DO statement_list DONE  */
-#line 215 "parser.y"
+  case 13: /* expression_bool: expression_bool OR expr_bool_and  */
+#line 164 "parser.y"
+                                       {
+        fprintf(yyout, "PRODUCTION Expression %s OR %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
+        if ((yyvsp[-2].ident).id_val.val_type == BOOL_TYPE && (yyvsp[0].ident).id_val.val_type == BOOL_TYPE) {
+            (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_bool || (yyvsp[0].ident).id_val.val_bool;
+            (yyval.ident).id_val.val_type = BOOL_TYPE;
+            printf("IF %s GOTO %d\n", (yyvsp[-2].ident).lexema, instruction_counter + 2);
+            printf("GOTO %d\n", instruction_counter + 4);
+            printf("IF %s GOTO %d\n", (yyvsp[0].ident).lexema, instruction_counter + 4);
+            printf("GOTO %d\n", instruction_counter + 5);
+        } else {
+            yyerror("Type error: Logical OR operation is only allowed between boolean values");
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
+        }
+    }
+#line 1266 "build/parser.tab.c"
+    break;
+
+  case 15: /* expr_bool_and: expr_bool_and AND expr_bool_not  */
+#line 182 "parser.y"
+                                      {
+        fprintf(yyout, "PRODUCTION Expression %s AND %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
+        if ((yyvsp[-2].ident).id_val.val_type == BOOL_TYPE && (yyvsp[0].ident).id_val.val_type == BOOL_TYPE) {
+            (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_bool && (yyvsp[0].ident).id_val.val_bool;
+            (yyval.ident).id_val.val_type = BOOL_TYPE;
+            printf("IF %s GOTO %d\n", (yyvsp[-2].ident).lexema, instruction_counter + 2);
+            printf("GOTO %d\n", instruction_counter + 4);
+            printf("IF %s GOTO %d\n", (yyvsp[0].ident).lexema, instruction_counter + 4);
+            printf("GOTO %d\n", instruction_counter + 5);
+            instruction_counter += 4;
+        } else {
+            yyerror("Type error: Logical AND operation is only allowed between boolean values");
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
+        }
+    }
+#line 1286 "build/parser.tab.c"
+    break;
+
+  case 17: /* expr_bool_not: NOT expr_bool  */
+#line 201 "parser.y"
+                    {
+        fprintf(yyout, "PRODUCTION NOT %s\n", value_to_str((yyvsp[0].ident).id_val));
+        if ((yyvsp[0].ident).id_val.val_type == BOOL_TYPE) {
+            (yyval.ident).id_val.val_bool = !(yyvsp[0].ident).id_val.val_bool;
+            (yyval.ident).id_val.val_type = BOOL_TYPE;
+            printf("IF %s GOTO %d\n", (yyvsp[0].ident).lexema, instruction_counter + 2);
+            printf("GOTO %d\n", instruction_counter + 1);
+            instruction_counter += 2;
+        } else {
+            yyerror("Type error: Logical NOT operation is only allowed on boolean values");
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
+        }
+    }
+#line 1304 "build/parser.tab.c"
+    break;
+
+  case 18: /* expr_bool: expression EQ expression  */
+#line 217 "parser.y"
+                             {
+        fprintf(yyout, "PRODUCTION Expression %s EQ %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                (yyval.ident).id_val.val_type = BOOL_TYPE;
+                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).id_val.val_int : (yyvsp[-2].ident).id_val.val_float) == 
+                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).id_val.val_int : (yyvsp[0].ident).id_val.val_float);
+                } else {
+                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_int == (yyvsp[0].ident).id_val.val_int;
+                }
+                char *lexema = concat_str((yyvsp[-2].ident).lexema, " ");
+                lexema = concat_str(lexema, "EQ");
+                lexema = concat_str(lexema, " ");
+                lexema = concat_str(lexema, (yyvsp[0].ident).lexema);
+                (yyval.ident).lexema = lexema;
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
+        }
+    }
+#line 1330 "build/parser.tab.c"
+    break;
+
+  case 19: /* expr_bool: expression NE expression  */
+#line 238 "parser.y"
+                               {
+        fprintf(yyout, "PRODUCTION Expression %s NE %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                (yyval.ident).id_val.val_type = BOOL_TYPE;
+                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).id_val.val_int : (yyvsp[-2].ident).id_val.val_float) != 
+                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).id_val.val_int : (yyvsp[0].ident).id_val.val_float);
+                } else {
+                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_int != (yyvsp[0].ident).id_val.val_int;
+                }
+                char *lexema = concat_str((yyvsp[-2].ident).lexema, " ");
+                lexema = concat_str(lexema, "NE");
+                lexema = concat_str(lexema, " ");
+                lexema = concat_str(lexema, (yyvsp[0].ident).lexema);
+                (yyval.ident).lexema = lexema;
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
+        }
+    }
+#line 1356 "build/parser.tab.c"
+    break;
+
+  case 20: /* expr_bool: expression GT expression  */
+#line 259 "parser.y"
+                               {
+        fprintf(yyout, "PRODUCTION Expression %s GT %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                char *comparison = NULL;
+                (yyval.ident).id_val.val_type = BOOL_TYPE;
+                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).id_val.val_int : (yyvsp[-2].ident).id_val.val_float) > 
+                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).id_val.val_int : (yyvsp[0].ident).id_val.val_float);
+                    comparison = "GTF";
+                } else {
+                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_int > (yyvsp[0].ident).id_val.val_int;
+                    comparison = "GTI";
+                }
+                char *lexema = concat_str((yyvsp[-2].ident).lexema, " ");
+                lexema = concat_str(lexema, comparison);
+                lexema = concat_str(lexema, " ");
+                lexema = concat_str(lexema, (yyvsp[0].ident).lexema);
+                (yyval.ident).lexema = lexema;
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
+        }
+    }
+#line 1385 "build/parser.tab.c"
+    break;
+
+  case 21: /* expr_bool: expression GE expression  */
+#line 283 "parser.y"
+                               {
+        fprintf(yyout, "PRODUCTION Expression %s GE %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                char *comparison = NULL;
+                (yyval.ident).id_val.val_type = BOOL_TYPE;
+                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).id_val.val_int : (yyvsp[-2].ident).id_val.val_float) >= 
+                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).id_val.val_int : (yyvsp[0].ident).id_val.val_float);
+                    comparison = "GEF";
+                } else {
+                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_int >= (yyvsp[0].ident).id_val.val_int;
+                    comparison = "GEI";
+                }
+                char *lexema = concat_str((yyvsp[-2].ident).lexema, " ");
+                lexema = concat_str(lexema, comparison);
+                lexema = concat_str(lexema, " ");
+                lexema = concat_str(lexema, (yyvsp[0].ident).lexema);
+                (yyval.ident).lexema = lexema;
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
+        }
+    }
+#line 1414 "build/parser.tab.c"
+    break;
+
+  case 22: /* expr_bool: expression LT expression  */
+#line 307 "parser.y"
+                               {
+        fprintf(yyout, "PRODUCTION Expression %s LT %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                char *comparison = NULL;
+                (yyval.ident).id_val.val_type = BOOL_TYPE;
+                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).id_val.val_int : (yyvsp[-2].ident).id_val.val_float) < 
+                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).id_val.val_int : (yyvsp[0].ident).id_val.val_float);
+                    comparison = "LTF";
+                } else {
+                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_int < (yyvsp[0].ident).id_val.val_int;
+                    comparison = "LTI";
+                }
+                char *lexema = concat_str((yyvsp[-2].ident).lexema, " ");
+                lexema = concat_str(lexema, comparison);
+                lexema = concat_str(lexema, " ");
+                lexema = concat_str(lexema, (yyvsp[0].ident).lexema);
+                (yyval.ident).lexema = lexema;
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
+        }
+    }
+#line 1443 "build/parser.tab.c"
+    break;
+
+  case 23: /* expr_bool: expression LE expression  */
+#line 331 "parser.y"
+                               {
+        fprintf(yyout, "PRODUCTION Expression %s LE %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
+        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
+            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
+                char *comparison = NULL;
+                (yyval.ident).id_val.val_type = BOOL_TYPE;
+                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
+                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).id_val.val_int : (yyvsp[-2].ident).id_val.val_float) <= 
+                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).id_val.val_int : (yyvsp[0].ident).id_val.val_float);
+                    comparison = "LEF";
+                } else {
+                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_int <= (yyvsp[0].ident).id_val.val_int;
+                    comparison = "LEI";
+                }
+                char *lexema = concat_str((yyvsp[-2].ident).lexema, " ");
+                lexema = concat_str(lexema, comparison);
+                lexema = concat_str(lexema, " ");
+                lexema = concat_str(lexema, (yyvsp[0].ident).lexema);
+                (yyval.ident).lexema = lexema;
+        } else {
+            yyerror("Type error: Comparison requires numeric types");
+            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
+        }
+    }
+#line 1472 "build/parser.tab.c"
+    break;
+
+  case 24: /* repeat_statement: REPEAT repeat_expression DO statement_list DONE  */
+#line 410 "parser.y"
                                                     {
         if ((yyvsp[-3].ident).id_val.val_type != INT_TYPE) {
             yyerror("Repeat count must be an integer");
@@ -1265,11 +1487,11 @@ yyreduce:
             instruction_counter += 2;
         }
     }
-#line 1269 "build/parser.tab.c"
+#line 1491 "build/parser.tab.c"
     break;
 
-  case 13: /* repeat_expression: expression  */
-#line 232 "parser.y"
+  case 25: /* repeat_expression: expression  */
+#line 427 "parser.y"
                {
         if ((yyvsp[0].ident).is_literal) {
             char *new_var = generate_temp_var();
@@ -1291,11 +1513,11 @@ yyreduce:
         sprintf(line_number, "%d", instruction_counter);
         push_repeat_stack(line_number);
     }
-#line 1295 "build/parser.tab.c"
+#line 1517 "build/parser.tab.c"
     break;
 
-  case 14: /* assignment: ID ASSIGN expression  */
-#line 256 "parser.y"
+  case 26: /* assignment: ID ASSIGN expression  */
+#line 451 "parser.y"
                          {
         fprintf(yyout, "PRODUCTION Assignment %s := %s\n", (yyvsp[-2].ident).lexema, value_to_str((yyvsp[0].ident).id_val));
         // Assign only if the type is compatible or if it has not been initialized
@@ -1334,11 +1556,11 @@ yyreduce:
             yyerror("Incompatible types in assignment");
         }
     }
-#line 1338 "build/parser.tab.c"
+#line 1560 "build/parser.tab.c"
     break;
 
-  case 15: /* assignment: array_access ASSIGN expression  */
-#line 294 "parser.y"
+  case 27: /* assignment: array_access ASSIGN expression  */
+#line 489 "parser.y"
                                      {
         fprintf(yyout, "PRODUCTION Assignment %s[%d] := %s\n", (yyvsp[-2].ident).lexema, (yyvsp[0].ident).id_val.val_int, value_to_str((yyvsp[0].ident).id_val));
 
@@ -1370,11 +1592,11 @@ yyreduce:
             }
         }
     }
-#line 1374 "build/parser.tab.c"
+#line 1596 "build/parser.tab.c"
     break;
 
-  case 17: /* expression_list: expression_list COMMA expr_arithmetic  */
-#line 332 "parser.y"
+  case 29: /* expression_list: expression_list COMMA expr_arithmetic  */
+#line 527 "parser.y"
                                           {
        if (array_size == 1) {
             char *new_elem1 = (yyvsp[-2].ident).lexema;
@@ -1426,11 +1648,11 @@ yyreduce:
         (yyval.ident).id_val.val_array = new_array;
 
     }
-#line 1430 "build/parser.tab.c"
+#line 1652 "build/parser.tab.c"
     break;
 
-  case 20: /* expr_arithmetic: expr_arithmetic PLUS expr_unary  */
-#line 388 "parser.y"
+  case 32: /* expr_arithmetic: expr_arithmetic PLUS expr_unary  */
+#line 583 "parser.y"
                                       {
         fprintf(yyout, "PRODUCTION expr_arithmetic %s + %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         char *temp_var = NULL;
@@ -1515,11 +1737,11 @@ yyreduce:
             (yyval.ident).lexema = temp_var;
             (yyval.ident).is_literal = 0;
     }
-#line 1519 "build/parser.tab.c"
+#line 1741 "build/parser.tab.c"
     break;
 
-  case 21: /* expr_arithmetic: expr_arithmetic MINUS expr_unary  */
-#line 472 "parser.y"
+  case 33: /* expr_arithmetic: expr_arithmetic MINUS expr_unary  */
+#line 667 "parser.y"
                                        {
         fprintf(yyout, "PRODUCTION expr_arithmetic %s - %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         char *temp_var = NULL;
@@ -1586,39 +1808,11 @@ yyreduce:
             (yyval.ident).lexema = temp_var;(yyval.ident).is_literal = 0;
             (yyval.ident).is_literal = 0;
     }
-#line 1590 "build/parser.tab.c"
+#line 1812 "build/parser.tab.c"
     break;
 
-  case 22: /* expr_arithmetic: expr_arithmetic OR expr_unary  */
-#line 538 "parser.y"
-                                    {
-        fprintf(yyout, "PRODUCTION expr_arithmetic %s OR %s\n", value_info_to_str((yyvsp[-2].ident).id_val), value_info_to_str((yyvsp[0].ident).id_val));
-        // Verify that are booleans
-        if ((yyvsp[-2].ident).id_val.val_type == BOOL_TYPE && (yyvsp[0].ident).id_val.val_type == BOOL_TYPE) {
-            (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_bool || (yyvsp[0].ident).id_val.val_bool;
-            (yyval.ident).id_val.val_type = BOOL_TYPE;
-            char *temp_var = generate_temp_var();
-            if ((yyvsp[-2].ident).array_name != NULL && (yyvsp[0].ident).array_name != NULL) {
-                printf("%s := [%s] OR [%s]\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
-            } else if ((yyvsp[-2].ident).array_name != NULL) {
-                printf("%s := [%s] OR %s\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
-            } else if ((yyvsp[0].ident).array_name != NULL) {
-                printf("%s := %s OR [%s]\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
-            } else {
-                printf("%s := %s OR %s\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
-            }
-            (yyval.ident).lexema = temp_var;
-            instruction_counter++;
-        } else {
-            yyerror("Type error: Logical OR operation is only allowed between boolean values");
-            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
-#line 1618 "build/parser.tab.c"
-    break;
-
-  case 24: /* expr_unary: PLUS expr_unary  */
-#line 565 "parser.y"
+  case 35: /* expr_unary: PLUS expr_unary  */
+#line 737 "parser.y"
                       {
         fprintf(yyout, "PRODUCTION expr_unary + %s\n", value_to_str((yyvsp[0].ident).id_val));
         char *temp_var = NULL;
@@ -1650,11 +1844,11 @@ yyreduce:
             (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1654 "build/parser.tab.c"
+#line 1848 "build/parser.tab.c"
     break;
 
-  case 25: /* expr_unary: MINUS expr_unary  */
-#line 596 "parser.y"
+  case 36: /* expr_unary: MINUS expr_unary  */
+#line 768 "parser.y"
                        {
         fprintf(yyout, "PRODUCTION expr_unary - %s\n", value_to_str((yyvsp[0].ident).id_val));
         char *temp_var = NULL;
@@ -1688,40 +1882,12 @@ yyreduce:
         (yyval.ident).lexema = temp_var;
         (yyval.ident).is_literal = 0;
     }
-#line 1692 "build/parser.tab.c"
+#line 1886 "build/parser.tab.c"
     break;
 
-  case 26: /* expr_unary: expr_unary AND expr_term  */
-#line 629 "parser.y"
-                               {
-        fprintf(yyout, "PRODUCTION expr_unary %s AND %s\n", value_info_to_str((yyvsp[-2].ident).id_val), value_info_to_str((yyvsp[0].ident).id_val));
-        // Verify that are booleans
-        if ((yyvsp[-2].ident).id_val.val_type == BOOL_TYPE && (yyvsp[0].ident).id_val.val_type == BOOL_TYPE) {
-            (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_bool && (yyvsp[0].ident).id_val.val_bool;
-            (yyval.ident).id_val.val_type = BOOL_TYPE;
-            char *temp_var = generate_temp_var();
-            if ((yyvsp[-2].ident).array_name != NULL && (yyvsp[0].ident).array_name != NULL) {
-                printf("%s := [%s] AND [%s]\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
-            } else if ((yyvsp[-2].ident).array_name != NULL) {
-                printf("%s := [%s] AND %s\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
-            } else if ((yyvsp[0].ident).array_name != NULL) {
-                printf("%s := %s AND [%s]\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
-            } else {
-                printf("%s := %s AND %s\n", temp_var, (yyvsp[-2].ident).lexema, (yyvsp[0].ident).lexema);
-            }
-            (yyval.ident).lexema = temp_var;
-            instruction_counter++;
-        } else {
-            yyerror("Type error: Logical AND operation is only allowed between boolean values");
-            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
-#line 1720 "build/parser.tab.c"
-    break;
-
-  case 28: /* expr_term: expr_term MULT expr_bool  */
-#line 656 "parser.y"
-                               {
+  case 38: /* expr_term: expr_term MULT factor  */
+#line 805 "parser.y"
+                            {
         fprintf(yyout, "PRODUCTION expr_term %s * %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         char *temp_var = NULL;
         // Verify that are numbers
@@ -1787,12 +1953,12 @@ yyreduce:
             (yyval.ident).lexema = temp_var;
             (yyval.ident).is_literal = 0;
     }
-#line 1791 "build/parser.tab.c"
+#line 1957 "build/parser.tab.c"
     break;
 
-  case 29: /* expr_term: expr_term DIV expr_bool  */
-#line 722 "parser.y"
-                              {
+  case 39: /* expr_term: expr_term DIV factor  */
+#line 871 "parser.y"
+                           {
         fprintf(yyout, "PRODUCTION expr_term %s / %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         char *temp_var = NULL;
         // Verify that are numbers
@@ -1857,12 +2023,12 @@ yyreduce:
             (yyval.ident).lexema = temp_var;
             (yyval.ident).is_literal = 0;
     }
-#line 1861 "build/parser.tab.c"
+#line 2027 "build/parser.tab.c"
     break;
 
-  case 30: /* expr_term: expr_term MOD expr_bool  */
-#line 787 "parser.y"
-                              {
+  case 40: /* expr_term: expr_term MOD factor  */
+#line 936 "parser.y"
+                           {
         fprintf(yyout, "PRODUCTION expr_term %s %% %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         char *temp_var = NULL;
         // Verify that both operands are integers
@@ -1887,162 +2053,11 @@ yyreduce:
         (yyval.ident).lexema = temp_var;
         (yyval.ident).is_literal = 0;
     }
-#line 1891 "build/parser.tab.c"
+#line 2057 "build/parser.tab.c"
     break;
 
-  case 31: /* expr_term: NOT expr_bool  */
-#line 812 "parser.y"
-                    {
-        fprintf(yyout, "PRODUCTION NOT %s\n", value_info_to_str((yyvsp[0].ident).id_val));
-        // Verify that the operand is a boolean
-        if ((yyvsp[0].ident).id_val.val_type == BOOL_TYPE) {
-            (yyval.ident).id_val.val_type = BOOL_TYPE;
-            (yyval.ident).id_val.val_bool = !(yyvsp[0].ident).id_val.val_bool;
-            char *temp_var = generate_temp_var();
-            if ((yyvsp[0].ident).array_name != NULL) {
-                printf("%s := NOT [%s]\n", temp_var, (yyvsp[0].ident).lexema);
-            } else {
-                printf("%s := NOT %s\n", temp_var, (yyvsp[0].ident).lexema);
-            }
-            (yyval.ident).lexema = temp_var;
-            instruction_counter++;
-        } else {
-            yyerror("Type error: Logical NOT operation is only allowed on boolean values");
-            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
-#line 1915 "build/parser.tab.c"
-    break;
-
-  case 33: /* expr_bool: expr_bool GT factor  */
-#line 835 "parser.y"
-                          {
-        fprintf(yyout, "PRODUCTION expr_bool %s > %s\n", value_info_to_str((yyvsp[-2].ident).id_val), value_info_to_str((yyvsp[0].ident).id_val));
-        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
-            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
-                (yyval.ident).id_val.val_type = BOOL_TYPE;
-                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
-                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).id_val.val_int : (yyvsp[-2].ident).id_val.val_float) > 
-                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).id_val.val_int : (yyvsp[0].ident).id_val.val_float);
-                } else {
-                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_int > (yyvsp[0].ident).id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
-#line 1936 "build/parser.tab.c"
-    break;
-
-  case 34: /* expr_bool: expr_bool LT factor  */
-#line 851 "parser.y"
-                          {
-        fprintf(yyout, "PRODUCTION expr_bool %s < %s\n", value_info_to_str((yyvsp[-2].ident).id_val), value_info_to_str((yyvsp[0].ident).id_val));
-        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
-            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
-                (yyval.ident).id_val.val_type = BOOL_TYPE;
-                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
-                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).id_val.val_int : (yyvsp[-2].ident).id_val.val_float) < 
-                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).id_val.val_int : (yyvsp[0].ident).id_val.val_float);
-                } else {
-                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_int < (yyvsp[0].ident).id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
-#line 1957 "build/parser.tab.c"
-    break;
-
-  case 35: /* expr_bool: expr_bool GE factor  */
-#line 867 "parser.y"
-                          {
-        fprintf(yyout, "PRODUCTION expr_bool %s >= %s\n", value_info_to_str((yyvsp[-2].ident).id_val), value_info_to_str((yyvsp[0].ident).id_val));
-        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
-            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
-                (yyval.ident).id_val.val_type = BOOL_TYPE;
-                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
-                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).id_val.val_int : (yyvsp[-2].ident).id_val.val_float) >= 
-                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).id_val.val_int : (yyvsp[0].ident).id_val.val_float);
-                } else {
-                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_int >= (yyvsp[0].ident).id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
-#line 1978 "build/parser.tab.c"
-    break;
-
-  case 36: /* expr_bool: expr_bool LE factor  */
-#line 883 "parser.y"
-                          {
-        fprintf(yyout, "PRODUCTION expr_bool %s <= %s\n", value_info_to_str((yyvsp[-2].ident).id_val), value_info_to_str((yyvsp[0].ident).id_val));
-        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
-            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
-                (yyval.ident).id_val.val_type = BOOL_TYPE;
-                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
-                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).id_val.val_int : (yyvsp[-2].ident).id_val.val_float) <= 
-                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).id_val.val_int : (yyvsp[0].ident).id_val.val_float);
-                } else {
-                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_int <= (yyvsp[0].ident).id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
-#line 1999 "build/parser.tab.c"
-    break;
-
-  case 37: /* expr_bool: expr_bool EQ factor  */
-#line 899 "parser.y"
-                          {
-        fprintf(yyout, "PRODUCTION expr_bool %s == %s\n", value_info_to_str((yyvsp[-2].ident).id_val), value_info_to_str((yyvsp[0].ident).id_val));
-        if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
-            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
-                (yyval.ident).id_val.val_type = BOOL_TYPE;
-                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
-                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).id_val.val_int : (yyvsp[-2].ident).id_val.val_float) == 
-                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).id_val.val_int : (yyvsp[0].ident).id_val.val_float);
-                } else {
-                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_int == (yyvsp[0].ident).id_val.val_int;
-                }
-        } else {
-            yyerror("Type error: Comparison requires numeric types");
-            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
-        }
-
-    }
-#line 2021 "build/parser.tab.c"
-    break;
-
-  case 38: /* expr_bool: expr_bool NE factor  */
-#line 916 "parser.y"
-                          {
-        fprintf(yyout, "PRODUCTION expr_bool %s != %s\n", value_info_to_str((yyvsp[-2].ident).id_val), value_info_to_str((yyvsp[0].ident).id_val));
-         if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
-            ((yyvsp[0].ident).id_val.val_type == INT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE)) {
-                (yyval.ident).id_val.val_type = BOOL_TYPE;
-                if ((yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE || (yyvsp[0].ident).id_val.val_type == FLOAT_TYPE) {
-                    (yyval.ident).id_val.val_bool = ((yyvsp[-2].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[-2].ident).id_val.val_int : (yyvsp[-2].ident).id_val.val_float) != 
-                        ((yyvsp[0].ident).id_val.val_type == INT_TYPE ? (float)(yyvsp[0].ident).id_val.val_int : (yyvsp[0].ident).id_val.val_float);
-                } else {
-                    (yyval.ident).id_val.val_bool = (yyvsp[-2].ident).id_val.val_int != (yyvsp[0].ident).id_val.val_int;
-                }
-        } else {
-            fprintf(yyout, "PRODUCTION ERROR expr_bool %s != %s\n", value_info_to_str((yyvsp[-2].ident).id_val), value_info_to_str((yyvsp[0].ident).id_val));
-            (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
-        }
-    }
-#line 2042 "build/parser.tab.c"
-    break;
-
-  case 40: /* factor: ID  */
-#line 936 "parser.y"
+  case 42: /* factor: ID  */
+#line 965 "parser.y"
          {
         fprintf(yyout, "PRODUCTION ID Factor %s\n", (yyvsp[0].ident).lexema);
         value_info value;
@@ -2057,11 +2072,11 @@ yyreduce:
                 (yyval.ident).is_literal = 1;
             }
     }
-#line 2061 "build/parser.tab.c"
+#line 2076 "build/parser.tab.c"
     break;
 
-  case 41: /* factor: INTEGER  */
-#line 950 "parser.y"
+  case 43: /* factor: INTEGER  */
+#line 979 "parser.y"
               {
         fprintf(yyout, "PRODUCTION INTEGER Factor %d\n", (yyvsp[0].integer));
         (yyval.ident).id_val.val_type = INT_TYPE;
@@ -2071,11 +2086,11 @@ yyreduce:
         sprintf((yyval.ident).lexema, "%d", (yyvsp[0].integer));
         (yyval.ident).is_literal = 1;
     }
-#line 2075 "build/parser.tab.c"
+#line 2090 "build/parser.tab.c"
     break;
 
-  case 42: /* factor: STRING  */
-#line 959 "parser.y"
+  case 44: /* factor: STRING  */
+#line 988 "parser.y"
              {
         fprintf(yyout, "PRODUCTION STRING Factor %s\n", (yyvsp[0].string));
         (yyval.ident).id_val.val_type = STR_TYPE;
@@ -2083,11 +2098,11 @@ yyreduce:
         (yyval.ident).lexema = (yyvsp[0].string);
         (yyval.ident).lenght = strlen((yyvsp[0].string)) - 2;
     }
-#line 2087 "build/parser.tab.c"
+#line 2102 "build/parser.tab.c"
     break;
 
-  case 43: /* factor: REAL  */
-#line 966 "parser.y"
+  case 45: /* factor: REAL  */
+#line 995 "parser.y"
            {
         fprintf(yyout, "PRODUCTION REAL Factor %f\n", (yyvsp[0].real));
         (yyval.ident).id_val.val_type = FLOAT_TYPE;
@@ -2096,11 +2111,11 @@ yyreduce:
         (yyval.ident).lexema = (char *)malloc(12);
         sprintf((yyval.ident).lexema, "%f", (yyvsp[0].real));
     }
-#line 2100 "build/parser.tab.c"
+#line 2115 "build/parser.tab.c"
     break;
 
-  case 44: /* factor: PI  */
-#line 974 "parser.y"
+  case 46: /* factor: PI  */
+#line 1003 "parser.y"
          {
         fprintf(yyout, "PRODUCTION PI Factor\n");
         (yyval.ident).id_val.val_type = FLOAT_TYPE;
@@ -2108,11 +2123,11 @@ yyreduce:
         // store value as a string
         (yyval.ident).lexema = "3.141592653589793";
     }
-#line 2112 "build/parser.tab.c"
+#line 2127 "build/parser.tab.c"
     break;
 
-  case 45: /* factor: E  */
-#line 981 "parser.y"
+  case 47: /* factor: E  */
+#line 1010 "parser.y"
         {
         fprintf(yyout, "PRODUCTION E Factor\n");
         (yyval.ident).id_val.val_type = FLOAT_TYPE;
@@ -2120,20 +2135,20 @@ yyreduce:
         // store value as a string
         (yyval.ident).lexema = "2.718281828459045";
     }
-#line 2124 "build/parser.tab.c"
+#line 2139 "build/parser.tab.c"
     break;
 
-  case 46: /* factor: LPAREN expression RPAREN  */
-#line 988 "parser.y"
+  case 48: /* factor: LPAREN expression RPAREN  */
+#line 1017 "parser.y"
                                {
         fprintf(yyout, "PRODUCTION LPAREN expression RPAREN %s\n", value_to_str((yyvsp[-1].ident).id_val));
         (yyval.ident) = (yyvsp[-1].ident);
     }
-#line 2133 "build/parser.tab.c"
+#line 2148 "build/parser.tab.c"
     break;
 
-  case 47: /* array_access: ID LBRACKET expr_arithmetic RBRACKET  */
-#line 995 "parser.y"
+  case 49: /* array_access: ID LBRACKET expr_arithmetic RBRACKET  */
+#line 1024 "parser.y"
                                          {
     value_info val1;
         if (sym_lookup((yyvsp[-3].ident).lexema, &val1) == SYMTAB_NOT_FOUND) {
@@ -2176,11 +2191,11 @@ yyreduce:
             }
         }
     }
-#line 2180 "build/parser.tab.c"
+#line 2195 "build/parser.tab.c"
     break;
 
 
-#line 2184 "build/parser.tab.c"
+#line 2199 "build/parser.tab.c"
 
       default: break;
     }
@@ -2373,5 +2388,5 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 1038 "parser.y"
+#line 1067 "parser.y"
 

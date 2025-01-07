@@ -4,6 +4,7 @@
 #include "../include/data.h"
 
 int temp_var_counter = 1;
+int if_counter = 1;
 
 char *type_to_str(data_type val_type)
 {
@@ -67,5 +68,12 @@ char *generate_temp_var()
     char buffer[6];
     snprintf(buffer, sizeof(buffer), "$t%02d", temp_var_counter);
     temp_var_counter++;
+    return strdup(buffer);
+}
+
+char *generate_fi_if() {
+    char buffer[6];
+    snprintf(buffer, sizeof(buffer), "fi_%02d", if_counter);
+    if_counter++;
     return strdup(buffer);
 }

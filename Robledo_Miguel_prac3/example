@@ -1,5 +1,32 @@
 total := 500
 i := 0
+/*
 if total == 666.6 or total == 500 then
   i := 1
+fi */
+
+x := 555
+
+/*
+if total <= 400.4 or i < 375 then
+  if i < 350 or i > 550 then
+    i := 666
+  fi
+  x := x + 1
+fi*/
+
+if total <= 400.4 or i < 375 or total >= 500 or i > 525 then
+  if i < 350 or i > 550 then
+    i := 666
+  fi
+  x := x + 1
 fi
+
+/*
+if total <= 400.4 and i < 375 or total >= 500 and i > 525 then
+  if i < 350 or i > 550 then
+    i := 666
+  fi
+  x := x + 1
+fi
+*/
