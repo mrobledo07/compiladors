@@ -1,0 +1,26 @@
+PRODUCTION INTEGER Factor 2
+PRODUCTION Assignment a := 2
+PRODUCTION INTEGER Factor 3
+PRODUCTION Assignment b := 3
+PRODUCTION ID Factor a
+PRODUCTION ID Factor b
+PRODUCTION INTEGER Factor 5
+PRODUCTION expr_term 3 * 5
+PRODUCTION expr_arithmetic 2 + 15
+PRODUCTION Assignment c := 17
+PRODUCTION ID Factor a
+PRODUCTION ID Factor b
+PRODUCTION expr_arithmetic 2 + 3
+PRODUCTION LPAREN expression RPAREN 5
+PRODUCTION INTEGER Factor 5
+PRODUCTION expr_term 5 * 5
+PRODUCTION Assignment d := 25
+PRODUCTION ID Factor d
+PRODUCTION ID Factor c
+PRODUCTION expr_term 25 / 17
+PRODUCTION ID Factor a
+PRODUCTION expr_arithmetic 1.0 - 2
+PRODUCTION Assignment z := -1.0
+PRODUCTION ID Factor z
+PRODUCTION expr_unary - -1.0
+PRODUCTION Assignment f := 1.0

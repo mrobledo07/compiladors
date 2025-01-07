@@ -1,0 +1,8 @@
+s1 := "Hello"
+s2 := "World"
+$t01 := s1 CONCAT " "
+$t02 := $t01 CONCAT s2
+s3 := $t02
+$t03 := s3 CONCAT "!"
+s4 := $t03
+HALT

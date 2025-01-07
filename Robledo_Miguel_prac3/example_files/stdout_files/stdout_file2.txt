@@ -1,0 +1,15 @@
+a := 2
+b := 3
+$t01 := b MULI 5
+$t02 := a ADDI $t01
+c := $t02
+$t03 := a ADDI b
+$t04 := $t03 MULI 5
+d := $t04
+$t05 := d DIVI c
+$t06 := I2F a
+$t07 := $t05 SUBF $t06
+z := $t07
+$t08 := CHSF z
+f := $t08
+HALT

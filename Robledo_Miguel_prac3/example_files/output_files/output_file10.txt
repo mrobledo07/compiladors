@@ -1,0 +1,66 @@
+PRODUCTION INTEGER Factor 1
+PRODUCTION INTEGER Factor 1
+PRODUCTION INTEGER Factor 2
+PRODUCTION INTEGER Factor 3
+PRODUCTION INTEGER Factor 5
+PRODUCTION INTEGER Factor 8
+PRODUCTION INTEGER Factor 13
+PRODUCTION Assignment arr := Array: size=7
+PRODUCTION INTEGER Factor 2
+PRODUCTION INTEGER Factor 2
+PRODUCTION INTEGER Factor 4
+PRODUCTION INTEGER Factor 6
+PRODUCTION INTEGER Factor 10
+PRODUCTION INTEGER Factor 16
+PRODUCTION INTEGER Factor 26
+PRODUCTION Assignment arr2 := Array: size=7
+PRODUCTION INTEGER Factor 7
+PRODUCTION Assignment arr_length := 7
+PRODUCTION INTEGER Factor 0
+PRODUCTION Assignment sum := 0
+PRODUCTION INTEGER Factor 1
+PRODUCTION Assignment i := 1
+PRODUCTION ID Factor arr_length
+PRODUCTION ID Factor i
+PRODUCTION ID Factor i
+PRODUCTION expr_arithmetic 1 + 2
+PRODUCTION Assignment sum := 3
+PRODUCTION ID Factor sum
+PRODUCTION Expression 3
+PRODUCTION ID Factor i
+PRODUCTION INTEGER Factor 1
+PRODUCTION expr_arithmetic 1 + 1
+PRODUCTION Assignment i := 2
+PRODUCTION Repeat 7 times
+PRODUCTION INTEGER Factor 0
+PRODUCTION Assignment sum := 0
+PRODUCTION INTEGER Factor 0
+PRODUCTION Assignment sum2 := 0
+PRODUCTION INTEGER Factor 1
+PRODUCTION Assignment i := 1
+PRODUCTION ID Factor arr_length
+PRODUCTION ID Factor sum
+PRODUCTION ID Factor i
+PRODUCTION expr_arithmetic 0 + 1
+PRODUCTION Assignment sum := 1
+PRODUCTION ID Factor sum2
+PRODUCTION ID Factor i
+PRODUCTION expr_arithmetic 0 + 2
+PRODUCTION Assignment sum2 := 2
+PRODUCTION ID Factor i
+PRODUCTION INTEGER Factor 1
+PRODUCTION expr_arithmetic 1 + 1
+PRODUCTION Assignment i := 2
+PRODUCTION Repeat 7 times
+PRODUCTION ID Factor sum
+PRODUCTION ID Factor arr_length
+PRODUCTION expr_term 1 / 7
+PRODUCTION Assignment median := 0.0
+PRODUCTION ID Factor sum2
+PRODUCTION ID Factor arr_length
+PRODUCTION expr_term 2 / 7
+PRODUCTION Assignment median2 := 0.0
+PRODUCTION ID Factor median
+PRODUCTION Expression 0.0
+PRODUCTION ID Factor median2
+PRODUCTION Expression 0.0

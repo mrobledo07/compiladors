@@ -1,0 +1,13 @@
+PRODUCTION INTEGER Factor 5
+PRODUCTION Assignment a := 5
+PRODUCTION ID Factor a
+PRODUCTION expr_unary - 5
+PRODUCTION Assignment b := -5
+PRODUCTION ID Factor b
+PRODUCTION expr_unary - -5
+PRODUCTION Assignment c := 5
+PRODUCTION ID Factor c
+PRODUCTION expr_unary - 5
+PRODUCTION LPAREN expression RPAREN -5
+PRODUCTION expr_unary - -5
+PRODUCTION Assignment d := 5

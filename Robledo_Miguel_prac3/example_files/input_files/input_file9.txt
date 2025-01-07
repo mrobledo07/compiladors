@@ -1,0 +1,23 @@
+arr := "Ha", "o", "l", "a"
+
+arr[2]
+
+arr1 := 4, 2, 6, 8
+
+arr1[1]
+arr1[2]
+
+arr2 := 3.5, 3.6, 3.7, 3.8
+
+arr2[1]
+arr2[2]
+arr2[4]
+
+x := arr2[1]
+y := arr2[4]
+z := arr1[1]
+w := x + y + z
+w
+
+var := arr2[1] + arr2[4] + arr1[1]
+var

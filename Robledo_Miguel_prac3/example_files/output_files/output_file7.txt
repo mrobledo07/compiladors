@@ -1,0 +1,31 @@
+PRODUCTION INTEGER Factor 4
+PRODUCTION INTEGER Factor 4
+PRODUCTION expr_arithmetic 4 + 4
+PRODUCTION Assignment a := 8
+PRODUCTION ID Factor a
+PRODUCTION INTEGER Factor 2
+PRODUCTION expr_arithmetic 8 - 2
+PRODUCTION Assignment b := 6
+PRODUCTION ID Factor a
+PRODUCTION ID Factor b
+PRODUCTION expr_term 8 * 6
+PRODUCTION Assignment c := 48
+PRODUCTION ID Factor a
+PRODUCTION ID Factor b
+PRODUCTION expr_arithmetic 8 + 6
+PRODUCTION LPAREN expression RPAREN 14
+PRODUCTION ID Factor b
+PRODUCTION ID Factor c
+PRODUCTION expr_arithmetic 6 + 48
+PRODUCTION LPAREN expression RPAREN 54
+PRODUCTION expr_arithmetic 14 + 54
+PRODUCTION ID Factor c
+PRODUCTION ID Factor a
+PRODUCTION expr_arithmetic 48 + 8
+PRODUCTION LPAREN expression RPAREN 56
+PRODUCTION INTEGER Factor 2
+PRODUCTION expr_term 56 * 2
+PRODUCTION expr_arithmetic 68 + 112
+PRODUCTION Assignment d := 180
+PRODUCTION ID Factor d
+PRODUCTION Expression 180

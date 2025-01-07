@@ -1,0 +1,24 @@
+PRODUCTION INTEGER Factor 3
+PRODUCTION Assignment m := 3
+PRODUCTION INTEGER Factor 4
+PRODUCTION Assignment n := 4
+PRODUCTION INTEGER Factor 1
+PRODUCTION Assignment i := 1
+PRODUCTION ID Factor m
+PRODUCTION INTEGER Factor 1
+PRODUCTION Assignment j := 1
+PRODUCTION ID Factor n
+PRODUCTION ID Factor i
+PRODUCTION ID Factor j
+PRODUCTION expr_term 1 * 1
+PRODUCTION Assignment x := 1
+PRODUCTION ID Factor j
+PRODUCTION INTEGER Factor 1
+PRODUCTION expr_arithmetic 1 + 1
+PRODUCTION Assignment j := 2
+PRODUCTION Repeat 4 times
+PRODUCTION ID Factor i
+PRODUCTION INTEGER Factor 1
+PRODUCTION expr_arithmetic 1 + 1
+PRODUCTION Assignment i := 2
+PRODUCTION Repeat 3 times

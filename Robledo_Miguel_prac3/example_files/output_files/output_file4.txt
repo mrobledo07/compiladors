@@ -1,0 +1,14 @@
+PRODUCTION STRING Factor "Hello"
+PRODUCTION Assignment s1 := Hello
+PRODUCTION STRING Factor "World"
+PRODUCTION Assignment s2 := World
+PRODUCTION ID Factor s1
+PRODUCTION STRING Factor " "
+PRODUCTION expr_arithmetic Hello +  
+PRODUCTION ID Factor s2
+PRODUCTION expr_arithmetic Hello  + World
+PRODUCTION Assignment s3 := Hello World
+PRODUCTION ID Factor s3
+PRODUCTION STRING Factor "!"
+PRODUCTION expr_arithmetic Hello World + !
+PRODUCTION Assignment s4 := Hello World!

@@ -1,0 +1,11 @@
+m := 3
+n := 4
+i := 1
+repeat m do
+    j := 1
+    repeat n do
+        x := i * j
+        j := j + 1
+    done
+    i := i + 1
+done

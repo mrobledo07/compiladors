@@ -1,0 +1,9 @@
+a := 5
+$t01 := CHSI a
+b := $t01
+$t02 := CHSI b
+c := $t02
+$t03 := CHSI c
+$t04 := CHSI $t03
+d := $t04
+HALT

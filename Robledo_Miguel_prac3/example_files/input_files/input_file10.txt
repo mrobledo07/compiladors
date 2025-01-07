@@ -1,0 +1,29 @@
+// arrays and repeats
+
+arr := 1, 1, 2, 3, 5, 8, 13
+arr2 := 2, 2, 4, 6, 10, 16, 26
+
+arr_length := 7
+
+sum := 0
+i := 1
+repeat arr_length do
+    sum := arr[i] + arr2[i]
+    sum
+    i := i + 1
+done
+
+sum := 0
+sum2 := 0
+i := 1
+repeat arr_length do
+    sum := sum + arr[i]
+    sum2 := sum2 + arr2[i]
+    i := i + 1
+done
+
+median := sum / arr_length
+median2 := sum2 / arr_length
+
+median
+median2

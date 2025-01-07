@@ -1,0 +1,33 @@
+x := 5.000000
+i := 3
+$t01 := i MULI 3
+$t02 := i ADDI $t01
+$t03 := I2F $t02
+$t04 := $t03 SUBF x
+y := $t04
+z := "Hola"
+w := " Pepsicola"
+$t05 := z CONCAT w
+z := $t05
+n := 10
+fact := 1
+i := 2
+$t06 := n SUBI 1
+$t07 := 0
+$t08 := n SUBI 1
+$t09 := 0
+$t10 := n SUBI 1
+$t11 := 0
+$t12 := fact MULI i
+fact := $t12
+$t13 := i ADDI 1
+i := $t13
+$t11 := $t11 ADDI 1
+IF $t11 LTI $t10 GOTO 21
+$t09 := $t09 ADDI 1
+IF $t09 LTI $t08 GOTO 19
+$t07 := $t07 ADDI 1
+IF $t07 LTI $t06 GOTO 17
+PARAM z
+CALL PUTC, 14
+HALT
