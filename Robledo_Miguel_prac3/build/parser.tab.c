@@ -528,7 +528,7 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  40
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   112
+#define YYLAST   117
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  49
@@ -537,7 +537,7 @@ union yyalloc
 /* YYNRULES -- Number of rules.  */
 #define YYNRULES  50
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  88
+#define YYNSTATES  89
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   303
@@ -592,11 +592,11 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int16 yyrline[] =
 {
        0,   127,   127,   131,   132,   136,   137,   165,   166,   167,
-     168,   172,   184,   185,   204,   205,   226,   232,   233,   250,
-     283,   316,   349,   384,   417,   505,   524,   550,   591,   626,
-     630,   681,   685,   686,   801,   894,   895,   932,   974,   975,
-    1065,  1154,  1189,  1190,  1204,  1213,  1220,  1228,  1235,  1242,
-    1249
+     168,   172,   186,   187,   206,   207,   228,   234,   235,   252,
+     285,   318,   351,   386,   419,   507,   526,   552,   593,   628,
+     632,   683,   687,   688,   803,   896,   897,   934,   976,   977,
+    1067,  1156,  1191,  1192,  1206,  1215,  1222,  1230,  1237,  1244,
+    1251
 };
 #endif
 
@@ -646,15 +646,15 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       4,   -41,    -1,   -41,   -41,    71,    71,   -41,   -41,    71,
-      71,    41,    20,   -41,    12,   -41,   -41,   -41,   -41,     1,
-      13,   -41,    95,   -41,    30,    71,    71,    24,   -41,   -41,
-     -41,     9,     5,   -41,    71,   -15,    38,   -41,   -41,    72,
-     -41,     4,   -41,    71,    71,    71,    78,    78,    78,    71,
-     -41,     7,   -41,     4,   -41,   -41,   -41,   -41,    71,    71,
-      71,    71,    71,    71,   -41,    13,   -41,   -41,   -41,   -41,
-     -41,   -41,   -41,    26,    41,     4,    41,   -41,   -41,   -41,
-     -41,   -41,   -41,   -41,    38,    25,   -41,   -41
+       4,   -41,    -1,   -41,   -41,    79,    79,   -41,   -41,    79,
+      79,    55,    26,   -41,    12,   -41,   -41,   -41,   -41,    -3,
+      13,   -41,   103,   -41,    28,    79,    79,     8,   -41,   -41,
+     -41,    10,    15,   -41,    79,   -15,    16,   -41,   -41,    80,
+     -41,     4,   -41,    79,    79,    79,    86,    86,    86,    79,
+     -41,     9,   -41,     4,   -41,   -41,   -41,   -41,    79,    79,
+      79,    79,    79,    79,   -41,    13,   -41,   -41,   -41,   -41,
+     -41,   -41,   -41,    11,    55,     4,    55,   -41,   -41,   -41,
+     -41,   -41,   -41,   -41,    16,    25,   -41,   -41,   -41
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -670,14 +670,14 @@ static const yytype_int8 yydefact[] =
       27,     0,    49,    10,    18,    16,    16,    16,     0,     0,
        0,     0,     0,     0,     3,    30,    33,    34,    39,    40,
       41,    28,    50,     0,     0,    10,     0,    21,    22,    23,
-      24,    19,    20,    25,    13,     0,    15,    11
+      24,    19,    20,    25,    13,     0,    15,    16,    11
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -41,   -41,   -40,   -41,   -41,   -41,   -11,   -30,    -9,    34,
-     -41,   -41,   -41,    -4,   -41,    -7,    -2,   -41,    64,     0
+     -41,   -41,   -40,   -41,   -41,   -41,   -27,   -39,   -25,    18,
+     -41,   -41,   -41,    -4,   -41,     7,    -2,   -41,    21,     0
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
@@ -693,33 +693,33 @@ static const yytype_int8 yydefgoto[] =
 static const yytype_int8 yytable[] =
 {
       24,    64,    25,    28,    30,    31,    33,    39,    55,     1,
-       2,     3,     4,    73,     5,     6,    41,    44,    45,    51,
-      40,    50,    56,    44,    45,    26,    75,    76,     7,     8,
-      39,    43,     9,    49,    72,    85,    65,    10,    52,    53,
-      11,    24,    66,    67,    42,    71,     1,    27,     3,     4,
-      26,     5,     6,    24,    77,    78,    79,    80,    81,    82,
-      57,    83,    34,    84,    87,     7,     8,    86,    54,     9,
-      39,     0,    39,     0,     0,    24,     1,    27,     3,     4,
-       0,     5,     6,     1,    27,     3,     4,    58,    59,    60,
-      61,    62,    63,     0,     0,     7,     8,     0,     0,     9,
-       0,     0,     7,     8,     0,     0,     9,    46,    47,    48,
-      68,    69,    70
+       2,     3,     4,    73,     5,     6,    41,    75,    76,    44,
+      45,    50,    56,    44,    45,    26,    40,    43,     7,     8,
+      39,    49,     9,    51,    26,    85,    72,    10,    57,    52,
+      11,    24,    66,    67,    42,    71,    83,    84,    88,    53,
+      65,    86,    54,    24,    77,    78,    79,    80,    81,    82,
+       1,    27,     3,     4,    87,     5,     6,    68,    69,    70,
+      39,     0,    39,     0,     0,    24,    34,     0,     0,     7,
+       8,     0,     0,     9,     1,    27,     3,     4,     0,     5,
+       6,     1,    27,     3,     4,    58,    59,    60,    61,    62,
+      63,     0,     0,     7,     8,     0,     0,     9,     0,     0,
+       7,     8,     0,     0,     9,    46,    47,    48
 };
 
 static const yytype_int8 yycheck[] =
 {
        0,    41,     3,     5,     6,     9,    10,    11,    23,     5,
-       6,     7,     8,    53,    10,    11,     4,    10,    11,    26,
-       0,    25,    37,    10,    11,    26,    56,    57,    24,    25,
-      34,    30,    28,     3,    27,    75,    43,    33,    29,    34,
-      36,    41,    44,    45,    32,    49,     5,     6,     7,     8,
-      26,    10,    11,    53,    58,    59,    60,    61,    62,    63,
-      22,    35,    21,    74,    39,    24,    25,    76,    34,    28,
-      74,    -1,    76,    -1,    -1,    75,     5,     6,     7,     8,
-      -1,    10,    11,     5,     6,     7,     8,    15,    16,    17,
-      18,    19,    20,    -1,    -1,    24,    25,    -1,    -1,    28,
-      -1,    -1,    24,    25,    -1,    -1,    28,    12,    13,    14,
-      46,    47,    48
+       6,     7,     8,    53,    10,    11,     4,    56,    57,    10,
+      11,    25,    37,    10,    11,    26,     0,    30,    24,    25,
+      34,     3,    28,    26,    26,    75,    27,    33,    22,    29,
+      36,    41,    44,    45,    32,    49,    35,    74,    87,    34,
+      43,    76,    34,    53,    58,    59,    60,    61,    62,    63,
+       5,     6,     7,     8,    39,    10,    11,    46,    47,    48,
+      74,    -1,    76,    -1,    -1,    75,    21,    -1,    -1,    24,
+      25,    -1,    -1,    28,     5,     6,     7,     8,    -1,    10,
+      11,     5,     6,     7,     8,    15,    16,    17,    18,    19,
+      20,    -1,    -1,    24,    25,    -1,    -1,    28,    -1,    -1,
+      24,    25,    -1,    -1,    28,    12,    13,    14
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
@@ -734,7 +734,7 @@ static const yytype_int8 yystos[] =
       62,    64,    29,    34,    58,    23,    37,    22,    15,    16,
       17,    18,    19,    20,    51,    64,    65,    65,    67,    67,
       67,    62,    27,    51,    56,    56,    56,    62,    62,    62,
-      62,    62,    62,    35,    55,    51,    57,    39
+      62,    62,    62,    35,    55,    51,    57,    39,    56
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
@@ -752,7 +752,7 @@ static const yytype_int8 yyr1[] =
 static const yytype_int8 yyr2[] =
 {
        0,     2,     1,     3,     1,     1,     1,     2,     1,     1,
-       0,     6,     1,     4,     1,     4,     0,     1,     2,     3,
+       0,     7,     1,     4,     1,     4,     0,     1,     2,     3,
        3,     3,     3,     3,     3,     5,     1,     3,     3,     1,
        3,     1,     1,     3,     3,     1,     2,     2,     1,     3,
        3,     3,     1,     1,     1,     1,     1,     1,     1,     3,
@@ -1252,22 +1252,24 @@ yyreduce:
 #line 1253 "build/parser.tab.c"
     break;
 
-  case 11: /* if_statement: IF expression_bool THEN marker statement_list FI  */
+  case 11: /* if_statement: IF expression_bool THEN marker statement_list FI marker  */
 #line 172 "parser.y"
-                                                     {
-        fprintf(yyout, "PRODUCTION If %s = %s THEN\n", (yyvsp[-4].ident).lexema, value_to_str((yyvsp[-4].ident).id_val));
+                                                            {
+        fprintf(yyout, "PRODUCTION If %s = %s THEN\n", (yyvsp[-5].ident).lexema, value_to_str((yyvsp[-5].ident).id_val));
                 
         // Backpatch the true_list of the condition to point to the start of the statement_list
-        backpatch((yyvsp[-4].ident).true_list, (yyvsp[-2].marker).instr);
+        backpatch((yyvsp[-5].ident).true_list, (yyvsp[-3].marker).instr);
+
+        backpatch((yyvsp[-5].ident).false_list, (yyvsp[0].marker).instr);
 
         // The next list (pending jumps) is the false_list of the condition
-        (yyval.ident).next_list = (yyvsp[-4].ident).false_list;
+        (yyval.ident).next_list = (yyvsp[-5].ident).false_list;
     }
-#line 1267 "build/parser.tab.c"
+#line 1269 "build/parser.tab.c"
     break;
 
   case 13: /* expression_bool: expression_bool OR marker expr_bool_and  */
-#line 185 "parser.y"
+#line 187 "parser.y"
                                               {
         fprintf(yyout, "PRODUCTION Expression %s OR %s\n", value_to_str((yyvsp[-3].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         if ((yyvsp[-3].ident).id_val.val_type == BOOL_TYPE && (yyvsp[0].ident).id_val.val_type == BOOL_TYPE) {
@@ -1284,11 +1286,11 @@ yyreduce:
             (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1288 "build/parser.tab.c"
+#line 1290 "build/parser.tab.c"
     break;
 
   case 15: /* expr_bool_and: expr_bool_and AND marker expr_bool_not  */
-#line 205 "parser.y"
+#line 207 "parser.y"
                                              {
         fprintf(yyout, "PRODUCTION Expression %s AND %s\n", value_to_str((yyvsp[-3].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         if ((yyvsp[-3].ident).id_val.val_type == BOOL_TYPE && (yyvsp[0].ident).id_val.val_type == BOOL_TYPE) {
@@ -1307,19 +1309,19 @@ yyreduce:
             (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1311 "build/parser.tab.c"
+#line 1313 "build/parser.tab.c"
     break;
 
   case 16: /* marker: %empty  */
-#line 226 "parser.y"
+#line 228 "parser.y"
     {
         (yyval.marker).instr = n_instructions;
     }
-#line 1319 "build/parser.tab.c"
+#line 1321 "build/parser.tab.c"
     break;
 
   case 18: /* expr_bool_not: NOT expr_bool  */
-#line 233 "parser.y"
+#line 235 "parser.y"
                     {
         fprintf(yyout, "PRODUCTION NOT %s\n", value_to_str((yyvsp[0].ident).id_val));
         if ((yyvsp[0].ident).id_val.val_type == BOOL_TYPE) {
@@ -1334,11 +1336,11 @@ yyreduce:
             (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1338 "build/parser.tab.c"
+#line 1340 "build/parser.tab.c"
     break;
 
   case 19: /* expr_bool: expression EQ expression  */
-#line 250 "parser.y"
+#line 252 "parser.y"
                              {
         fprintf(yyout, "PRODUCTION Expression %s EQ %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
@@ -1372,11 +1374,11 @@ yyreduce:
             (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1376 "build/parser.tab.c"
+#line 1378 "build/parser.tab.c"
     break;
 
   case 20: /* expr_bool: expression NE expression  */
-#line 283 "parser.y"
+#line 285 "parser.y"
                                {
         fprintf(yyout, "PRODUCTION Expression %s NE %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
@@ -1410,11 +1412,11 @@ yyreduce:
             (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1414 "build/parser.tab.c"
+#line 1416 "build/parser.tab.c"
     break;
 
   case 21: /* expr_bool: expression GT expression  */
-#line 316 "parser.y"
+#line 318 "parser.y"
                                {
         fprintf(yyout, "PRODUCTION Expression %s GT %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
@@ -1448,11 +1450,11 @@ yyreduce:
             (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1452 "build/parser.tab.c"
+#line 1454 "build/parser.tab.c"
     break;
 
   case 22: /* expr_bool: expression GE expression  */
-#line 349 "parser.y"
+#line 351 "parser.y"
                                {
         fprintf(yyout, "PRODUCTION Expression %s GE %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
@@ -1488,11 +1490,11 @@ yyreduce:
             (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1492 "build/parser.tab.c"
+#line 1494 "build/parser.tab.c"
     break;
 
   case 23: /* expr_bool: expression LT expression  */
-#line 384 "parser.y"
+#line 386 "parser.y"
                                {
         fprintf(yyout, "PRODUCTION Expression %s LT %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
@@ -1526,11 +1528,11 @@ yyreduce:
             (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1530 "build/parser.tab.c"
+#line 1532 "build/parser.tab.c"
     break;
 
   case 24: /* expr_bool: expression LE expression  */
-#line 417 "parser.y"
+#line 419 "parser.y"
                                {
         fprintf(yyout, "PRODUCTION Expression %s LE %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         if (((yyvsp[-2].ident).id_val.val_type == INT_TYPE || (yyvsp[-2].ident).id_val.val_type == FLOAT_TYPE) && 
@@ -1564,11 +1566,11 @@ yyreduce:
             (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 1568 "build/parser.tab.c"
+#line 1570 "build/parser.tab.c"
     break;
 
   case 25: /* repeat_statement: REPEAT repeat_expression DO statement_list DONE  */
-#line 505 "parser.y"
+#line 507 "parser.y"
                                                     {
         if ((yyvsp[-3].ident).id_val.val_type != INT_TYPE) {
             yyerror("Repeat count must be an integer");
@@ -1585,11 +1587,11 @@ yyreduce:
             emit(buffer);
         }
     }
-#line 1589 "build/parser.tab.c"
+#line 1591 "build/parser.tab.c"
     break;
 
   case 26: /* repeat_expression: expression  */
-#line 524 "parser.y"
+#line 526 "parser.y"
                {
         if ((yyvsp[0].ident).is_literal) {
             char *new_var = generate_temp_var();
@@ -1613,11 +1615,11 @@ yyreduce:
         sprintf(line_number, "%d", n_instructions);
         push_repeat_stack(line_number);
     }
-#line 1617 "build/parser.tab.c"
+#line 1619 "build/parser.tab.c"
     break;
 
   case 27: /* assignment: ID ASSIGN expression  */
-#line 550 "parser.y"
+#line 552 "parser.y"
                          {
         fprintf(yyout, "PRODUCTION Assignment %s := %s\n", (yyvsp[-2].ident).lexema, value_to_str((yyvsp[0].ident).id_val));
         // Assign only if the type is compatible or if it has not been initialized
@@ -1659,11 +1661,11 @@ yyreduce:
             yyerror("Incompatible types in assignment");
         }
     }
-#line 1663 "build/parser.tab.c"
+#line 1665 "build/parser.tab.c"
     break;
 
   case 28: /* assignment: array_access ASSIGN expression  */
-#line 591 "parser.y"
+#line 593 "parser.y"
                                      {
         fprintf(yyout, "PRODUCTION Assignment %s[%d] := %s\n", (yyvsp[-2].ident).lexema, (yyvsp[0].ident).id_val.val_int, value_to_str((yyvsp[0].ident).id_val));
 
@@ -1696,11 +1698,11 @@ yyreduce:
             }
         }
     }
-#line 1700 "build/parser.tab.c"
+#line 1702 "build/parser.tab.c"
     break;
 
   case 30: /* expression_list: expression_list COMMA expr_arithmetic  */
-#line 630 "parser.y"
+#line 632 "parser.y"
                                           {
        if (array_size == 1) {
             char *new_elem1 = (yyvsp[-2].ident).lexema;
@@ -1752,11 +1754,11 @@ yyreduce:
         (yyval.ident).id_val.val_array = new_array;
 
     }
-#line 1756 "build/parser.tab.c"
+#line 1758 "build/parser.tab.c"
     break;
 
   case 33: /* expr_arithmetic: expr_arithmetic PLUS expr_unary  */
-#line 686 "parser.y"
+#line 688 "parser.y"
                                       {
         fprintf(yyout, "PRODUCTION expr_arithmetic %s + %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         char *temp_var = NULL;
@@ -1872,11 +1874,11 @@ yyreduce:
             (yyval.ident).lexema = temp_var;
             (yyval.ident).is_literal = 0;
     }
-#line 1876 "build/parser.tab.c"
+#line 1878 "build/parser.tab.c"
     break;
 
   case 34: /* expr_arithmetic: expr_arithmetic MINUS expr_unary  */
-#line 801 "parser.y"
+#line 803 "parser.y"
                                        {
         fprintf(yyout, "PRODUCTION expr_arithmetic %s - %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         char *temp_var = NULL;
@@ -1967,11 +1969,11 @@ yyreduce:
             (yyval.ident).lexema = temp_var;
             (yyval.ident).is_literal = 0;
     }
-#line 1971 "build/parser.tab.c"
+#line 1973 "build/parser.tab.c"
     break;
 
   case 36: /* expr_unary: PLUS expr_unary  */
-#line 895 "parser.y"
+#line 897 "parser.y"
                       {
         fprintf(yyout, "PRODUCTION expr_unary + %s\n", value_to_str((yyvsp[0].ident).id_val));
         char *temp_var = NULL;
@@ -2009,11 +2011,11 @@ yyreduce:
             (yyval.ident).id_val.val_type = UNKNOWN_TYPE;
         }
     }
-#line 2013 "build/parser.tab.c"
+#line 2015 "build/parser.tab.c"
     break;
 
   case 37: /* expr_unary: MINUS expr_unary  */
-#line 932 "parser.y"
+#line 934 "parser.y"
                        {
         fprintf(yyout, "PRODUCTION expr_unary - %s\n", value_to_str((yyvsp[0].ident).id_val));
         char *temp_var = NULL;
@@ -2053,11 +2055,11 @@ yyreduce:
         (yyval.ident).lexema = temp_var;
         (yyval.ident).is_literal = 0;
     }
-#line 2057 "build/parser.tab.c"
+#line 2059 "build/parser.tab.c"
     break;
 
   case 39: /* expr_term: expr_term MULT factor  */
-#line 975 "parser.y"
+#line 977 "parser.y"
                             {
         fprintf(yyout, "PRODUCTION expr_term %s * %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         char *temp_var = NULL;
@@ -2148,11 +2150,11 @@ yyreduce:
             (yyval.ident).lexema = temp_var;
             (yyval.ident).is_literal = 0;
     }
-#line 2152 "build/parser.tab.c"
+#line 2154 "build/parser.tab.c"
     break;
 
   case 40: /* expr_term: expr_term DIV factor  */
-#line 1065 "parser.y"
+#line 1067 "parser.y"
                            {
         fprintf(yyout, "PRODUCTION expr_term %s / %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         char *temp_var = NULL;
@@ -2242,11 +2244,11 @@ yyreduce:
             (yyval.ident).lexema = temp_var;
             (yyval.ident).is_literal = 0;
     }
-#line 2246 "build/parser.tab.c"
+#line 2248 "build/parser.tab.c"
     break;
 
   case 41: /* expr_term: expr_term MOD factor  */
-#line 1154 "parser.y"
+#line 1156 "parser.y"
                            {
         fprintf(yyout, "PRODUCTION expr_term %s %% %s\n", value_to_str((yyvsp[-2].ident).id_val), value_to_str((yyvsp[0].ident).id_val));
         char *temp_var = NULL;
@@ -2279,11 +2281,11 @@ yyreduce:
         (yyval.ident).lexema = temp_var;
         (yyval.ident).is_literal = 0;
     }
-#line 2283 "build/parser.tab.c"
+#line 2285 "build/parser.tab.c"
     break;
 
   case 43: /* factor: ID  */
-#line 1190 "parser.y"
+#line 1192 "parser.y"
          {
         fprintf(yyout, "PRODUCTION ID Factor %s\n", (yyvsp[0].ident).lexema);
         value_info value;
@@ -2298,11 +2300,11 @@ yyreduce:
                 (yyval.ident).is_literal = 1;
             }
     }
-#line 2302 "build/parser.tab.c"
+#line 2304 "build/parser.tab.c"
     break;
 
   case 44: /* factor: INTEGER  */
-#line 1204 "parser.y"
+#line 1206 "parser.y"
               {
         fprintf(yyout, "PRODUCTION INTEGER Factor %d\n", (yyvsp[0].integer));
         (yyval.ident).id_val.val_type = INT_TYPE;
@@ -2312,11 +2314,11 @@ yyreduce:
         sprintf((yyval.ident).lexema, "%d", (yyvsp[0].integer));
         (yyval.ident).is_literal = 1;
     }
-#line 2316 "build/parser.tab.c"
+#line 2318 "build/parser.tab.c"
     break;
 
   case 45: /* factor: STRING  */
-#line 1213 "parser.y"
+#line 1215 "parser.y"
              {
         fprintf(yyout, "PRODUCTION STRING Factor %s\n", (yyvsp[0].string));
         (yyval.ident).id_val.val_type = STR_TYPE;
@@ -2324,11 +2326,11 @@ yyreduce:
         (yyval.ident).lexema = (yyvsp[0].string);
         (yyval.ident).lenght = strlen((yyvsp[0].string)) - 2;
     }
-#line 2328 "build/parser.tab.c"
+#line 2330 "build/parser.tab.c"
     break;
 
   case 46: /* factor: REAL  */
-#line 1220 "parser.y"
+#line 1222 "parser.y"
            {
         fprintf(yyout, "PRODUCTION REAL Factor %f\n", (yyvsp[0].real));
         (yyval.ident).id_val.val_type = FLOAT_TYPE;
@@ -2337,11 +2339,11 @@ yyreduce:
         (yyval.ident).lexema = (char *)malloc(12);
         sprintf((yyval.ident).lexema, "%f", (yyvsp[0].real));
     }
-#line 2341 "build/parser.tab.c"
+#line 2343 "build/parser.tab.c"
     break;
 
   case 47: /* factor: PI  */
-#line 1228 "parser.y"
+#line 1230 "parser.y"
          {
         fprintf(yyout, "PRODUCTION PI Factor\n");
         (yyval.ident).id_val.val_type = FLOAT_TYPE;
@@ -2349,11 +2351,11 @@ yyreduce:
         // store value as a string
         (yyval.ident).lexema = "3.141592653589793";
     }
-#line 2353 "build/parser.tab.c"
+#line 2355 "build/parser.tab.c"
     break;
 
   case 48: /* factor: E  */
-#line 1235 "parser.y"
+#line 1237 "parser.y"
         {
         fprintf(yyout, "PRODUCTION E Factor\n");
         (yyval.ident).id_val.val_type = FLOAT_TYPE;
@@ -2361,20 +2363,20 @@ yyreduce:
         // store value as a string
         (yyval.ident).lexema = "2.718281828459045";
     }
-#line 2365 "build/parser.tab.c"
+#line 2367 "build/parser.tab.c"
     break;
 
   case 49: /* factor: LPAREN expression RPAREN  */
-#line 1242 "parser.y"
+#line 1244 "parser.y"
                                {
         fprintf(yyout, "PRODUCTION LPAREN expression RPAREN %s\n", value_to_str((yyvsp[-1].ident).id_val));
         (yyval.ident) = (yyvsp[-1].ident);
     }
-#line 2374 "build/parser.tab.c"
+#line 2376 "build/parser.tab.c"
     break;
 
   case 50: /* array_access: ID LBRACKET expr_arithmetic RBRACKET  */
-#line 1249 "parser.y"
+#line 1251 "parser.y"
                                          {
     value_info val1;
         if (sym_lookup((yyvsp[-3].ident).lexema, &val1) == SYMTAB_NOT_FOUND) {
@@ -2419,11 +2421,11 @@ yyreduce:
             }
         }
     }
-#line 2423 "build/parser.tab.c"
+#line 2425 "build/parser.tab.c"
     break;
 
 
-#line 2427 "build/parser.tab.c"
+#line 2429 "build/parser.tab.c"
 
       default: break;
     }
@@ -2616,5 +2618,5 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 1294 "parser.y"
+#line 1296 "parser.y"
 

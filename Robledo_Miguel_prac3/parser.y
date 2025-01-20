@@ -169,11 +169,13 @@ statement:
     ;
 
 if_statement:
-    IF expression_bool THEN marker statement_list FI {
+    IF expression_bool THEN marker statement_list FI marker {
         fprintf(yyout, "PRODUCTION If %s = %s THEN\n", $2.lexema, value_to_str($2.id_val));
                 
         // Backpatch the true_list of the condition to point to the start of the statement_list
         backpatch($2.true_list, $4.instr);
+
+        backpatch($2.false_list, $7.instr);
 
         // The next list (pending jumps) is the false_list of the condition
         $$.next_list = $2.false_list;

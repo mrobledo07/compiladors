@@ -30,7 +30,7 @@ Grammar
     8          | if_statement
     9          | ε
 
-   10 if_statement: IF expression_bool THEN marker statement_list FI
+   10 if_statement: IF expression_bool THEN marker statement_list FI marker
 
    11 expression_bool: expr_bool_and
    12                | expression_bool OR marker expr_bool_and
@@ -371,7 +371,7 @@ State 10
 
 State 11
 
-   10 if_statement: IF • expression_bool THEN marker statement_list FI
+   10 if_statement: IF • expression_bool THEN marker statement_list FI marker
 
     INTEGER  shift, and go to state 1
     ID       shift, and go to state 27
@@ -633,7 +633,7 @@ State 34
 
 State 35
 
-   10 if_statement: IF expression_bool • THEN marker statement_list FI
+   10 if_statement: IF expression_bool • THEN marker statement_list FI marker
    12 expression_bool: expression_bool • OR marker expr_bool_and
 
     OR    shift, and go to state 55
@@ -934,7 +934,7 @@ State 55
 
 State 56
 
-   10 if_statement: IF expression_bool THEN • marker statement_list FI
+   10 if_statement: IF expression_bool THEN • marker statement_list FI marker
 
     $default  reduce using rule 15 (marker)
 
@@ -1192,7 +1192,7 @@ State 74
 
 State 75
 
-   10 if_statement: IF expression_bool THEN marker • statement_list FI
+   10 if_statement: IF expression_bool THEN marker • statement_list FI marker
 
     INTEGER  shift, and go to state 1
     ID       shift, and go to state 2
@@ -1309,7 +1309,7 @@ State 84
 
 State 85
 
-   10 if_statement: IF expression_bool THEN marker statement_list • FI
+   10 if_statement: IF expression_bool THEN marker statement_list • FI marker
 
     FI  shift, and go to state 87
 
@@ -1323,6 +1323,15 @@ State 86
 
 State 87
 
-   10 if_statement: IF expression_bool THEN marker statement_list FI •
+   10 if_statement: IF expression_bool THEN marker statement_list FI • marker
+
+    $default  reduce using rule 15 (marker)
+
+    marker  go to state 88
+
+
+State 88
+
+   10 if_statement: IF expression_bool THEN marker statement_list FI marker •
 
     $default  reduce using rule 10 (if_statement)
