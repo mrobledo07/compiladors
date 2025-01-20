@@ -61,6 +61,10 @@
     struct {
         int instr;
     }   marker;
+    struct {
+        int instr;
+        instruction_list *goto_end_list;
+    } statement;
 }
 
 %token <no_value> ASSIGN ENDLINE
@@ -100,6 +104,9 @@
 %type <ident> expression_list
 %type <ident> repeat_expression
 %type <ident> if_statement
+%type <statement> else_part
+%type <ident> if_else_statement
+%type <statement> statement_then
 %type <ident> expression_bool
 %type <ident> expr_bool_and
 %type <ident> expr_bool_not
@@ -165,6 +172,7 @@ statement:
     | statement COMMENT
     | repeat_statement
     | if_statement
+    | if_else_statement
     |
     ;
 
@@ -174,8 +182,39 @@ if_statement:
                 
         // Backpatch the true_list of the condition to point to the start of the statement_list
         backpatch($2.true_list, $4.instr);
-
         backpatch($2.false_list, $7.instr);
+    }
+    ;
+
+if_else_statement:
+    IF expression_bool THEN marker statement_then else_part FI marker {
+        fprintf(yyout, "PRODUCTION If %s = %s THEN\n", $2.lexema, value_to_str($2.id_val));
+                
+        // Backpatch the true_list of the condition to point to the start of the statement_list
+        backpatch($2.true_list, $4.instr);
+
+        // Backpatch the false_list of the condition to point to the start of the else_part
+        backpatch($2.false_list, $6.instr);
+        
+        // Backpatch the goto_end_list of the if statement to point to the end of the statement_list
+        backpatch($5.goto_end_list, $8.instr);
+    }
+    ;
+
+
+else_part:
+    ELSE marker statement_list {
+        fprintf(yyout, "PRODUCTION ELSE\n");
+        // Backpatch the false_list of the condition to point to the start of the statement_list
+        $$.instr = $2.instr;
+    }
+    ;
+
+statement_then:
+    statement_list {
+        fprintf(yyout, "PRODUCTION THEN\n");
+        $$.goto_end_list = makelist(n_instructions);
+        emit("GOTO ____\n");
     }
     ;
 

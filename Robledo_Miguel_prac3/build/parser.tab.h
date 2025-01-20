@@ -137,8 +137,12 @@ union YYSTYPE
     struct {
         int instr;
     }   marker;
+    struct {
+        int instr;
+        instruction_list *goto_end_list;
+    } statement;
 
-#line 142 "build/parser.tab.h"
+#line 146 "build/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
