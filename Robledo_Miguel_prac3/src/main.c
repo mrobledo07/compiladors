@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "../include/functions.h"
+#include "../include/data.h"
 
 
 int main(int argc, char *argv[])
@@ -18,6 +19,7 @@ int main(int argc, char *argv[])
         error = semantic_analysis();
 
         if (error == EXIT_SUCCESS) {
+          print_code();
           printf("HALT\n");
         } else {
           printf("ERROR");

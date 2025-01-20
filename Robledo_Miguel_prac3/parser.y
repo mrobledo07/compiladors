@@ -30,9 +30,9 @@
         }
     }
 
-    int instruction_counter = 1;
     int array_size = 1;
     char *array_elems = NULL;
+    extern int n_instructions;
 %}
 
 %code requires {
@@ -50,12 +50,18 @@
         int is_literal;
         char *array_name;
         int index;
+        instruction_list *true_list;
+        instruction_list *false_list;
+        instruction_list *next_list;
     } ident;
     int integer;
     float real;
     char *string;
     int boolean;
     void *no_value;
+    struct {
+        int instr;
+    }   marker;
 }
 
 %token <no_value> ASSIGN ENDLINE
@@ -104,6 +110,7 @@
 %type <ident> factor
 %type <ident> array_access
 %type <ident> expr_unary
+%type <marker> marker
 
 %left OR
 %left AND
@@ -131,20 +138,29 @@ statement:
         // Print the result of the expression
         fprintf(yyout, "PRODUCTION Expression %s\n", value_to_str($1.id_val));
         if ($1.array_name != NULL) {
-            printf("PARAM [%s]\n", $1.lexema);
+            char *buffer = (char *)malloc(100);
+            sprintf(buffer, "PARAM [%s]\n", $1.lexema);
+            emit(buffer);
         } else {
-            printf("PARAM %s\n", $1.lexema);
+            char *buffer = (char *)malloc(100);
+            sprintf(buffer, "PARAM %s\n", $1.lexema);
+            emit(buffer);
         }
         if ($1.id_val.val_type == INT_TYPE) {
-            printf("CALL PUTI, 1\n");
+            char *buffer = (char *)malloc(100);
+            sprintf(buffer, "CALL PUTI\n");
+            emit(buffer);
         } else if ($1.id_val.val_type == FLOAT_TYPE) {
-            printf("CALL PUTF, 1\n");
+            char *buffer = (char *)malloc(100);
+            sprintf(buffer, "CALL PUTF\n");
+            emit(buffer);
         } else if ($1.id_val.val_type == STR_TYPE) {
-            printf("CALL PUTC, %d\n", $1.lenght);
+            char *buffer = (char *)malloc(100);
+            sprintf(buffer, "CALL PUTC, %d\n", $1.lenght);
+            emit(buffer);
         } else {
             yyerror("Unknown type in expression");
         }
-        instruction_counter += 2;
     }
     | statement COMMENT
     | repeat_statement
@@ -153,46 +169,62 @@ statement:
     ;
 
 if_statement:
-    IF expression_bool THEN statement_list FI {
+    IF expression_bool THEN marker statement_list FI {
         fprintf(yyout, "PRODUCTION If %s = %s THEN\n", $2.lexema, value_to_str($2.id_val));
-        instruction_counter++;
+                
+        // Backpatch the true_list of the condition to point to the start of the statement_list
+        backpatch($2.true_list, $4.instr);
+
+        // The next list (pending jumps) is the false_list of the condition
+        $$.next_list = $2.false_list;
     }
     ;
 
 expression_bool:
     expr_bool_and
-    | expression_bool OR expr_bool_and {
-        fprintf(yyout, "PRODUCTION Expression %s OR %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
-        if ($1.id_val.val_type == BOOL_TYPE && $3.id_val.val_type == BOOL_TYPE) {
-            $$.id_val.val_bool = $1.id_val.val_bool || $3.id_val.val_bool;
+    | expression_bool OR marker expr_bool_and {
+        fprintf(yyout, "PRODUCTION Expression %s OR %s\n", value_to_str($1.id_val), value_to_str($4.id_val));
+        if ($1.id_val.val_type == BOOL_TYPE && $4.id_val.val_type == BOOL_TYPE) {
+            $$.id_val.val_bool = $1.id_val.val_bool || $4.id_val.val_bool;
             $$.id_val.val_type = BOOL_TYPE;
-            printf("IF %s GOTO %d\n", $1.lexema, instruction_counter + 2);
-            printf("GOTO %d\n", instruction_counter + 4);
-            printf("IF %s GOTO %d\n", $3.lexema, instruction_counter + 4);
-            printf("GOTO %d\n", instruction_counter + 5);
+            // Backpatch false_list de la izquierda al inicio del lado derecho
+            backpatch($1.false_list, $3.instr);
+            // Combinar true_lists
+            $$.true_list = merge($1.true_list, $4.true_list);
+            // false_list es la del lado derecho
+            $$.false_list = $4.false_list;
         } else {
             yyerror("Type error: Logical OR operation is only allowed between boolean values");
             $$.id_val.val_type = UNKNOWN_TYPE;
         }
     }
     ;
-    
+
 expr_bool_and:
     expr_bool_not
-    | expr_bool_and AND expr_bool_not {
-        fprintf(yyout, "PRODUCTION Expression %s AND %s\n", value_to_str($1.id_val), value_to_str($3.id_val));
-        if ($1.id_val.val_type == BOOL_TYPE && $3.id_val.val_type == BOOL_TYPE) {
-            $$.id_val.val_bool = $1.id_val.val_bool && $3.id_val.val_bool;
+    | expr_bool_and AND marker expr_bool_not {
+        fprintf(yyout, "PRODUCTION Expression %s AND %s\n", value_to_str($1.id_val), value_to_str($4.id_val));
+        if ($1.id_val.val_type == BOOL_TYPE && $4.id_val.val_type == BOOL_TYPE) {
+            $$.id_val.val_bool = $1.id_val.val_bool && $4.id_val.val_bool;
             $$.id_val.val_type = BOOL_TYPE;
-            printf("IF %s GOTO %d\n", $1.lexema, instruction_counter + 2);
-            printf("GOTO %d\n", instruction_counter + 4);
-            printf("IF %s GOTO %d\n", $3.lexema, instruction_counter + 4);
-            printf("GOTO %d\n", instruction_counter + 5);
-            instruction_counter += 4;
+            // Backpatch true_list del lado izquierdo al inicio del lado derecho
+            backpatch($1.true_list, $3.instr);
+        
+            // La false_list es la combinación de ambas false_lists
+            $$.false_list = merge($1.false_list, $4.false_list);
+        
+            // true_list es la del lado derecho
+            $$.true_list = $4.true_list;
         } else {
             yyerror("Type error: Logical AND operation is only allowed between boolean values");
             $$.id_val.val_type = UNKNOWN_TYPE;
         }
+    }
+    ;
+
+marker:
+    {
+        $$.instr = n_instructions;
     }
     ;
 
@@ -203,9 +235,10 @@ expr_bool_not:
         if ($2.id_val.val_type == BOOL_TYPE) {
             $$.id_val.val_bool = !$2.id_val.val_bool;
             $$.id_val.val_type = BOOL_TYPE;
-            printf("IF %s GOTO %d\n", $2.lexema, instruction_counter + 2);
-            printf("GOTO %d\n", instruction_counter + 1);
-            instruction_counter += 2;
+            // Intercambiar las listas true y false
+            $$.true_list = $2.false_list;
+            $$.false_list = $2.true_list;
+            $$.lexema = concat_str("NOT ", $2.lexema);
         } else {
             yyerror("Type error: Logical NOT operation is only allowed on boolean values");
             $$.id_val.val_type = UNKNOWN_TYPE;
@@ -230,6 +263,18 @@ expr_bool:
                 lexema = concat_str(lexema, " ");
                 lexema = concat_str(lexema, $3.lexema);
                 $$.lexema = lexema;
+
+                // Crear las listas para backpatching
+                $$.true_list = makelist(n_instructions);
+                $$.false_list = makelist(n_instructions + 1);
+
+
+                char *buffer = (char *)malloc(100);
+                sprintf(buffer, "IF %s GOTO ____\n", $$.lexema);
+                emit(buffer);                           // Para true_list
+                emit("GOTO ____\n");                   // Para false_list
+                
+                
         } else {
             yyerror("Type error: Comparison requires numeric types");
             $$.id_val.val_type = UNKNOWN_TYPE;
@@ -251,6 +296,18 @@ expr_bool:
                 lexema = concat_str(lexema, " ");
                 lexema = concat_str(lexema, $3.lexema);
                 $$.lexema = lexema;
+
+
+                // Crear las listas para backpatching
+                $$.true_list = makelist(n_instructions);
+                $$.false_list = makelist(n_instructions + 1); 
+
+                char *buffer = (char *)malloc(100);
+                sprintf(buffer, "IF %s GOTO ____\n", $$.lexema);
+                emit(buffer);                           // Para true_list
+                emit("GOTO ____\n");                   // Para false_list
+                
+                               
         } else {
             yyerror("Type error: Comparison requires numeric types");
             $$.id_val.val_type = UNKNOWN_TYPE;
@@ -275,6 +332,15 @@ expr_bool:
                 lexema = concat_str(lexema, " ");
                 lexema = concat_str(lexema, $3.lexema);
                 $$.lexema = lexema;
+
+                // Crear las listas para backpatching
+                $$.true_list = makelist(n_instructions);
+                $$.false_list = makelist(n_instructions + 1);
+
+                char *buffer = (char *)malloc(100);
+                sprintf(buffer, "IF %s GOTO ____\n", $$.lexema);
+                emit(buffer);                           // Para true_list
+                emit("GOTO ____\n");                   // Para false_list                
         } else {
             yyerror("Type error: Comparison requires numeric types");
             $$.id_val.val_type = UNKNOWN_TYPE;
@@ -299,6 +365,17 @@ expr_bool:
                 lexema = concat_str(lexema, " ");
                 lexema = concat_str(lexema, $3.lexema);
                 $$.lexema = lexema;
+
+                // Crear las listas para backpatching
+                $$.true_list = makelist(n_instructions);
+                $$.false_list = makelist(n_instructions + 1);
+
+                char *buffer = (char *)malloc(100);
+                sprintf(buffer, "IF %s GOTO ____\n", $$.lexema);
+                emit(buffer);                           // Para true_list
+                emit("GOTO ____\n");                   // Para false_list
+                
+
         } else {
             yyerror("Type error: Comparison requires numeric types");
             $$.id_val.val_type = UNKNOWN_TYPE;
@@ -323,6 +400,15 @@ expr_bool:
                 lexema = concat_str(lexema, " ");
                 lexema = concat_str(lexema, $3.lexema);
                 $$.lexema = lexema;
+
+                // Crear las listas para backpatching
+                $$.true_list = makelist(n_instructions);
+                $$.false_list = makelist(n_instructions + 1);
+
+                char *buffer = (char *)malloc(100);
+                sprintf(buffer, "IF %s GOTO ____\n", $$.lexema);
+                emit(buffer);                           // Para true_list
+                emit("GOTO ____\n");                   // Para false_list                
         } else {
             yyerror("Type error: Comparison requires numeric types");
             $$.id_val.val_type = UNKNOWN_TYPE;
@@ -347,6 +433,15 @@ expr_bool:
                 lexema = concat_str(lexema, " ");
                 lexema = concat_str(lexema, $3.lexema);
                 $$.lexema = lexema;
+                
+                // Crear las listas para backpatching
+                $$.true_list = makelist(n_instructions);
+                $$.false_list = makelist(n_instructions + 1);  
+
+                char *buffer = (char *)malloc(100);
+                sprintf(buffer, "IF %s GOTO ____\n", $$.lexema);
+                emit(buffer);                           // Para true_list
+                emit("GOTO ____\n");                   // Para false_list             
         } else {
             yyerror("Type error: Comparison requires numeric types");
             $$.id_val.val_type = UNKNOWN_TYPE;
@@ -357,17 +452,17 @@ expr_bool:
 // if_else_statement:
 //     IF expression THEN statement_list ELSE statement_list FI {
 //         fprintf(yyout, "PRODUCTION If %s THEN ELSE\n", value_to_str($2.id_val));
-//         printf("IF %s GOTO %d\n", $2.lexema, instruction_counter + 2);
-//         printf("GOTO %d\n", instruction_counter + 1);
-//         instruction_counter += 2;
+//         printf("IF %s GOTO %d\n", $2.lexema, n_instructions + 2);
+//         printf("GOTO %d\n", n_instructions + 1);
+//         n_instructions += 2;
 //     }
 //     ;
 
 // switch_statement:
 //     SWITCH expression LBRACKET case_list RBRACKET {
 //         fprintf(yyout, "PRODUCTION Switch %s\n", value_to_str($2.id_val));
-//         printf("GOTO %d\n", instruction_counter + 1);
-//         instruction_counter++;
+//         printf("GOTO %d\n", n_instructions + 1);
+//         n_instructions++;
 //     }
 //     ;
 
@@ -381,18 +476,18 @@ expr_bool:
 // while_statement:
 //     WHILE expression DO statement_list DONE {
 //         fprintf(yyout, "PRODUCTION While %s DO\n", value_to_str($2.id_val));
-//         printf("IF %s GOTO %d\n", $2.lexema, instruction_counter + 2);
-//         printf("GOTO %d\n", instruction_counter + 1);
-//         instruction_counter += 2;
+//         printf("IF %s GOTO %d\n", $2.lexema, n_instructions + 2);
+//         printf("GOTO %d\n", n_instructions + 1);
+//         n_instructions += 2;
 //     }
 //     ;
 
 // do_until_statement:
 //     DO statement_list UNTIL expression {
 //         fprintf(yyout, "PRODUCTION Do %s UNTIL\n", value_to_str($4.id_val));
-//         printf("IF %s GOTO %d\n", $4.lexema, instruction_counter + 2);
-//         printf("GOTO %d\n", instruction_counter + 1);
-//         instruction_counter += 2;
+//         printf("IF %s GOTO %d\n", $4.lexema, n_instructions + 2);
+//         printf("GOTO %d\n", n_instructions + 1);
+//         n_instructions += 2;
 //     }
 //     ;
 
@@ -400,9 +495,9 @@ expr_bool:
 //     FOR ID IN expression DOT DOT expression DO statement_list DONE {
 //         fprintf(yyout, "PRODUCTION For %s IN %s DO\n", $2.lexema, value_to_str($4.id_val));
 //         printf("%s := 0\n", $2.lexema);
-//         printf("IF %s LTI %s GOTO %d\n", $2.lexema, $4.lexema, instruction_counter + 2);
-//         printf("GOTO %d\n", instruction_counter + 1);
-//         instruction_counter += 2;
+//         printf("IF %s LTI %s GOTO %d\n", $2.lexema, $4.lexema, n_instructions + 2);
+//         printf("GOTO %d\n", n_instructions + 1);
+//         n_instructions += 2;
 //     }
 //     ;
 
@@ -416,9 +511,11 @@ repeat_statement:
             char *repeat_counter_name = pop_repeat_stack();
             char *repeat_expression_name = pop_repeat_stack();
             fprintf(yyout, "PRODUCTION Repeat %d times\n", repeat_count);
-            printf("%s := %s ADDI 1\n", repeat_counter_name, repeat_counter_name);
-            printf("IF %s LTI %s GOTO %s\n", repeat_counter_name, repeat_expression_name, repeat_line_number);
-            instruction_counter += 2;
+            char *buffer = (char *)malloc(100);
+            sprintf(buffer, "%s := %s ADDI 1\n", repeat_counter_name, repeat_counter_name);
+            emit(buffer);
+            sprintf(buffer, "IF %s LTI %s GOTO %s\n", repeat_counter_name, repeat_expression_name, repeat_line_number);
+            emit(buffer);
         }
     }
     ;
@@ -427,12 +524,14 @@ repeat_expression:
     expression {
         if ($1.is_literal) {
             char *new_var = generate_temp_var();
-            printf("%s := %s\n", new_var, $1.lexema);
-            instruction_counter++;
+            char *buffer = (char *)malloc(100);
+            sprintf(buffer, "%s := %s\n", new_var, $1.lexema);
+            emit(buffer);
         } 
         char *temp_var = generate_temp_var();
-        printf("%s := 0\n", temp_var);
-        instruction_counter++;
+        char *buffer = (char *)malloc(100);
+        sprintf(buffer, "%s := 0\n", temp_var);
+        emit(buffer);
         char * repeat_counter_name = temp_var;
         // store the previous temp var in repeat_expression_name
         int previous_number = atoi(temp_var + 2) - 1;
@@ -442,7 +541,7 @@ repeat_expression:
         push_repeat_stack(repeat_expression_name);
         push_repeat_stack(repeat_counter_name);
         char *line_number = (char *)malloc(10); 
-        sprintf(line_number, "%d", instruction_counter);
+        sprintf(line_number, "%d", n_instructions);
         push_repeat_stack(line_number);
     }
     ;
@@ -472,13 +571,16 @@ assignment:
             int symtab_status = sym_enter($1.lexema, &value);
             if (symtab_status == SYMTAB_OK || symtab_status == SYMTAB_DUPLICATE) {
                 if (array_size > 1 || $3.array_name != NULL) {
-                    printf("%s := [%s]\n", $1.lexema, $3.lexema);
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "%s := [%s]\n", $1.lexema, $3.lexema);
+                    emit(buffer);
                     array_size = 1;
                     array_elems = NULL;
                 } else { 
-                    printf("%s := %s\n", $1.lexema, $3.lexema);
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "%s := %s\n", $1.lexema, $3.lexema);
+                    emit(buffer);
                 }
-                instruction_counter++;
             } else {
                 yyerror("Error: Variable could not be entered into the symbol table. Stack overflow.");
             }
@@ -509,8 +611,9 @@ assignment:
                 };
                 int symtab_status = sym_enter($1.lexema, &val1);
                 if (symtab_status == SYMTAB_OK || symtab_status == SYMTAB_DUPLICATE) {
-                    printf("[%s] := %s\n", $1.lexema, $3.lexema);
-                    instruction_counter++;
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "[%s] := %s\n", $1.lexema, $3.lexema);
+                    emit(buffer);
                 } else {
                     yyerror("Error: Variable could not be entered into the symbol table. Stack overflow.");
                 } 
@@ -591,51 +694,75 @@ expr_arithmetic:
                     $$.id_val.val_type = INT_TYPE;
                     temp_var = generate_temp_var();
                     if ($1.array_name != NULL && $3.array_name != NULL) {
-                        printf("%s := [%s] ADDI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := [%s] ADDI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        emit(buffer);
                     } else if ($1.array_name != NULL) {
-                        printf("%s := [%s] ADDI %s\n", temp_var, $1.lexema, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := [%s] ADDI %s\n", temp_var, $1.lexema, $3.lexema);
+                        emit(buffer);
                     } else if ($3.array_name != NULL) {
-                        printf("%s := %s ADDI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s ADDI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        emit(buffer);
                     } else {
-                        printf("%s := %s ADDI %s\n", temp_var, $1.lexema, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s ADDI %s\n", temp_var, $1.lexema, $3.lexema);
+                        emit(buffer);
                     }
-                    instruction_counter++;
                 } else {
                     if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == FLOAT_TYPE) {
                         $$.id_val.val_float = $1.id_val.val_float + $3.id_val.val_float;
                         temp_var = generate_temp_var();
                         if ($1.array_name != NULL && $3.array_name != NULL) {
-                            printf("%s := [%s] ADDF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := [%s] ADDF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         } else if ($1.array_name != NULL) {
-                            printf("%s := [%s] ADDF %s\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := [%s] ADDF %s\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         } else if ($3.array_name != NULL) {
-                            printf("%s := %s ADDF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := %s ADDF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         } else {
-                            printf("%s := %s ADDF %s\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := %s ADDF %s\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         }
-                        instruction_counter++;
                     } else if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == INT_TYPE) {
                         $$.id_val.val_float = (float) $1.id_val.val_float + $3.id_val.val_int;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         if ($3.array_name != NULL) {
-                            printf("%s := I2F [%s]\n", new_temp_var, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F [%s]\n", new_temp_var, $3.lexema);
+                            emit(buffer);
                         } else {
-                            printf("%s := I2F %s\n", new_temp_var, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F %s\n", new_temp_var, $3.lexema);
+                            emit(buffer);
                         }
-                        printf("%s := %s ADDF %s\n", temp_var, $1.lexema, new_temp_var);
-                        instruction_counter += 2;
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s ADDF %s\n", temp_var,$1.lexema, new_temp_var);
+                        emit(buffer);
                     } else {
                         $$.id_val.val_float = (float) $1.id_val.val_int + $3.id_val.val_float;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         if ($1.array_name != NULL) {
-                            printf("%s := I2F [%s]\n", new_temp_var, $1.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F [%s]\n", new_temp_var, $1.lexema);
+                            emit(buffer);
                         } else {
-                            printf("%s := I2F %s\n", new_temp_var, $1.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F %s\n", new_temp_var, $1.lexema);
+                            emit(buffer);
                         }
-                        printf("%s := %s ADDF %s\n", temp_var, new_temp_var, $3.lexema);
-                        instruction_counter += 2;
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s ADDF %s\n", temp_var, new_temp_var, $3.lexema);
+                        emit(buffer);
                     }
                     $$.id_val.val_type = FLOAT_TYPE;
                 }
@@ -647,15 +774,22 @@ expr_arithmetic:
                 temp_var = generate_temp_var();
 
                 if ($1.array_name != NULL && $3.array_name != NULL) {
-                    printf("%s := [%s] CONCAT [%s]\n", temp_var, $1.lexema, $3.lexema);
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "%s := [%s] CONCAT [%s]\n", temp_var, $1.lexema, $3.lexema);
+                    emit(buffer);
                 } else if ($1.array_name != NULL) {
-                    printf("%s := [%s] CONCAT %s\n", temp_var, $1.lexema, $3.lexema);
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "%s := [%s] CONCAT %s\n", temp_var, $1.lexema, $3.lexema);
+                    emit(buffer);
                 } else if ($3.array_name != NULL) {
-                    printf("%s := %s CONCAT [%s]\n", temp_var, $1.lexema, $3.lexema);
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "%s := %s CONCAT [%s]\n", temp_var, $1.lexema, $3.lexema);
+                    emit(buffer);
                 } else {
-                    printf("%s := %s CONCAT %s\n", temp_var, $1.lexema, $3.lexema);
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "%s := %s CONCAT %s\n", temp_var, $1.lexema, $3.lexema);
+                    emit(buffer);
                 }
-                instruction_counter++;
             }
             else {
                 yyerror("Type error: Unknown type in addition operation");
@@ -675,51 +809,75 @@ expr_arithmetic:
                     $$.id_val.val_type = INT_TYPE;
                     temp_var = generate_temp_var();
                     if ($1.array_name != NULL && $3.array_name != NULL) {
-                        printf("%s := [%s] SUBI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := [%s] SUBI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        emit(buffer);
                     } else if ($1.array_name != NULL) {
-                        printf("%s := [%s] SUBI %s\n", temp_var, $1.lexema, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := [%s] SUBI %s\n", temp_var, $1.lexema, $3.lexema);
+                        emit(buffer);
                     } else if ($3.array_name != NULL) {
-                        printf("%s := %s SUBI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s SUBI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        emit(buffer);
                     } else {
-                        printf("%s := %s SUBI %s\n", temp_var, $1.lexema, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s SUBI %s\n", temp_var, $1.lexema, $3.lexema);
+                        emit(buffer);
                     }
-                    instruction_counter++;
                 } else {
                     if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == FLOAT_TYPE) {
                         $$.id_val.val_float = $1.id_val.val_float - $3.id_val.val_float;
                         temp_var = generate_temp_var();
                         if ($1.array_name != NULL && $3.array_name != NULL) {
-                            printf("%s := [%s] SUBF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := [%s] SUBF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         } else if ($1.array_name != NULL) {
-                            printf("%s := [%s] SUBF %s\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := [%s] SUBF %s\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         } else if ($3.array_name != NULL) {
-                            printf("%s := %s SUBF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := %s SUBF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         } else {
-                            printf("%s := %s SUBF %s\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := %s SUBF %s\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         }
-                        instruction_counter++;
                     } else if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == INT_TYPE) {
                         $$.id_val.val_float = (float) $1.id_val.val_float - $3.id_val.val_int;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         if ($3.array_name != NULL) {
-                            printf("%s := I2F [%s]\n", new_temp_var, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F [%s]\n", new_temp_var, $3.lexema);
+                            emit(buffer);
                         } else {
-                            printf("%s := I2F %s\n", new_temp_var, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F %s\n", new_temp_var, $3.lexema);
+                            emit(buffer);
                         }
-                        printf("%s := %s SUBF %s\n", temp_var, $1.lexema, new_temp_var);
-                        instruction_counter += 2;
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s SUBF %s\n", temp_var, $1.lexema, new_temp_var);
+                        emit(buffer);
                     } else {
                         $$.id_val.val_float = (float) $1.id_val.val_int - $3.id_val.val_float;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         if ($1.array_name != NULL) {
-                            printf("%s := I2F [%s]\n", new_temp_var, $1.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F [%s]\n", new_temp_var, $1.lexema);
+                            emit(buffer);
                         } else {
-                            printf("%s := I2F %s\n", new_temp_var, $1.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F %s\n", new_temp_var, $1.lexema);
+                            emit(buffer);
                         }
-                        printf("%s := %s SUBF %s\n", temp_var, new_temp_var, $3.lexema);
-                        instruction_counter += 2;
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s SUBF %s\n", temp_var, new_temp_var, $3.lexema);
+                        emit(buffer);
                     }
                     $$.id_val.val_type = FLOAT_TYPE;
                 }
@@ -727,7 +885,7 @@ expr_arithmetic:
                 yyerror("Type error: Subtraction operation is only allowed between numeric values");
                 $$.id_val.val_type = UNKNOWN_TYPE;
             }
-            $$.lexema = temp_var;$$.is_literal = 0;
+            $$.lexema = temp_var;
             $$.is_literal = 0;
     }
     ;
@@ -744,21 +902,27 @@ expr_unary:
                 $$.id_val.val_type = INT_TYPE;
                 temp_var = generate_temp_var();
                 if ($2.array_name != NULL) {
-                    printf("%s := [%s]\n", temp_var, $2.lexema);
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "%s := [%s]\n", temp_var, $2.lexema);
+                    emit(buffer);
                 } else {
-                    printf("%s := %s\n", temp_var, $2.lexema);
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "%s := %s\n", temp_var, $2.lexema);
+                    emit(buffer);
                 }
-                instruction_counter++;
             } else {
                 $$.id_val.val_float = $2.id_val.val_float;
                 $$.id_val.val_type = FLOAT_TYPE;
                 temp_var = generate_temp_var();
                 if ($2.array_name != NULL) {
-                    printf("%s := [%s]\n", temp_var, $2.lexema);
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "%s := [%s]\n", temp_var, $2.lexema);
+                    emit(buffer);
                 } else {
-                    printf("%s := %s\n", temp_var, $2.lexema);
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "%s := %s\n", temp_var, $2.lexema);
+                    emit(buffer);
                 }
-                instruction_counter++;
             }
         } else {
             yyerror("Type error: Unary plus operation is only allowed on numeric values");
@@ -775,21 +939,27 @@ expr_unary:
                 $$.id_val.val_type = INT_TYPE;
                 temp_var = generate_temp_var();
                 if ($2.array_name != NULL) {
-                    printf("%s := CHSI [%s]\n", temp_var, $2.lexema);
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "%s := CHSI [%s]\n", temp_var, $2.lexema);
+                    emit(buffer);
                 } else {
-                    printf("%s := CHSI %s\n", temp_var, $2.lexema);
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "%s := CHSI %s\n", temp_var, $2.lexema);
+                    emit(buffer);
                 }
-                instruction_counter++;
             } else {
                 $$.id_val.val_float = $2.id_val.val_float * -1;
                 $$.id_val.val_type = FLOAT_TYPE;
                 temp_var = generate_temp_var();
                 if ($2.array_name != NULL) {
-                    printf("%s := CHSF [%s]\n", temp_var, $2.lexema);
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "%s := CHSF [%s]\n", temp_var, $2.lexema);
+                    emit(buffer);
                 } else {
-                    printf("%s := CHSF %s\n", temp_var, $2.lexema);
+                    char *buffer = (char *)malloc(100);
+                    sprintf(buffer, "%s := CHSF %s\n", temp_var, $2.lexema);
+                    emit(buffer);
                 }
-                instruction_counter++;
             }
         } else {
             yyerror("Type error: Unary minus operation is only allowed on numeric values");
@@ -813,51 +983,75 @@ expr_term:
                     $$.id_val.val_type = INT_TYPE;
                     temp_var = generate_temp_var();
                     if ($1.array_name != NULL && $3.array_name != NULL) {
-                        printf("%s := [%s] MULI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := [%s] MULI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        emit(buffer);
                     } else if ($1.array_name != NULL) {
-                        printf("%s := [%s] MULI %s\n", temp_var, $1.lexema, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := [%s] MULI %s\n", temp_var, $1.lexema, $3.lexema);
+                        emit(buffer);
                     } else if ($3.array_name != NULL) {
-                        printf("%s := %s MULI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s MULI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        emit(buffer);
                     } else {
-                        printf("%s := %s MULI %s\n", temp_var, $1.lexema, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s MULI %s\n", temp_var, $1.lexema, $3.lexema);
+                        emit(buffer);
                     }
-                    instruction_counter++;
                 } else {
                     if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == FLOAT_TYPE) {
                         $$.id_val.val_float = $1.id_val.val_float * $3.id_val.val_float;
                         temp_var = generate_temp_var();
                         if ($1.array_name != NULL && $3.array_name != NULL) {
-                            printf("%s := [%s] MULF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := [%s] MULF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         } else if ($1.array_name != NULL) {
-                            printf("%s := [%s] MULF %s\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := [%s] MULF %s\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         } else if ($3.array_name != NULL) {
-                            printf("%s := %s MULF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := %s MULF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         } else {
-                            printf("%s := %s MULF %s\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := %s MULF %s\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         }
-                        instruction_counter++;
                     } else if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == INT_TYPE) {
                         $$.id_val.val_float = (float) $1.id_val.val_float * $3.id_val.val_int;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         if ($3.array_name != NULL) {
-                            printf("%s := I2F [%s]\n", new_temp_var, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F [%s]\n", new_temp_var, $3.lexema);
+                            emit(buffer);
                         } else {
-                            printf("%s := I2F %s\n", new_temp_var, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F %s\n", new_temp_var, $3.lexema);
+                            emit(buffer);
                         }
-                        printf("%s := %s MULF %s\n", temp_var, $1.lexema, new_temp_var);
-                        instruction_counter += 2;
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s MULF %s\n", temp_var, $1.lexema, new_temp_var);
+                        emit(buffer);
                     } else {
                         $$.id_val.val_float = (float) $1.id_val.val_int * $3.id_val.val_float;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         if ($1.array_name != NULL) {
-                            printf("%s := I2F [%s]\n", new_temp_var, $1.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F [%s]\n", new_temp_var, $1.lexema);
+                            emit(buffer);
                         } else {
-                            printf("%s := I2F %s\n", new_temp_var, $1.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F %s\n", new_temp_var, $1.lexema);
+                            emit(buffer);
                         }
-                        printf("%s := %s MULF %s\n", temp_var, new_temp_var, $3.lexema);
-                        instruction_counter += 2;
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s MULF %s\n", temp_var, new_temp_var, $3.lexema);
+                        emit(buffer);
                     }
                     $$.id_val.val_type = FLOAT_TYPE;
                 }
@@ -879,51 +1073,75 @@ expr_term:
                     $$.id_val.val_float = (float) ($1.id_val.val_int / $3.id_val.val_int);
                     temp_var = generate_temp_var();
                     if ($1.array_name != NULL && $3.array_name != NULL) {
-                        printf("%s := [%s] DIVI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := [%s] DIVI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        emit(buffer);
                     } else if ($1.array_name != NULL) {
-                        printf("%s := [%s] DIVI %s\n", temp_var, $1.lexema, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := [%s] DIVI %s\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                     } else if ($3.array_name != NULL) {
-                        printf("%s := %s DIVI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                         char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := [%s] DIVI %s\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                     } else {
-                        printf("%s := %s DIVI %s\n", temp_var, $1.lexema, $3.lexema);
+                         char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := %s DIVI %s\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                     }
-                    instruction_counter++;
                 } else {
                     if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == FLOAT_TYPE) {
                         $$.id_val.val_float = $1.id_val.val_float / $3.id_val.val_float;
                         temp_var = generate_temp_var();
                         if ($1.array_name != NULL && $3.array_name != NULL) {
-                            printf("%s := [%s] DIVF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := [%s] DIVF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                        emit(buffer);
                         } else if ($1.array_name != NULL) {
-                            printf("%s := [%s] DIVF %s\n", temp_var, $1.lexema, $3.lexema);
+                           char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := [%s] DIVF %s\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         } else if ($3.array_name != NULL) {
-                            printf("%s := %s DIVF [%s]\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := [%s] DIVF %s\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         } else {
-                            printf("%s := %s DIVF %s\n", temp_var, $1.lexema, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := %s DIVF %s\n", temp_var, $1.lexema, $3.lexema);
+                            emit(buffer);
                         }
-                        instruction_counter++;
                     } else if ($1.id_val.val_type == FLOAT_TYPE && $3.id_val.val_type == INT_TYPE) {
                         $$.id_val.val_float = (float) $1.id_val.val_float / $3.id_val.val_int;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         if ($3.array_name != NULL) {
-                            printf("%s := I2F [%s]\n", new_temp_var, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F [%s]\n", new_temp_var, $3.lexema);
+                            emit(buffer);
                         } else {
-                            printf("%s := I2F %s\n", new_temp_var, $3.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F %s\n", new_temp_var, $3.lexema);
+                            emit(buffer);
                         }
-                        printf("%s := %s DIVF %s\n", temp_var, $1.lexema, new_temp_var);
-                        instruction_counter += 2;
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s DIVF %s\n", temp_var, $1.lexema, new_temp_var);
+                        emit(buffer);
                     } else {
                         $$.id_val.val_float = (float) $1.id_val.val_int / $3.id_val.val_float;
                         char *new_temp_var = generate_temp_var();
                         temp_var = generate_temp_var();
                         if ($1.array_name != NULL) {
-                            printf("%s := I2F [%s]\n", new_temp_var, $1.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F [%s]\n", new_temp_var, $1.lexema);
+                            emit(buffer);
                         } else {
-                            printf("%s := I2F %s\n", new_temp_var, $1.lexema);
+                            char *buffer = (char *)malloc(100);
+                            sprintf(buffer, "%s := I2F %s\n", new_temp_var, $1.lexema);
+                            emit(buffer);
                         }
-                        printf("%s := %s DIVF %s\n", temp_var, new_temp_var, $3.lexema);
-                        instruction_counter += 2;
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s DIVF %s\n", temp_var, new_temp_var, $3.lexema);
+                        emit(buffer);
                     }
                 }
             } else {
@@ -942,15 +1160,22 @@ expr_term:
             $$.id_val.val_int = $1.id_val.val_int % $3.id_val.val_int;
             temp_var = generate_temp_var();
             if ($1.array_name != NULL && $3.array_name != NULL) {
-                printf("%s := [%s] MODI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                char *buffer = (char *)malloc(100);
+                sprintf(buffer, "%s := [%s] MODI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                emit(buffer);
             } else if ($1.array_name != NULL) {
-                printf("%s := [%s] MODI %s\n", temp_var, $1.lexema, $3.lexema);
+                char *buffer = (char *)malloc(100);
+                sprintf(buffer, "%s := [%s] MODI %s\n", temp_var, $1.lexema, $3.lexema);
+                emit(buffer);
             } else if ($3.array_name != NULL) {
-                printf("%s := %s MODI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                char *buffer = (char *)malloc(100);
+                sprintf(buffer, "%s := %s MODI [%s]\n", temp_var, $1.lexema, $3.lexema);
+                emit(buffer);
             } else {
-                printf("%s := %s MODI %s\n", temp_var, $1.lexema, $3.lexema);
+                char *buffer = (char *)malloc(100);
+                sprintf(buffer, "%s := %s MODI %s\n", temp_var, $1.lexema, $3.lexema);
+                emit(buffer);
             }
-            instruction_counter++;
         } else {
             yyerror("Type error: Modulus operation is only allowed between integers");
             $$.id_val.val_type = UNKNOWN_TYPE;
@@ -1041,9 +1266,12 @@ array_access:
                             yyerror("Error. Array index access must be integer.");
                         }
                         int index = $3.id_val.val_int;
-                        printf("%s := %s MULI 4\n", temp_var, $3.lexema);
+                        char *buffer = (char *)malloc(100);
+                        sprintf(buffer, "%s := %s MULI 4\n", temp_var, $3.lexema);
+                        emit(buffer);
                         char *temp_var2 = generate_temp_var();
-                        printf("%s := &%s ADDI %s\n", temp_var2, $1.lexema, temp_var);
+                        sprintf(buffer, "%s := &%s ADDI %s\n", temp_var2, $1.lexema, temp_var);
+                        emit(buffer);
                         $$.lexema = temp_var2;
                         $$.array_name = $1.lexema;
                         $$.index = index;
@@ -1057,7 +1285,6 @@ array_access:
                         if (val2.val_type == STR_TYPE) {
                             $$.lenght = strlen(val2.val_str);
                         }
-                        instruction_counter += 2;
                     }
                 }
             }

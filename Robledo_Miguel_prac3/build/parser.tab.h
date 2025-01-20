@@ -126,14 +126,20 @@ union YYSTYPE
         int is_literal;
         char *array_name;
         int index;
+        instruction_list *true_list;
+        instruction_list *false_list;
+        instruction_list *next_list;
     } ident;
     int integer;
     float real;
     char *string;
     int boolean;
     void *no_value;
+    struct {
+        int instr;
+    }   marker;
 
-#line 137 "build/parser.tab.h"
+#line 143 "build/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

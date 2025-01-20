@@ -38,4 +38,16 @@ char *value_to_str(value_info value);
 char *generate_temp_var();
 char *generate_fi_if();
 
+// Estructura para las listas de instrucciones
+typedef struct instruction_list {
+    int instruction;           // Número de instrucción que necesita backpatching
+    struct instruction_list* next;
+} instruction_list;
+
+instruction_list* makelist(int addr);
+instruction_list* merge(instruction_list *list1, instruction_list *list2);
+void backpatch(instruction_list *list, int addr);
+void emit(char *format, ...);
+void print_code();
+void clear_code();
 #endif
