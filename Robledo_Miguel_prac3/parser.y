@@ -52,7 +52,6 @@
         int index;
         instruction_list *true_list;
         instruction_list *false_list;
-        instruction_list *next_list;
     } ident;
     int integer;
     float real;
@@ -177,9 +176,6 @@ if_statement:
         backpatch($2.true_list, $4.instr);
 
         backpatch($2.false_list, $7.instr);
-
-        // The next list (pending jumps) is the false_list of the condition
-        $$.next_list = $2.false_list;
     }
     ;
 

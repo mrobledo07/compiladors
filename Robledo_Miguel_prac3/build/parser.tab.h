@@ -128,7 +128,6 @@ union YYSTYPE
         int index;
         instruction_list *true_list;
         instruction_list *false_list;
-        instruction_list *next_list;
     } ident;
     int integer;
     float real;
@@ -139,7 +138,7 @@ union YYSTYPE
         int instr;
     }   marker;
 
-#line 143 "build/parser.tab.h"
+#line 142 "build/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
