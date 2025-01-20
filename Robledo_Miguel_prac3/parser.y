@@ -111,6 +111,7 @@
 %type <ident> array_access
 %type <ident> expr_unary
 %type <marker> marker
+%type <ident> primary_bool
 
 %left OR
 %left AND
@@ -231,8 +232,7 @@ marker:
     ;
 
 expr_bool_not:
-    expr_bool
-    | NOT expr_bool {
+    NOT expr_bool_not {
         fprintf(yyout, "PRODUCTION NOT %s\n", value_to_str($2.id_val));
         if ($2.id_val.val_type == BOOL_TYPE) {
             $$.id_val.val_bool = !$2.id_val.val_bool;
@@ -246,6 +246,19 @@ expr_bool_not:
             $$.id_val.val_type = UNKNOWN_TYPE;
         }
     }
+    | primary_bool
+    ;
+
+primary_bool:
+    LPAREN expression_bool RPAREN {
+        fprintf(yyout, "PRODUCTION ( %s )\n", value_to_str($2.id_val));
+        $$.id_val = $2.id_val;
+        $$.lexema = concat_str("(", $2.lexema);
+        $$.lexema = concat_str($$.lexema, ")");
+        $$.true_list = $2.true_list;
+        $$.false_list = $2.false_list;
+    }
+    | expr_bool
     ;
 
 expr_bool:
