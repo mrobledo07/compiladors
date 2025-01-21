@@ -6,22 +6,27 @@ x := $t01
 GOTO 2
 $t02 := x SUBI 1
 x := $t02
-IF x EQ 0 GOTO 11
+$t03 := x SUBI 2
+x := $t03
+$t04 := CHSI 50
+IF x EQ $t04 GOTO 14
+GOTO 9
+IF x EQ 0 GOTO 16
 GOTO 7
 x := 1
-IF x LEI 10 GOTO 14
-GOTO 19
-$t03 := x ADDI 1
-x := $t03
-$t04 := x ADDI 1
-x := $t04
-GOTO 12
-x := 5
-IF x LEI 2 GOTO 22
-GOTO 27
-PARAM x
-CALL PUTI
+IF x LEI 10 GOTO 19
+GOTO 24
 $t05 := x ADDI 1
 x := $t05
-GOTO 20
+$t06 := x ADDI 1
+x := $t06
+GOTO 17
+x := 5
+IF x LEI 2 GOTO 27
+GOTO 32
+PARAM x
+CALL PUTI
+$t07 := x ADDI 1
+x := $t07
+GOTO 25
 HALT

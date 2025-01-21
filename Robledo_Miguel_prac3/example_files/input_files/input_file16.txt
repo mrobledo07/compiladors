@@ -7,6 +7,9 @@ done
 
 do 
     x := x - 1
+    do
+        x := x - 2
+    until x == -50
 until x == 0
 
 for x in 1..10 do
