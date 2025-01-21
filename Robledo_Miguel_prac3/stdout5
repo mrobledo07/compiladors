@@ -1,0 +1,18 @@
+x := 0
+y := 1
+z := 2
+$t01 := x
+$t02 := 0
+$t03 := y MULI z
+y := $t03
+$t02 := $t02 ADDI 1
+IF $t02 LTI $t01 GOTO 6
+$t04 := 1
+PARAM x
+CALL PUTI
+IF $t04 EQ 0 GOTO 11
+GOTO 18
+PARAM y
+CALL PUTI
+GOTO 18
+HALT

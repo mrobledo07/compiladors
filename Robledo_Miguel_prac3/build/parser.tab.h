@@ -45,7 +45,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 38 "parser.y"
+#line 40 "parser.y"
 
     #include "../include/data.h"
     #include "../include/functions.h"
@@ -91,23 +91,25 @@ extern int yydebug;
     RPAREN = 284,                  /* RPAREN  */
     COMMA = 285,                   /* COMMA  */
     DOT = 286,                     /* DOT  */
-    COMMENT = 287,                 /* COMMENT  */
-    REPEAT = 288,                  /* REPEAT  */
-    DO = 289,                      /* DO  */
-    DONE = 290,                    /* DONE  */
-    IF = 291,                      /* IF  */
-    THEN = 292,                    /* THEN  */
-    ELSE = 293,                    /* ELSE  */
-    FI = 294,                      /* FI  */
-    SWITCH = 295,                  /* SWITCH  */
-    CASE = 296,                    /* CASE  */
-    DEFAULT = 297,                 /* DEFAULT  */
-    BREAK = 298,                   /* BREAK  */
-    FSWITCH = 299,                 /* FSWITCH  */
-    WHILE = 300,                   /* WHILE  */
-    UNTIL = 301,                   /* UNTIL  */
-    FOR = 302,                     /* FOR  */
-    IN = 303                       /* IN  */
+    COLON = 287,                   /* COLON  */
+    SEMICOLON = 288,               /* SEMICOLON  */
+    COMMENT = 289,                 /* COMMENT  */
+    REPEAT = 290,                  /* REPEAT  */
+    DO = 291,                      /* DO  */
+    DONE = 292,                    /* DONE  */
+    IF = 293,                      /* IF  */
+    THEN = 294,                    /* THEN  */
+    ELSE = 295,                    /* ELSE  */
+    FI = 296,                      /* FI  */
+    SWITCH = 297,                  /* SWITCH  */
+    CASE = 298,                    /* CASE  */
+    DEFAULT = 299,                 /* DEFAULT  */
+    BREAK = 300,                   /* BREAK  */
+    FSWITCH = 301,                 /* FSWITCH  */
+    WHILE = 302,                   /* WHILE  */
+    UNTIL = 303,                   /* UNTIL  */
+    FOR = 304,                     /* FOR  */
+    IN = 305                       /* IN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -116,7 +118,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 44 "parser.y"
+#line 46 "parser.y"
 
     struct {
         char *lexema;
@@ -142,7 +144,7 @@ union YYSTYPE
         instruction_list *goto_end_list;
     } statement;
 
-#line 146 "build/parser.tab.h"
+#line 148 "build/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

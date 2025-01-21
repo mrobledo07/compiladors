@@ -33,6 +33,8 @@
     int array_size = 1;
     char *array_elems = NULL;
     extern int n_instructions;
+
+    char *temporal_var_switch = NULL;
 %}
 
 %code requires {
@@ -82,6 +84,8 @@
 %token LPAREN RPAREN
 %token COMMA
 %token DOT
+%token COLON
+%token SEMICOLON
 %token COMMENT
 %token <ident> REPEAT
 %token DO
@@ -107,17 +111,26 @@
 %type <statement> else_part
 %type <ident> if_else_statement
 %type <statement> statement_then
+%type <ident> switch_statement
+%type <statement> case_list
+%type <statement> case_block
+%type <statement> default_clause
+%type <ident> expression_switch
+
 %type <ident> expression_bool
 %type <ident> expr_bool_and
 %type <ident> expr_bool_not
 %type <ident> expr_bool
+%type <ident> primary_bool
+
 %type <ident> expr_arithmetic
 %type <ident> expr_term
 %type <ident> factor
+
 %type <ident> array_access
 %type <ident> expr_unary
+
 %type <marker> marker
-%type <ident> primary_bool
 
 %left OR
 %left AND
@@ -173,6 +186,7 @@ statement:
     | repeat_statement
     | if_statement
     | if_else_statement
+    | switch_statement
     |
     ;
 
@@ -213,6 +227,62 @@ else_part:
 statement_then:
     statement_list {
         fprintf(yyout, "PRODUCTION THEN\n");
+        $$.goto_end_list = makelist(n_instructions);
+        emit("GOTO ____\n");
+    }
+    ;
+
+switch_statement:
+    SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list default_clause ENDLINE FSWITCH marker {
+        if ($3.id_val.val_type != INT_TYPE) {
+            yyerror("Switch expression must be an integer");
+        } else {
+            fprintf(yyout, "PRODUCTION Switch %s\n", value_to_str($3.id_val));
+            // Backpatch the goto_end_list of the switch statement to point to the end of the statement_list
+            backpatch($7.goto_end_list, $11.instr);
+            backpatch($8.goto_end_list, $11.instr);
+        }
+    }
+    ;
+
+expression_switch:
+    expression {
+        if ($1.is_literal) {
+            char *new_var = generate_temp_var();
+            char *buffer = (char *)malloc(100);
+            sprintf(buffer, "%s := %s\n", new_var, $1.lexema);
+            emit(buffer);
+            temporal_var_switch = new_var;
+        }
+        $$ = $1;
+    }
+
+
+case_list:
+    case_list case_block ENDLINE {
+        fprintf(yyout, "PRODUCTION Case LIST\n");
+        $$.goto_end_list = merge($1.goto_end_list, $2.goto_end_list);
+    }
+    | { 
+        $$.instr = 0;
+        $$.goto_end_list = NULL;
+    }
+    ;
+
+case_block:
+    CASE INTEGER COLON ENDLINE marker statement_list BREAK SEMICOLON {
+        fprintf(yyout, "PRODUCTION Case block\n");   
+        char *buffer = (char *)malloc(100);
+        sprintf(buffer, "IF %s EQ %d GOTO %d\n", temporal_var_switch, $2, $5.instr);
+        emit(buffer);
+        $$.goto_end_list = makelist(n_instructions);
+        emit("GOTO ____\n");
+    }
+    ;
+
+default_clause:
+    DEFAULT COLON ENDLINE marker statement_list  BREAK SEMICOLON {
+        fprintf(yyout, "PRODUCTION Default\n");
         $$.goto_end_list = makelist(n_instructions);
         emit("GOTO ____\n");
     }

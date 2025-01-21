@@ -259,6 +259,8 @@ e         (e|E)
 
 "," { return COMMA; }
 "." { return DOT; }
+":" { return COLON; }
+";" { return SEMICOLON; }
 
 
 ^[ \t]*\n { }
