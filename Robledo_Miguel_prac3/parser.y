@@ -66,6 +66,7 @@
     struct {
         int instr;
         instruction_list *goto_end_list;
+        instruction_list *goto_next_list;
     } statement;
 }
 
@@ -116,6 +117,7 @@
 %type <statement> case_block
 %type <statement> default_clause
 %type <ident> expression_switch
+%type <statement> midrule_block
 
 %type <ident> expression_bool
 %type <ident> expr_bool_and
@@ -233,14 +235,17 @@ statement_then:
     ;
 
 switch_statement:
-    SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list default_clause ENDLINE FSWITCH marker {
+    SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list marker default_clause ENDLINE FSWITCH marker {
         if ($3.id_val.val_type != INT_TYPE) {
             yyerror("Switch expression must be an integer");
         } else {
             fprintf(yyout, "PRODUCTION Switch %s\n", value_to_str($3.id_val));
             // Backpatch the goto_end_list of the switch statement to point to the end of the statement_list
-            backpatch($7.goto_end_list, $11.instr);
-            backpatch($8.goto_end_list, $11.instr);
+            backpatch($7.goto_end_list, $12.instr);
+            backpatch($9.goto_end_list, $12.instr);
+
+            // Backpatch the goto_next_list of the switch statement to point to the default clause
+            backpatch($7.goto_next_list, $8.instr);
         }
     }
     ;
@@ -261,21 +266,35 @@ expression_switch:
 case_list:
     case_list case_block ENDLINE {
         fprintf(yyout, "PRODUCTION Case LIST\n");
+        backpatch($1.goto_next_list, $2.instr);
         $$.goto_end_list = merge($1.goto_end_list, $2.goto_end_list);
+        $$.goto_next_list = $2.goto_next_list;
     }
     | { 
         $$.instr = 0;
         $$.goto_end_list = NULL;
+        $$.goto_next_list = NULL;
     }
     ;
 
 case_block:
-    CASE INTEGER COLON ENDLINE marker statement_list BREAK SEMICOLON {
-        fprintf(yyout, "PRODUCTION Case block\n");   
-        char *buffer = (char *)malloc(100);
-        sprintf(buffer, "IF %s EQ %d GOTO %d\n", temporal_var_switch, $2, $5.instr);
-        emit(buffer);
+    midrule_block statement_list BREAK SEMICOLON {
+        fprintf(yyout, "PRODUCTION Case block\n"); 
+        $$.instr = $1.instr;
+        $$.goto_next_list = $1.goto_next_list;
         $$.goto_end_list = makelist(n_instructions);
+        emit("GOTO ____\n");  
+    }
+    ;
+
+midrule_block:
+    CASE INTEGER COLON ENDLINE marker {
+        fprintf(yyout, "PRODUCTION Case %d\n", $2);
+        $$.instr = n_instructions;
+        char *buffer = (char *)malloc(100);
+        sprintf(buffer, "IF %s EQ %d GOTO %d\n", temporal_var_switch, $2, $5.instr + 2);
+        emit(buffer);
+        $$.goto_next_list = makelist(n_instructions);
         emit("GOTO ____\n");
     }
     ;

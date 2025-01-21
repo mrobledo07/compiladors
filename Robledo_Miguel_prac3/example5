@@ -4,15 +4,23 @@ x := 0
 y := 1
 z := 2
 
+/*
 repeat x do
 	y := y * z
 done
+*/
 
 switch (1) 
 	case 0: 
-	x 
-	break; 
+		x := x + 1
+		break; 
+	case 1:
+		x := x + 2
+		break;
+	case 2:
+		x := x + 3
+		break;
 	default: 
-	y 
-	break; 
+		y := x
+		break; 
 fswitch

@@ -142,9 +142,10 @@ union YYSTYPE
     struct {
         int instr;
         instruction_list *goto_end_list;
+        instruction_list *goto_next_list;
     } statement;
 
-#line 148 "build/parser.tab.h"
+#line 149 "build/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
