@@ -8,4 +8,12 @@ $t02 := x SUBI 1
 x := $t02
 IF x EQ 0 GOTO 11
 GOTO 7
+x := 1
+IF x LEI 10 GOTO 14
+GOTO 19
+$t03 := x ADDI 1
+x := $t03
+$t04 := x ADDI 1
+x := $t04
+GOTO 12
 HALT

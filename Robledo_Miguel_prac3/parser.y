@@ -123,6 +123,7 @@
 %type <ident> while_statement
 %type <ident> do_until_statement
 %type <ident> for_statement
+%type <statement> for_first
 
 %type <ident> expression_bool
 %type <ident> expr_bool_and
@@ -332,8 +333,50 @@ do_until_statement:
     }
 
 for_statement:
-    FOR ID IN expression DOT DOT expression DO statement_list DONE {
-        
+    marker for_first DO statement_list DONE marker {
+        fprintf(yyout, "PRODUCTION For DO DONE\n");
+        char *variable = pop_repeat_stack();
+        char *buffer = (char *)malloc(100);
+        char *temp_var = generate_temp_var();
+        sprintf(buffer, "%s := %s ADDI 1\n", temp_var, variable);
+        emit(buffer);
+        sprintf(buffer, "%s := %s\n", variable, temp_var);
+        emit(buffer);
+        emit("GOTO %d\n", $1.instr + 1);
+
+        backpatch($2.goto_end_list, $6.instr + 3);
+    }
+    ;
+
+for_first:
+    FOR ID IN expression DOT DOT expression {
+        // declare variable ID as integer
+        if ($4.id_val.val_type != INT_TYPE || $7.id_val.val_type != INT_TYPE) {
+            yyerror("For loop requires integer values");
+        } else {
+            value_info value = {
+                .val_type = INT_TYPE,
+                .val_int = $4.id_val.val_int,
+                .val_float = 0.0,
+                .val_str = NULL,
+                .val_array = NULL
+            };
+            int symtab_status = sym_enter($2.lexema, &value);
+            if (symtab_status == SYMTAB_OK || symtab_status == SYMTAB_DUPLICATE) {
+                char *buffer = (char *)malloc(100);
+                sprintf(buffer, "%s := %s\n", $2.lexema, $4.lexema);
+                emit(buffer);
+            } else {
+                yyerror("Error: Variable could not be entered into the symbol table. Stack overflow.");
+            }
+            char *buffer = (char *)malloc(100);
+            sprintf(buffer, "IF %s LEI %s GOTO %d\n", $2.lexema, $7.lexema, n_instructions + 2);
+            emit(buffer);
+            $$.goto_end_list = makelist(n_instructions);
+            emit("GOTO ____\n");
+            push_repeat_stack($2.lexema);
+
+        }
     }
     ;
 
@@ -617,58 +660,6 @@ expr_bool:
         }
     }
     ;
-
-// if_else_statement:
-//     IF expression THEN statement_list ELSE statement_list FI {
-//         fprintf(yyout, "PRODUCTION If %s THEN ELSE\n", value_to_str($2.id_val));
-//         printf("IF %s GOTO %d\n", $2.lexema, n_instructions + 2);
-//         printf("GOTO %d\n", n_instructions + 1);
-//         n_instructions += 2;
-//     }
-//     ;
-
-// switch_statement:
-//     SWITCH expression LBRACKET case_list RBRACKET {
-//         fprintf(yyout, "PRODUCTION Switch %s\n", value_to_str($2.id_val));
-//         printf("GOTO %d\n", n_instructions + 1);
-//         n_instructions++;
-//     }
-//     ;
-
-// case_list:
-//     case_list CASE INTEGER COLON statement_list
-//     | case_list DEFAULT COLON statement_list
-//     | CASE INTEGER COLON statement_list
-//     | DEFAULT COLON statement_list
-//     ;
-
-// while_statement:
-//     WHILE expression DO statement_list DONE {
-//         fprintf(yyout, "PRODUCTION While %s DO\n", value_to_str($2.id_val));
-//         printf("IF %s GOTO %d\n", $2.lexema, n_instructions + 2);
-//         printf("GOTO %d\n", n_instructions + 1);
-//         n_instructions += 2;
-//     }
-//     ;
-
-// do_until_statement:
-//     DO statement_list UNTIL expression {
-//         fprintf(yyout, "PRODUCTION Do %s UNTIL\n", value_to_str($4.id_val));
-//         printf("IF %s GOTO %d\n", $4.lexema, n_instructions + 2);
-//         printf("GOTO %d\n", n_instructions + 1);
-//         n_instructions += 2;
-//     }
-//     ;
-
-// for_statement:
-//     FOR ID IN expression DOT DOT expression DO statement_list DONE {
-//         fprintf(yyout, "PRODUCTION For %s IN %s DO\n", $2.lexema, value_to_str($4.id_val));
-//         printf("%s := 0\n", $2.lexema);
-//         printf("IF %s LTI %s GOTO %d\n", $2.lexema, $4.lexema, n_instructions + 2);
-//         printf("GOTO %d\n", n_instructions + 1);
-//         n_instructions += 2;
-//     }
-//     ;
 
 repeat_statement:
     REPEAT repeat_expression DO statement_list DONE {
