@@ -1,0 +1,23 @@
+
+x := 1000
+n := 5
+
+while x > 200 do
+    for y in 10..200 do
+        repeat 5 do
+            x := x - 5 * y
+        done 
+
+        if x < 500 then
+            y := 10
+        fi
+
+    done
+
+    if x < 300 then
+        x := x - 100
+    else
+        x := x - 200
+    fi
+
+done
