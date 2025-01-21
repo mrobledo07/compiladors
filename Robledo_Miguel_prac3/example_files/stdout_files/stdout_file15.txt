@@ -1,0 +1,22 @@
+x := 0
+y := 1
+z := 2
+$t01 := 1
+IF $t01 EQ 0 GOTO 7
+GOTO 10
+$t02 := x ADDI 1
+x := $t02
+GOTO 22
+IF $t01 EQ 1 GOTO 12
+GOTO 15
+$t03 := x ADDI 2
+x := $t03
+GOTO 22
+IF $t01 EQ 2 GOTO 17
+GOTO 20
+$t04 := x ADDI 3
+x := $t04
+GOTO 22
+y := x
+GOTO 22
+HALT

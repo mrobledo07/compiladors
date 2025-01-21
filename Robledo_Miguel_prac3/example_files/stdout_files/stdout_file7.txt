@@ -12,5 +12,5 @@ $t08 := $t07 MULI 2
 $t09 := $t06 ADDI $t08
 d := $t09
 PARAM d
-CALL PUTI, 1
+CALL PUTI
 HALT

@@ -12,7 +12,7 @@ $t06 := &arr2 ADDI $t05
 $t07 := [$t04] ADDI [$t06]
 sum := [$t07]
 PARAM sum
-CALL PUTI, 1
+CALL PUTI
 $t08 := i ADDI 1
 i := $t08
 $t02 := $t02 ADDI 1
@@ -39,7 +39,7 @@ median := $t18
 $t19 := sum2 DIVI arr_length
 median2 := $t19
 PARAM median
-CALL PUTF, 1
+CALL PUTF
 PARAM median2
-CALL PUTF, 1
+CALL PUTF
 HALT

@@ -1,0 +1,32 @@
+x := 1
+IF x LEI 10 GOTO 4
+GOTO 20
+y := x
+IF y LEI 10 GOTO 7
+GOTO 17
+IF x EQ y GOTO 9
+GOTO 12
+PARAM x
+CALL PUTI
+GOTO 14
+PARAM y
+CALL PUTI
+$t01 := y ADDI 1
+y := $t01
+GOTO 5
+$t02 := x ADDI 1
+x := $t02
+GOTO 2
+x := 1
+IF x LEI 10 GOTO 23
+GOTO 32
+$t03 := 10
+$t04 := 0
+PARAM x
+CALL PUTI
+$t04 := $t04 ADDI 1
+IF $t04 LTI $t03 GOTO 25
+$t05 := x ADDI 1
+x := $t05
+GOTO 21
+HALT

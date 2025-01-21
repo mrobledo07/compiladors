@@ -1,0 +1,27 @@
+x := 500
+IF x GTI 200 GOTO 4
+GOTO 7
+$t01 := x SUBI 1
+x := $t01
+GOTO 2
+$t02 := x SUBI 1
+x := $t02
+IF x EQ 0 GOTO 11
+GOTO 7
+x := 1
+IF x LEI 10 GOTO 14
+GOTO 19
+$t03 := x ADDI 1
+x := $t03
+$t04 := x ADDI 1
+x := $t04
+GOTO 12
+x := 5
+IF x LEI 2 GOTO 22
+GOTO 27
+PARAM x
+CALL PUTI
+$t05 := x ADDI 1
+x := $t05
+GOTO 20
+HALT
