@@ -1,0 +1,29 @@
+x := 1000
+n := 5
+IF x GTI 200 GOTO 5
+GOTO 29
+y := 10
+IF y LEI 200 GOTO 8
+GOTO 21
+$t01 := 5
+$t02 := 0
+$t03 := 5 MULI y
+$t04 := x SUBI $t03
+x := $t04
+$t02 := $t02 ADDI 1
+IF $t02 LTI $t01 GOTO 10
+IF x LTI 500 GOTO 17
+GOTO 18
+y := 10
+$t05 := y ADDI 1
+y := $t05
+GOTO 6
+IF x LTI 300 GOTO 23
+GOTO 26
+$t06 := x SUBI 100
+x := $t06
+GOTO 28
+$t07 := x SUBI 200
+x := $t07
+GOTO 3
+HALT
