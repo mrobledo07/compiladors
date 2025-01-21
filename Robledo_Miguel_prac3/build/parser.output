@@ -2,8 +2,6 @@ Terminals unused in grammar
 
     BOOLEAN
     DOT
-    WHILE
-    UNTIL
     FOR
     IN
 
@@ -24,137 +22,143 @@ Grammar
     8          | if_statement
     9          | if_else_statement
    10          | switch_statement
-   11          | ε
+   11          | while_statement
+   12          | do_until_statement
+   13          | ε
 
-   12 if_statement: IF expression_bool THEN marker statement_list FI marker
+   14 if_statement: IF expression_bool THEN marker statement_list FI marker
 
-   13 if_else_statement: IF expression_bool THEN marker statement_then else_part FI marker
+   15 if_else_statement: IF expression_bool THEN marker statement_then else_part FI marker
 
-   14 else_part: ELSE marker statement_list
+   16 else_part: ELSE marker statement_list
 
-   15 statement_then: statement_list
+   17 statement_then: statement_list
 
-   16 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list marker default_clause ENDLINE FSWITCH marker
+   18 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list marker default_clause ENDLINE FSWITCH marker
 
-   17 expression_switch: expression
+   19 expression_switch: expression
 
-   18 case_list: case_list case_block ENDLINE
-   19          | ε
+   20 case_list: case_list case_block ENDLINE
+   21          | ε
 
-   20 case_block: midrule_block statement_list BREAK SEMICOLON
+   22 case_block: midrule_block statement_list BREAK SEMICOLON
 
-   21 midrule_block: CASE INTEGER COLON ENDLINE marker
+   23 midrule_block: CASE INTEGER COLON ENDLINE marker
 
-   22 default_clause: DEFAULT COLON ENDLINE marker statement_list BREAK SEMICOLON
+   24 default_clause: DEFAULT COLON ENDLINE marker statement_list BREAK SEMICOLON
 
-   23 expression_bool: expr_bool_and
-   24                | expression_bool OR marker expr_bool_and
+   25 while_statement: marker WHILE expression_bool DO marker statement_list DONE
 
-   25 expr_bool_and: expr_bool_not
-   26              | expr_bool_and AND marker expr_bool_not
+   26 do_until_statement: DO marker statement_list UNTIL expression_bool
 
-   27 marker: ε
+   27 expression_bool: expr_bool_and
+   28                | expression_bool OR marker expr_bool_and
 
-   28 expr_bool_not: NOT expr_bool_not
-   29              | primary_bool
+   29 expr_bool_and: expr_bool_not
+   30              | expr_bool_and AND marker expr_bool_not
 
-   30 primary_bool: LPAREN expression_bool RPAREN
-   31             | expr_bool
+   31 marker: ε
 
-   32 expr_bool: expression EQ expression
-   33          | expression NE expression
-   34          | expression GT expression
-   35          | expression GE expression
-   36          | expression LT expression
-   37          | expression LE expression
+   32 expr_bool_not: NOT expr_bool_not
+   33              | primary_bool
 
-   38 repeat_statement: REPEAT repeat_expression DO statement_list DONE
+   34 primary_bool: LPAREN expression_bool RPAREN
+   35             | expr_bool
 
-   39 repeat_expression: expression
+   36 expr_bool: expression EQ expression
+   37          | expression NE expression
+   38          | expression GT expression
+   39          | expression GE expression
+   40          | expression LT expression
+   41          | expression LE expression
 
-   40 assignment: ID ASSIGN expression
-   41           | array_access ASSIGN expression
+   42 repeat_statement: REPEAT repeat_expression DO statement_list DONE
 
-   42 expression: expression_list
+   43 repeat_expression: expression
 
-   43 expression_list: expression_list COMMA expr_arithmetic
-   44                | expr_arithmetic
+   44 assignment: ID ASSIGN expression
+   45           | array_access ASSIGN expression
 
-   45 expr_arithmetic: expr_unary
-   46                | expr_arithmetic PLUS expr_unary
-   47                | expr_arithmetic MINUS expr_unary
+   46 expression: expression_list
 
-   48 expr_unary: expr_term
-   49           | PLUS expr_unary
-   50           | MINUS expr_unary
+   47 expression_list: expression_list COMMA expr_arithmetic
+   48                | expr_arithmetic
 
-   51 expr_term: factor
-   52          | expr_term MULT factor
-   53          | expr_term DIV factor
-   54          | expr_term MOD factor
+   49 expr_arithmetic: expr_unary
+   50                | expr_arithmetic PLUS expr_unary
+   51                | expr_arithmetic MINUS expr_unary
 
-   55 factor: array_access
-   56       | ID
-   57       | INTEGER
-   58       | STRING
-   59       | REAL
-   60       | PI
-   61       | E
-   62       | LPAREN expression RPAREN
+   52 expr_unary: expr_term
+   53           | PLUS expr_unary
+   54           | MINUS expr_unary
 
-   63 array_access: ID LBRACKET expr_arithmetic RBRACKET
+   55 expr_term: factor
+   56          | expr_term MULT factor
+   57          | expr_term DIV factor
+   58          | expr_term MOD factor
+
+   59 factor: array_access
+   60       | ID
+   61       | INTEGER
+   62       | STRING
+   63       | REAL
+   64       | PI
+   65       | E
+   66       | LPAREN expression RPAREN
+
+   67 array_access: ID LBRACKET expr_arithmetic RBRACKET
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
     error (256)
-    ASSIGN <no_value> (258) 40 41
-    ENDLINE <no_value> (259) 2 16 18 21 22
-    INTEGER <integer> (260) 21 57
-    ID <ident> (261) 40 56 63
-    REAL <real> (262) 59
-    STRING <string> (263) 58
+    ASSIGN <no_value> (258) 44 45
+    ENDLINE <no_value> (259) 2 18 20 23 24
+    INTEGER <integer> (260) 23 61
+    ID <ident> (261) 44 60 67
+    REAL <real> (262) 63
+    STRING <string> (263) 62
     BOOLEAN <boolean> (264)
-    PLUS (265) 46 49
-    MINUS (266) 47 50
-    MULT (267) 52
-    DIV (268) 53
-    MOD (269) 54
-    GT (270) 34
-    GE (271) 35
-    LT (272) 36
-    LE (273) 37
-    EQ (274) 32
-    NE (275) 33
-    NOT (276) 28
-    AND (277) 26
-    OR (278) 24
-    PI (279) 60
-    E (280) 61
-    LBRACKET (281) 63
-    RBRACKET (282) 63
-    LPAREN (283) 16 30 62
-    RPAREN (284) 16 30 62
-    COMMA (285) 43
+    PLUS (265) 50 53
+    MINUS (266) 51 54
+    MULT (267) 56
+    DIV (268) 57
+    MOD (269) 58
+    GT (270) 38
+    GE (271) 39
+    LT (272) 40
+    LE (273) 41
+    EQ (274) 36
+    NE (275) 37
+    NOT (276) 32
+    AND (277) 30
+    OR (278) 28
+    PI (279) 64
+    E (280) 65
+    LBRACKET (281) 67
+    RBRACKET (282) 67
+    LPAREN (283) 18 34 66
+    RPAREN (284) 18 34 66
+    COMMA (285) 47
     DOT (286)
-    COLON (287) 21 22
-    SEMICOLON (288) 20 22
+    COLON (287) 23 24
+    SEMICOLON (288) 22 24
     COMMENT (289) 6
-    REPEAT <ident> (290) 38
-    DO (291) 38
-    DONE (292) 38
-    IF <ident> (293) 12 13
-    THEN (294) 12 13
-    ELSE (295) 14
-    FI (296) 12 13
-    SWITCH (297) 16
-    CASE (298) 21
-    DEFAULT (299) 22
-    BREAK (300) 20 22
-    FSWITCH (301) 16
-    WHILE (302)
-    UNTIL (303)
+    REPEAT <ident> (290) 42
+    DO (291) 25 26 42
+    DONE (292) 25 42
+    IF <ident> (293) 14 15
+    THEN (294) 14 15
+    ELSE (295) 16
+    FI (296) 14 15
+    SWITCH (297) 18
+    CASE (298) 23
+    DEFAULT (299) 24
+    BREAK (300) 22 24
+    FSWITCH (301) 18
+    WHILE (302) 25
+    UNTIL (303) 26
     FOR (304)
     IN (305)
 
@@ -168,88 +172,94 @@ Nonterminals, with rules where they appear
         on right: 0
     statement_list (53)
         on left: 2 3
-        on right: 1 2 12 14 15 20 22 38
+        on right: 1 2 14 16 17 22 24 25 26 42
     statement (54)
-        on left: 4 5 6 7 8 9 10 11
+        on left: 4 5 6 7 8 9 10 11 12 13
         on right: 2 3 6
     if_statement <ident> (55)
-        on left: 12
+        on left: 14
         on right: 8
     if_else_statement <ident> (56)
-        on left: 13
+        on left: 15
         on right: 9
     else_part <statement> (57)
-        on left: 14
-        on right: 13
-    statement_then <statement> (58)
-        on left: 15
-        on right: 13
-    switch_statement <ident> (59)
         on left: 16
+        on right: 15
+    statement_then <statement> (58)
+        on left: 17
+        on right: 15
+    switch_statement <ident> (59)
+        on left: 18
         on right: 10
     expression_switch <ident> (60)
-        on left: 17
-        on right: 16
-    case_list <statement> (61)
-        on left: 18 19
-        on right: 16 18
-    case_block <statement> (62)
-        on left: 20
+        on left: 19
         on right: 18
-    midrule_block <statement> (63)
-        on left: 21
-        on right: 20
-    default_clause <statement> (64)
+    case_list <statement> (61)
+        on left: 20 21
+        on right: 18 20
+    case_block <statement> (62)
         on left: 22
-        on right: 16
-    expression_bool <ident> (65)
-        on left: 23 24
-        on right: 12 13 24 30
-    expr_bool_and <ident> (66)
-        on left: 25 26
-        on right: 23 24 26
-    marker <marker> (67)
-        on left: 27
-        on right: 12 13 14 16 21 22 24 26
-    expr_bool_not <ident> (68)
-        on left: 28 29
-        on right: 25 26 28
-    primary_bool <ident> (69)
-        on left: 30 31
-        on right: 29
-    expr_bool <ident> (70)
-        on left: 32 33 34 35 36 37
-        on right: 31
-    repeat_statement (71)
-        on left: 38
-        on right: 7
-    repeat_expression <ident> (72)
-        on left: 39
-        on right: 38
-    assignment (73)
-        on left: 40 41
-        on right: 4
-    expression <ident> (74)
+        on right: 20
+    midrule_block <statement> (63)
+        on left: 23
+        on right: 22
+    default_clause <statement> (64)
+        on left: 24
+        on right: 18
+    while_statement <ident> (65)
+        on left: 25
+        on right: 11
+    do_until_statement <ident> (66)
+        on left: 26
+        on right: 12
+    expression_bool <ident> (67)
+        on left: 27 28
+        on right: 14 15 25 26 28 34
+    expr_bool_and <ident> (68)
+        on left: 29 30
+        on right: 27 28 30
+    marker <marker> (69)
+        on left: 31
+        on right: 14 15 16 18 23 24 25 26 28 30
+    expr_bool_not <ident> (70)
+        on left: 32 33
+        on right: 29 30 32
+    primary_bool <ident> (71)
+        on left: 34 35
+        on right: 33
+    expr_bool <ident> (72)
+        on left: 36 37 38 39 40 41
+        on right: 35
+    repeat_statement (73)
         on left: 42
-        on right: 5 17 32 33 34 35 36 37 39 40 41 62
-    expression_list <ident> (75)
-        on left: 43 44
-        on right: 42 43
-    expr_arithmetic <ident> (76)
-        on left: 45 46 47
-        on right: 43 44 46 47 63
-    expr_unary <ident> (77)
-        on left: 48 49 50
-        on right: 45 46 47 49 50
-    expr_term <ident> (78)
-        on left: 51 52 53 54
-        on right: 48 52 53 54
-    factor <ident> (79)
-        on left: 55 56 57 58 59 60 61 62
-        on right: 51 52 53 54
-    array_access <ident> (80)
-        on left: 63
-        on right: 41 55
+        on right: 7
+    repeat_expression <ident> (74)
+        on left: 43
+        on right: 42
+    assignment (75)
+        on left: 44 45
+        on right: 4
+    expression <ident> (76)
+        on left: 46
+        on right: 5 19 36 37 38 39 40 41 43 44 45 66
+    expression_list <ident> (77)
+        on left: 47 48
+        on right: 46 47
+    expr_arithmetic <ident> (78)
+        on left: 49 50 51
+        on right: 47 48 50 51 67
+    expr_unary <ident> (79)
+        on left: 52 53 54
+        on right: 49 50 51 53 54
+    expr_term <ident> (80)
+        on left: 55 56 57 58
+        on right: 52 56 57 58
+    factor <ident> (81)
+        on left: 59 60 61 62 63 64 65 66
+        on right: 55 56 57 58
+    array_access <ident> (82)
+        on left: 67
+        on right: 45 59
 
 
 State 0
@@ -266,121 +276,72 @@ State 0
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
     REPEAT   shift, and go to state 10
-    IF       shift, and go to state 11
-    SWITCH   shift, and go to state 12
+    DO       shift, and go to state 11
+    IF       shift, and go to state 12
+    SWITCH   shift, and go to state 13
 
-    $default  reduce using rule 11 (statement)
+    WHILE     reduce using rule 31 (marker)
+    $default  reduce using rule 13 (statement)
 
-    program            go to state 13
-    statement_list     go to state 14
-    statement          go to state 15
-    if_statement       go to state 16
-    if_else_statement  go to state 17
-    switch_statement   go to state 18
-    repeat_statement   go to state 19
-    assignment         go to state 20
-    expression         go to state 21
-    expression_list    go to state 22
-    expr_arithmetic    go to state 23
-    expr_unary         go to state 24
-    expr_term          go to state 25
-    factor             go to state 26
-    array_access       go to state 27
+    program             go to state 14
+    statement_list      go to state 15
+    statement           go to state 16
+    if_statement        go to state 17
+    if_else_statement   go to state 18
+    switch_statement    go to state 19
+    while_statement     go to state 20
+    do_until_statement  go to state 21
+    marker              go to state 22
+    repeat_statement    go to state 23
+    assignment          go to state 24
+    expression          go to state 25
+    expression_list     go to state 26
+    expr_arithmetic     go to state 27
+    expr_unary          go to state 28
+    expr_term           go to state 29
+    factor              go to state 30
+    array_access        go to state 31
 
 
 State 1
 
-   57 factor: INTEGER •
-
-    $default  reduce using rule 57 (factor)
-
-
-State 2
-
-   40 assignment: ID • ASSIGN expression
-   56 factor: ID •
-   63 array_access: ID • LBRACKET expr_arithmetic RBRACKET
-
-    ASSIGN    shift, and go to state 28
-    LBRACKET  shift, and go to state 29
-
-    $default  reduce using rule 56 (factor)
-
-
-State 3
-
-   59 factor: REAL •
-
-    $default  reduce using rule 59 (factor)
-
-
-State 4
-
-   58 factor: STRING •
-
-    $default  reduce using rule 58 (factor)
-
-
-State 5
-
-   49 expr_unary: PLUS • expr_unary
-
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-
-    expr_unary    go to state 31
-    expr_term     go to state 25
-    factor        go to state 26
-    array_access  go to state 32
-
-
-State 6
-
-   50 expr_unary: MINUS • expr_unary
-
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-
-    expr_unary    go to state 33
-    expr_term     go to state 25
-    factor        go to state 26
-    array_access  go to state 32
-
-
-State 7
-
-   60 factor: PI •
-
-    $default  reduce using rule 60 (factor)
-
-
-State 8
-
-   61 factor: E •
+   61 factor: INTEGER •
 
     $default  reduce using rule 61 (factor)
 
 
-State 9
+State 2
 
-   62 factor: LPAREN • expression RPAREN
+   44 assignment: ID • ASSIGN expression
+   60 factor: ID •
+   67 array_access: ID • LBRACKET expr_arithmetic RBRACKET
+
+    ASSIGN    shift, and go to state 32
+    LBRACKET  shift, and go to state 33
+
+    $default  reduce using rule 60 (factor)
+
+
+State 3
+
+   63 factor: REAL •
+
+    $default  reduce using rule 63 (factor)
+
+
+State 4
+
+   62 factor: STRING •
+
+    $default  reduce using rule 62 (factor)
+
+
+State 5
+
+   53 expr_unary: PLUS • expr_unary
 
     INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
+    ID       shift, and go to state 34
     REAL     shift, and go to state 3
     STRING   shift, and go to state 4
     PLUS     shift, and go to state 5
@@ -389,21 +350,75 @@ State 9
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
 
-    expression       go to state 34
-    expression_list  go to state 22
-    expr_arithmetic  go to state 23
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
+    expr_unary    go to state 35
+    expr_term     go to state 29
+    factor        go to state 30
+    array_access  go to state 36
+
+
+State 6
+
+   54 expr_unary: MINUS • expr_unary
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    expr_unary    go to state 37
+    expr_term     go to state 29
+    factor        go to state 30
+    array_access  go to state 36
+
+
+State 7
+
+   64 factor: PI •
+
+    $default  reduce using rule 64 (factor)
+
+
+State 8
+
+   65 factor: E •
+
+    $default  reduce using rule 65 (factor)
+
+
+State 9
+
+   66 factor: LPAREN • expression RPAREN
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    expression       go to state 38
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
 
 
 State 10
 
-   38 repeat_statement: REPEAT • repeat_expression DO statement_list DONE
+   42 repeat_statement: REPEAT • repeat_expression DO statement_list DONE
 
     INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
+    ID       shift, and go to state 34
     REAL     shift, and go to state 3
     STRING   shift, and go to state 4
     PLUS     shift, and go to state 5
@@ -412,398 +427,217 @@ State 10
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
 
-    repeat_expression  go to state 35
-    expression         go to state 36
-    expression_list    go to state 22
-    expr_arithmetic    go to state 23
-    expr_unary         go to state 24
-    expr_term          go to state 25
-    factor             go to state 26
-    array_access       go to state 32
+    repeat_expression  go to state 39
+    expression         go to state 40
+    expression_list    go to state 26
+    expr_arithmetic    go to state 27
+    expr_unary         go to state 28
+    expr_term          go to state 29
+    factor             go to state 30
+    array_access       go to state 36
 
 
 State 11
 
-   12 if_statement: IF • expression_bool THEN marker statement_list FI marker
-   13 if_else_statement: IF • expression_bool THEN marker statement_then else_part FI marker
+   26 do_until_statement: DO • marker statement_list UNTIL expression_bool
 
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    NOT      shift, and go to state 37
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 38
+    $default  reduce using rule 31 (marker)
 
-    expression_bool  go to state 39
-    expr_bool_and    go to state 40
-    expr_bool_not    go to state 41
-    primary_bool     go to state 42
-    expr_bool        go to state 43
-    expression       go to state 44
-    expression_list  go to state 22
-    expr_arithmetic  go to state 23
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
+    marker  go to state 41
 
 
 State 12
 
-   16 switch_statement: SWITCH • LPAREN expression_switch RPAREN ENDLINE marker case_list marker default_clause ENDLINE FSWITCH marker
+   14 if_statement: IF • expression_bool THEN marker statement_list FI marker
+   15 if_else_statement: IF • expression_bool THEN marker statement_then else_part FI marker
 
-    LPAREN  shift, and go to state 45
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    NOT      shift, and go to state 42
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 43
+
+    expression_bool  go to state 44
+    expr_bool_and    go to state 45
+    expr_bool_not    go to state 46
+    primary_bool     go to state 47
+    expr_bool        go to state 48
+    expression       go to state 49
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
 
 
 State 13
 
-    0 $accept: program • $end
+   18 switch_statement: SWITCH • LPAREN expression_switch RPAREN ENDLINE marker case_list marker default_clause ENDLINE FSWITCH marker
 
-    $end  shift, and go to state 46
+    LPAREN  shift, and go to state 50
 
 
 State 14
+
+    0 $accept: program • $end
+
+    $end  shift, and go to state 51
+
+
+State 15
 
     1 program: statement_list •
 
     $default  reduce using rule 1 (program)
 
 
-State 15
+State 16
 
     2 statement_list: statement • ENDLINE statement_list
     3               | statement •
     6 statement: statement • COMMENT
 
-    ENDLINE  shift, and go to state 47
-    COMMENT  shift, and go to state 48
+    ENDLINE  shift, and go to state 52
+    COMMENT  shift, and go to state 53
 
     $default  reduce using rule 3 (statement_list)
 
 
-State 16
+State 17
 
     8 statement: if_statement •
 
     $default  reduce using rule 8 (statement)
 
 
-State 17
+State 18
 
     9 statement: if_else_statement •
 
     $default  reduce using rule 9 (statement)
 
 
-State 18
+State 19
 
    10 statement: switch_statement •
 
     $default  reduce using rule 10 (statement)
 
 
-State 19
+State 20
+
+   11 statement: while_statement •
+
+    $default  reduce using rule 11 (statement)
+
+
+State 21
+
+   12 statement: do_until_statement •
+
+    $default  reduce using rule 12 (statement)
+
+
+State 22
+
+   25 while_statement: marker • WHILE expression_bool DO marker statement_list DONE
+
+    WHILE  shift, and go to state 54
+
+
+State 23
 
     7 statement: repeat_statement •
 
     $default  reduce using rule 7 (statement)
 
 
-State 20
+State 24
 
     4 statement: assignment •
 
     $default  reduce using rule 4 (statement)
 
 
-State 21
+State 25
 
     5 statement: expression •
 
     $default  reduce using rule 5 (statement)
 
 
-State 22
-
-   42 expression: expression_list •
-   43 expression_list: expression_list • COMMA expr_arithmetic
-
-    COMMA  shift, and go to state 49
-
-    $default  reduce using rule 42 (expression)
-
-
-State 23
-
-   44 expression_list: expr_arithmetic •
-   46 expr_arithmetic: expr_arithmetic • PLUS expr_unary
-   47                | expr_arithmetic • MINUS expr_unary
-
-    PLUS   shift, and go to state 50
-    MINUS  shift, and go to state 51
-
-    $default  reduce using rule 44 (expression_list)
-
-
-State 24
-
-   45 expr_arithmetic: expr_unary •
-
-    $default  reduce using rule 45 (expr_arithmetic)
-
-
-State 25
-
-   48 expr_unary: expr_term •
-   52 expr_term: expr_term • MULT factor
-   53          | expr_term • DIV factor
-   54          | expr_term • MOD factor
-
-    MULT  shift, and go to state 52
-    DIV   shift, and go to state 53
-    MOD   shift, and go to state 54
-
-    $default  reduce using rule 48 (expr_unary)
-
-
 State 26
 
-   51 expr_term: factor •
+   46 expression: expression_list •
+   47 expression_list: expression_list • COMMA expr_arithmetic
 
-    $default  reduce using rule 51 (expr_term)
+    COMMA  shift, and go to state 55
+
+    $default  reduce using rule 46 (expression)
 
 
 State 27
 
-   41 assignment: array_access • ASSIGN expression
-   55 factor: array_access •
+   48 expression_list: expr_arithmetic •
+   50 expr_arithmetic: expr_arithmetic • PLUS expr_unary
+   51                | expr_arithmetic • MINUS expr_unary
 
-    ASSIGN  shift, and go to state 55
+    PLUS   shift, and go to state 56
+    MINUS  shift, and go to state 57
 
-    $default  reduce using rule 55 (factor)
+    $default  reduce using rule 48 (expression_list)
 
 
 State 28
 
-   40 assignment: ID ASSIGN • expression
+   49 expr_arithmetic: expr_unary •
 
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-
-    expression       go to state 56
-    expression_list  go to state 22
-    expr_arithmetic  go to state 23
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
+    $default  reduce using rule 49 (expr_arithmetic)
 
 
 State 29
 
-   63 array_access: ID LBRACKET • expr_arithmetic RBRACKET
+   52 expr_unary: expr_term •
+   56 expr_term: expr_term • MULT factor
+   57          | expr_term • DIV factor
+   58          | expr_term • MOD factor
 
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
+    MULT  shift, and go to state 58
+    DIV   shift, and go to state 59
+    MOD   shift, and go to state 60
 
-    expr_arithmetic  go to state 57
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
+    $default  reduce using rule 52 (expr_unary)
 
 
 State 30
 
-   56 factor: ID •
-   63 array_access: ID • LBRACKET expr_arithmetic RBRACKET
+   55 expr_term: factor •
 
-    LBRACKET  shift, and go to state 29
-
-    $default  reduce using rule 56 (factor)
+    $default  reduce using rule 55 (expr_term)
 
 
 State 31
 
-   49 expr_unary: PLUS expr_unary •
+   45 assignment: array_access • ASSIGN expression
+   59 factor: array_access •
 
-    $default  reduce using rule 49 (expr_unary)
+    ASSIGN  shift, and go to state 61
+
+    $default  reduce using rule 59 (factor)
 
 
 State 32
 
-   55 factor: array_access •
-
-    $default  reduce using rule 55 (factor)
-
-
-State 33
-
-   50 expr_unary: MINUS expr_unary •
-
-    $default  reduce using rule 50 (expr_unary)
-
-
-State 34
-
-   62 factor: LPAREN expression • RPAREN
-
-    RPAREN  shift, and go to state 58
-
-
-State 35
-
-   38 repeat_statement: REPEAT repeat_expression • DO statement_list DONE
-
-    DO  shift, and go to state 59
-
-
-State 36
-
-   39 repeat_expression: expression •
-
-    $default  reduce using rule 39 (repeat_expression)
-
-
-State 37
-
-   28 expr_bool_not: NOT • expr_bool_not
+   44 assignment: ID ASSIGN • expression
 
     INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    NOT      shift, and go to state 37
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 38
-
-    expr_bool_not    go to state 60
-    primary_bool     go to state 42
-    expr_bool        go to state 43
-    expression       go to state 44
-    expression_list  go to state 22
-    expr_arithmetic  go to state 23
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
-
-
-State 38
-
-   30 primary_bool: LPAREN • expression_bool RPAREN
-   62 factor: LPAREN • expression RPAREN
-
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    NOT      shift, and go to state 37
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 38
-
-    expression_bool  go to state 61
-    expr_bool_and    go to state 40
-    expr_bool_not    go to state 41
-    primary_bool     go to state 42
-    expr_bool        go to state 43
-    expression       go to state 62
-    expression_list  go to state 22
-    expr_arithmetic  go to state 23
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
-
-
-State 39
-
-   12 if_statement: IF expression_bool • THEN marker statement_list FI marker
-   13 if_else_statement: IF expression_bool • THEN marker statement_then else_part FI marker
-   24 expression_bool: expression_bool • OR marker expr_bool_and
-
-    OR    shift, and go to state 63
-    THEN  shift, and go to state 64
-
-
-State 40
-
-   23 expression_bool: expr_bool_and •
-   26 expr_bool_and: expr_bool_and • AND marker expr_bool_not
-
-    AND  shift, and go to state 65
-
-    $default  reduce using rule 23 (expression_bool)
-
-
-State 41
-
-   25 expr_bool_and: expr_bool_not •
-
-    $default  reduce using rule 25 (expr_bool_and)
-
-
-State 42
-
-   29 expr_bool_not: primary_bool •
-
-    $default  reduce using rule 29 (expr_bool_not)
-
-
-State 43
-
-   31 primary_bool: expr_bool •
-
-    $default  reduce using rule 31 (primary_bool)
-
-
-State 44
-
-   32 expr_bool: expression • EQ expression
-   33          | expression • NE expression
-   34          | expression • GT expression
-   35          | expression • GE expression
-   36          | expression • LT expression
-   37          | expression • LE expression
-
-    GT  shift, and go to state 66
-    GE  shift, and go to state 67
-    LT  shift, and go to state 68
-    LE  shift, and go to state 69
-    EQ  shift, and go to state 70
-    NE  shift, and go to state 71
-
-
-State 45
-
-   16 switch_statement: SWITCH LPAREN • expression_switch RPAREN ENDLINE marker case_list marker default_clause ENDLINE FSWITCH marker
-
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
+    ID       shift, and go to state 34
     REAL     shift, and go to state 3
     STRING   shift, and go to state 4
     PLUS     shift, and go to state 5
@@ -812,24 +646,275 @@ State 45
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
 
-    expression_switch  go to state 72
-    expression         go to state 73
-    expression_list    go to state 22
-    expr_arithmetic    go to state 23
-    expr_unary         go to state 24
-    expr_term          go to state 25
-    factor             go to state 26
-    array_access       go to state 32
+    expression       go to state 62
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
+
+
+State 33
+
+   67 array_access: ID LBRACKET • expr_arithmetic RBRACKET
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    expr_arithmetic  go to state 63
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
+
+
+State 34
+
+   60 factor: ID •
+   67 array_access: ID • LBRACKET expr_arithmetic RBRACKET
+
+    LBRACKET  shift, and go to state 33
+
+    $default  reduce using rule 60 (factor)
+
+
+State 35
+
+   53 expr_unary: PLUS expr_unary •
+
+    $default  reduce using rule 53 (expr_unary)
+
+
+State 36
+
+   59 factor: array_access •
+
+    $default  reduce using rule 59 (factor)
+
+
+State 37
+
+   54 expr_unary: MINUS expr_unary •
+
+    $default  reduce using rule 54 (expr_unary)
+
+
+State 38
+
+   66 factor: LPAREN expression • RPAREN
+
+    RPAREN  shift, and go to state 64
+
+
+State 39
+
+   42 repeat_statement: REPEAT repeat_expression • DO statement_list DONE
+
+    DO  shift, and go to state 65
+
+
+State 40
+
+   43 repeat_expression: expression •
+
+    $default  reduce using rule 43 (repeat_expression)
+
+
+State 41
+
+   26 do_until_statement: DO marker • statement_list UNTIL expression_bool
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 2
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+    REPEAT   shift, and go to state 10
+    DO       shift, and go to state 11
+    IF       shift, and go to state 12
+    SWITCH   shift, and go to state 13
+
+    WHILE     reduce using rule 31 (marker)
+    $default  reduce using rule 13 (statement)
+
+    statement_list      go to state 66
+    statement           go to state 16
+    if_statement        go to state 17
+    if_else_statement   go to state 18
+    switch_statement    go to state 19
+    while_statement     go to state 20
+    do_until_statement  go to state 21
+    marker              go to state 22
+    repeat_statement    go to state 23
+    assignment          go to state 24
+    expression          go to state 25
+    expression_list     go to state 26
+    expr_arithmetic     go to state 27
+    expr_unary          go to state 28
+    expr_term           go to state 29
+    factor              go to state 30
+    array_access        go to state 31
+
+
+State 42
+
+   32 expr_bool_not: NOT • expr_bool_not
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    NOT      shift, and go to state 42
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 43
+
+    expr_bool_not    go to state 67
+    primary_bool     go to state 47
+    expr_bool        go to state 48
+    expression       go to state 49
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
+
+
+State 43
+
+   34 primary_bool: LPAREN • expression_bool RPAREN
+   66 factor: LPAREN • expression RPAREN
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    NOT      shift, and go to state 42
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 43
+
+    expression_bool  go to state 68
+    expr_bool_and    go to state 45
+    expr_bool_not    go to state 46
+    primary_bool     go to state 47
+    expr_bool        go to state 48
+    expression       go to state 69
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
+
+
+State 44
+
+   14 if_statement: IF expression_bool • THEN marker statement_list FI marker
+   15 if_else_statement: IF expression_bool • THEN marker statement_then else_part FI marker
+   28 expression_bool: expression_bool • OR marker expr_bool_and
+
+    OR    shift, and go to state 70
+    THEN  shift, and go to state 71
+
+
+State 45
+
+   27 expression_bool: expr_bool_and •
+   30 expr_bool_and: expr_bool_and • AND marker expr_bool_not
+
+    AND  shift, and go to state 72
+
+    $default  reduce using rule 27 (expression_bool)
 
 
 State 46
+
+   29 expr_bool_and: expr_bool_not •
+
+    $default  reduce using rule 29 (expr_bool_and)
+
+
+State 47
+
+   33 expr_bool_not: primary_bool •
+
+    $default  reduce using rule 33 (expr_bool_not)
+
+
+State 48
+
+   35 primary_bool: expr_bool •
+
+    $default  reduce using rule 35 (primary_bool)
+
+
+State 49
+
+   36 expr_bool: expression • EQ expression
+   37          | expression • NE expression
+   38          | expression • GT expression
+   39          | expression • GE expression
+   40          | expression • LT expression
+   41          | expression • LE expression
+
+    GT  shift, and go to state 73
+    GE  shift, and go to state 74
+    LT  shift, and go to state 75
+    LE  shift, and go to state 76
+    EQ  shift, and go to state 77
+    NE  shift, and go to state 78
+
+
+State 50
+
+   18 switch_statement: SWITCH LPAREN • expression_switch RPAREN ENDLINE marker case_list marker default_clause ENDLINE FSWITCH marker
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    expression_switch  go to state 79
+    expression         go to state 80
+    expression_list    go to state 26
+    expr_arithmetic    go to state 27
+    expr_unary         go to state 28
+    expr_term          go to state 29
+    factor             go to state 30
+    array_access       go to state 36
+
+
+State 51
 
     0 $accept: program $end •
 
     $default  accept
 
 
-State 47
+State 52
 
     2 statement_list: statement ENDLINE • statement_list
 
@@ -843,149 +928,74 @@ State 47
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
     REPEAT   shift, and go to state 10
-    IF       shift, and go to state 11
-    SWITCH   shift, and go to state 12
+    DO       shift, and go to state 11
+    IF       shift, and go to state 12
+    SWITCH   shift, and go to state 13
 
-    $default  reduce using rule 11 (statement)
+    WHILE     reduce using rule 31 (marker)
+    $default  reduce using rule 13 (statement)
 
-    statement_list     go to state 74
-    statement          go to state 15
-    if_statement       go to state 16
-    if_else_statement  go to state 17
-    switch_statement   go to state 18
-    repeat_statement   go to state 19
-    assignment         go to state 20
-    expression         go to state 21
-    expression_list    go to state 22
-    expr_arithmetic    go to state 23
-    expr_unary         go to state 24
-    expr_term          go to state 25
-    factor             go to state 26
-    array_access       go to state 27
+    statement_list      go to state 81
+    statement           go to state 16
+    if_statement        go to state 17
+    if_else_statement   go to state 18
+    switch_statement    go to state 19
+    while_statement     go to state 20
+    do_until_statement  go to state 21
+    marker              go to state 22
+    repeat_statement    go to state 23
+    assignment          go to state 24
+    expression          go to state 25
+    expression_list     go to state 26
+    expr_arithmetic     go to state 27
+    expr_unary          go to state 28
+    expr_term           go to state 29
+    factor              go to state 30
+    array_access        go to state 31
 
 
-State 48
+State 53
 
     6 statement: statement COMMENT •
 
     $default  reduce using rule 6 (statement)
 
 
-State 49
-
-   43 expression_list: expression_list COMMA • expr_arithmetic
-
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-
-    expr_arithmetic  go to state 75
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
-
-
-State 50
-
-   46 expr_arithmetic: expr_arithmetic PLUS • expr_unary
-
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-
-    expr_unary    go to state 76
-    expr_term     go to state 25
-    factor        go to state 26
-    array_access  go to state 32
-
-
-State 51
-
-   47 expr_arithmetic: expr_arithmetic MINUS • expr_unary
-
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-
-    expr_unary    go to state 77
-    expr_term     go to state 25
-    factor        go to state 26
-    array_access  go to state 32
-
-
-State 52
-
-   52 expr_term: expr_term MULT • factor
-
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-
-    factor        go to state 78
-    array_access  go to state 32
-
-
-State 53
-
-   53 expr_term: expr_term DIV • factor
-
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-
-    factor        go to state 79
-    array_access  go to state 32
-
-
 State 54
 
-   54 expr_term: expr_term MOD • factor
+   25 while_statement: marker WHILE • expression_bool DO marker statement_list DONE
 
     INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
+    ID       shift, and go to state 34
     REAL     shift, and go to state 3
     STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    NOT      shift, and go to state 42
     PI       shift, and go to state 7
     E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
+    LPAREN   shift, and go to state 43
 
-    factor        go to state 80
-    array_access  go to state 32
+    expression_bool  go to state 82
+    expr_bool_and    go to state 45
+    expr_bool_not    go to state 46
+    primary_bool     go to state 47
+    expr_bool        go to state 48
+    expression       go to state 49
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
 
 
 State 55
 
-   41 assignment: array_access ASSIGN • expression
+   47 expression_list: expression_list COMMA • expr_arithmetic
 
     INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
+    ID       shift, and go to state 34
     REAL     shift, and go to state 3
     STRING   shift, and go to state 4
     PLUS     shift, and go to state 5
@@ -994,167 +1004,107 @@ State 55
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
 
-    expression       go to state 81
-    expression_list  go to state 22
-    expr_arithmetic  go to state 23
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
+    expr_arithmetic  go to state 83
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
 
 
 State 56
 
-   40 assignment: ID ASSIGN expression •
+   50 expr_arithmetic: expr_arithmetic PLUS • expr_unary
 
-    $default  reduce using rule 40 (assignment)
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    expr_unary    go to state 84
+    expr_term     go to state 29
+    factor        go to state 30
+    array_access  go to state 36
 
 
 State 57
 
-   46 expr_arithmetic: expr_arithmetic • PLUS expr_unary
-   47                | expr_arithmetic • MINUS expr_unary
-   63 array_access: ID LBRACKET expr_arithmetic • RBRACKET
+   51 expr_arithmetic: expr_arithmetic MINUS • expr_unary
 
-    PLUS      shift, and go to state 50
-    MINUS     shift, and go to state 51
-    RBRACKET  shift, and go to state 82
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    expr_unary    go to state 85
+    expr_term     go to state 29
+    factor        go to state 30
+    array_access  go to state 36
 
 
 State 58
 
-   62 factor: LPAREN expression RPAREN •
+   56 expr_term: expr_term MULT • factor
 
-    $default  reduce using rule 62 (factor)
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    factor        go to state 86
+    array_access  go to state 36
 
 
 State 59
 
-   38 repeat_statement: REPEAT repeat_expression DO • statement_list DONE
+   57 expr_term: expr_term DIV • factor
 
     INTEGER  shift, and go to state 1
-    ID       shift, and go to state 2
+    ID       shift, and go to state 34
     REAL     shift, and go to state 3
     STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
     PI       shift, and go to state 7
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
-    REPEAT   shift, and go to state 10
-    IF       shift, and go to state 11
-    SWITCH   shift, and go to state 12
 
-    $default  reduce using rule 11 (statement)
-
-    statement_list     go to state 83
-    statement          go to state 15
-    if_statement       go to state 16
-    if_else_statement  go to state 17
-    switch_statement   go to state 18
-    repeat_statement   go to state 19
-    assignment         go to state 20
-    expression         go to state 21
-    expression_list    go to state 22
-    expr_arithmetic    go to state 23
-    expr_unary         go to state 24
-    expr_term          go to state 25
-    factor             go to state 26
-    array_access       go to state 27
+    factor        go to state 87
+    array_access  go to state 36
 
 
 State 60
 
-   28 expr_bool_not: NOT expr_bool_not •
-
-    $default  reduce using rule 28 (expr_bool_not)
-
-
-State 61
-
-   24 expression_bool: expression_bool • OR marker expr_bool_and
-   30 primary_bool: LPAREN expression_bool • RPAREN
-
-    OR      shift, and go to state 63
-    RPAREN  shift, and go to state 84
-
-
-State 62
-
-   32 expr_bool: expression • EQ expression
-   33          | expression • NE expression
-   34          | expression • GT expression
-   35          | expression • GE expression
-   36          | expression • LT expression
-   37          | expression • LE expression
-   62 factor: LPAREN expression • RPAREN
-
-    GT      shift, and go to state 66
-    GE      shift, and go to state 67
-    LT      shift, and go to state 68
-    LE      shift, and go to state 69
-    EQ      shift, and go to state 70
-    NE      shift, and go to state 71
-    RPAREN  shift, and go to state 58
-
-
-State 63
-
-   24 expression_bool: expression_bool OR • marker expr_bool_and
-
-    $default  reduce using rule 27 (marker)
-
-    marker  go to state 85
-
-
-State 64
-
-   12 if_statement: IF expression_bool THEN • marker statement_list FI marker
-   13 if_else_statement: IF expression_bool THEN • marker statement_then else_part FI marker
-
-    $default  reduce using rule 27 (marker)
-
-    marker  go to state 86
-
-
-State 65
-
-   26 expr_bool_and: expr_bool_and AND • marker expr_bool_not
-
-    $default  reduce using rule 27 (marker)
-
-    marker  go to state 87
-
-
-State 66
-
-   34 expr_bool: expression GT • expression
+   58 expr_term: expr_term MOD • factor
 
     INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
+    ID       shift, and go to state 34
     REAL     shift, and go to state 3
     STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
     PI       shift, and go to state 7
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
 
-    expression       go to state 88
-    expression_list  go to state 22
-    expr_arithmetic  go to state 23
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
+    factor        go to state 88
+    array_access  go to state 36
 
 
-State 67
+State 61
 
-   35 expr_bool: expression GE • expression
+   45 assignment: array_access ASSIGN • expression
 
     INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
+    ID       shift, and go to state 34
     REAL     shift, and go to state 3
     STRING   shift, and go to state 4
     PLUS     shift, and go to state 5
@@ -1164,89 +1114,155 @@ State 67
     LPAREN   shift, and go to state 9
 
     expression       go to state 89
-    expression_list  go to state 22
-    expr_arithmetic  go to state 23
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
+
+
+State 62
+
+   44 assignment: ID ASSIGN expression •
+
+    $default  reduce using rule 44 (assignment)
+
+
+State 63
+
+   50 expr_arithmetic: expr_arithmetic • PLUS expr_unary
+   51                | expr_arithmetic • MINUS expr_unary
+   67 array_access: ID LBRACKET expr_arithmetic • RBRACKET
+
+    PLUS      shift, and go to state 56
+    MINUS     shift, and go to state 57
+    RBRACKET  shift, and go to state 90
+
+
+State 64
+
+   66 factor: LPAREN expression RPAREN •
+
+    $default  reduce using rule 66 (factor)
+
+
+State 65
+
+   42 repeat_statement: REPEAT repeat_expression DO • statement_list DONE
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 2
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+    REPEAT   shift, and go to state 10
+    DO       shift, and go to state 11
+    IF       shift, and go to state 12
+    SWITCH   shift, and go to state 13
+
+    WHILE     reduce using rule 31 (marker)
+    $default  reduce using rule 13 (statement)
+
+    statement_list      go to state 91
+    statement           go to state 16
+    if_statement        go to state 17
+    if_else_statement   go to state 18
+    switch_statement    go to state 19
+    while_statement     go to state 20
+    do_until_statement  go to state 21
+    marker              go to state 22
+    repeat_statement    go to state 23
+    assignment          go to state 24
+    expression          go to state 25
+    expression_list     go to state 26
+    expr_arithmetic     go to state 27
+    expr_unary          go to state 28
+    expr_term           go to state 29
+    factor              go to state 30
+    array_access        go to state 31
+
+
+State 66
+
+   26 do_until_statement: DO marker statement_list • UNTIL expression_bool
+
+    UNTIL  shift, and go to state 92
+
+
+State 67
+
+   32 expr_bool_not: NOT expr_bool_not •
+
+    $default  reduce using rule 32 (expr_bool_not)
 
 
 State 68
 
-   36 expr_bool: expression LT • expression
+   28 expression_bool: expression_bool • OR marker expr_bool_and
+   34 primary_bool: LPAREN expression_bool • RPAREN
 
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-
-    expression       go to state 90
-    expression_list  go to state 22
-    expr_arithmetic  go to state 23
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
+    OR      shift, and go to state 70
+    RPAREN  shift, and go to state 93
 
 
 State 69
 
-   37 expr_bool: expression LE • expression
+   36 expr_bool: expression • EQ expression
+   37          | expression • NE expression
+   38          | expression • GT expression
+   39          | expression • GE expression
+   40          | expression • LT expression
+   41          | expression • LE expression
+   66 factor: LPAREN expression • RPAREN
 
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-
-    expression       go to state 91
-    expression_list  go to state 22
-    expr_arithmetic  go to state 23
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
+    GT      shift, and go to state 73
+    GE      shift, and go to state 74
+    LT      shift, and go to state 75
+    LE      shift, and go to state 76
+    EQ      shift, and go to state 77
+    NE      shift, and go to state 78
+    RPAREN  shift, and go to state 64
 
 
 State 70
 
-   32 expr_bool: expression EQ • expression
+   28 expression_bool: expression_bool OR • marker expr_bool_and
 
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
+    $default  reduce using rule 31 (marker)
 
-    expression       go to state 92
-    expression_list  go to state 22
-    expr_arithmetic  go to state 23
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
+    marker  go to state 94
 
 
 State 71
 
-   33 expr_bool: expression NE • expression
+   14 if_statement: IF expression_bool THEN • marker statement_list FI marker
+   15 if_else_statement: IF expression_bool THEN • marker statement_then else_part FI marker
+
+    $default  reduce using rule 31 (marker)
+
+    marker  go to state 95
+
+
+State 72
+
+   30 expr_bool_and: expr_bool_and AND • marker expr_bool_not
+
+    $default  reduce using rule 31 (marker)
+
+    marker  go to state 96
+
+
+State 73
+
+   38 expr_bool: expression GT • expression
 
     INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
+    ID       shift, and go to state 34
     REAL     shift, and go to state 3
     STRING   shift, and go to state 4
     PLUS     shift, and go to state 5
@@ -1255,582 +1271,572 @@ State 71
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
 
-    expression       go to state 93
-    expression_list  go to state 22
-    expr_arithmetic  go to state 23
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
-
-
-State 72
-
-   16 switch_statement: SWITCH LPAREN expression_switch • RPAREN ENDLINE marker case_list marker default_clause ENDLINE FSWITCH marker
-
-    RPAREN  shift, and go to state 94
-
-
-State 73
-
-   17 expression_switch: expression •
-
-    $default  reduce using rule 17 (expression_switch)
+    expression       go to state 97
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
 
 
 State 74
+
+   39 expr_bool: expression GE • expression
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    expression       go to state 98
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
+
+
+State 75
+
+   40 expr_bool: expression LT • expression
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    expression       go to state 99
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
+
+
+State 76
+
+   41 expr_bool: expression LE • expression
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    expression       go to state 100
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
+
+
+State 77
+
+   36 expr_bool: expression EQ • expression
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    expression       go to state 101
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
+
+
+State 78
+
+   37 expr_bool: expression NE • expression
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+
+    expression       go to state 102
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
+
+
+State 79
+
+   18 switch_statement: SWITCH LPAREN expression_switch • RPAREN ENDLINE marker case_list marker default_clause ENDLINE FSWITCH marker
+
+    RPAREN  shift, and go to state 103
+
+
+State 80
+
+   19 expression_switch: expression •
+
+    $default  reduce using rule 19 (expression_switch)
+
+
+State 81
 
     2 statement_list: statement ENDLINE statement_list •
 
     $default  reduce using rule 2 (statement_list)
 
 
-State 75
-
-   43 expression_list: expression_list COMMA expr_arithmetic •
-   46 expr_arithmetic: expr_arithmetic • PLUS expr_unary
-   47                | expr_arithmetic • MINUS expr_unary
-
-    PLUS   shift, and go to state 50
-    MINUS  shift, and go to state 51
-
-    $default  reduce using rule 43 (expression_list)
-
-
-State 76
-
-   46 expr_arithmetic: expr_arithmetic PLUS expr_unary •
-
-    $default  reduce using rule 46 (expr_arithmetic)
-
-
-State 77
-
-   47 expr_arithmetic: expr_arithmetic MINUS expr_unary •
-
-    $default  reduce using rule 47 (expr_arithmetic)
-
-
-State 78
-
-   52 expr_term: expr_term MULT factor •
-
-    $default  reduce using rule 52 (expr_term)
-
-
-State 79
-
-   53 expr_term: expr_term DIV factor •
-
-    $default  reduce using rule 53 (expr_term)
-
-
-State 80
-
-   54 expr_term: expr_term MOD factor •
-
-    $default  reduce using rule 54 (expr_term)
-
-
-State 81
-
-   41 assignment: array_access ASSIGN expression •
-
-    $default  reduce using rule 41 (assignment)
-
-
 State 82
 
-   63 array_access: ID LBRACKET expr_arithmetic RBRACKET •
+   25 while_statement: marker WHILE expression_bool • DO marker statement_list DONE
+   28 expression_bool: expression_bool • OR marker expr_bool_and
 
-    $default  reduce using rule 63 (array_access)
+    OR  shift, and go to state 70
+    DO  shift, and go to state 104
 
 
 State 83
 
-   38 repeat_statement: REPEAT repeat_expression DO statement_list • DONE
+   47 expression_list: expression_list COMMA expr_arithmetic •
+   50 expr_arithmetic: expr_arithmetic • PLUS expr_unary
+   51                | expr_arithmetic • MINUS expr_unary
 
-    DONE  shift, and go to state 95
+    PLUS   shift, and go to state 56
+    MINUS  shift, and go to state 57
+
+    $default  reduce using rule 47 (expression_list)
 
 
 State 84
 
-   30 primary_bool: LPAREN expression_bool RPAREN •
+   50 expr_arithmetic: expr_arithmetic PLUS expr_unary •
 
-    $default  reduce using rule 30 (primary_bool)
+    $default  reduce using rule 50 (expr_arithmetic)
 
 
 State 85
 
-   24 expression_bool: expression_bool OR marker • expr_bool_and
+   51 expr_arithmetic: expr_arithmetic MINUS expr_unary •
 
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    NOT      shift, and go to state 37
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 38
-
-    expr_bool_and    go to state 96
-    expr_bool_not    go to state 41
-    primary_bool     go to state 42
-    expr_bool        go to state 43
-    expression       go to state 44
-    expression_list  go to state 22
-    expr_arithmetic  go to state 23
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
+    $default  reduce using rule 51 (expr_arithmetic)
 
 
 State 86
 
-   12 if_statement: IF expression_bool THEN marker • statement_list FI marker
-   13 if_else_statement: IF expression_bool THEN marker • statement_then else_part FI marker
+   56 expr_term: expr_term MULT factor •
 
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 2
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-    REPEAT   shift, and go to state 10
-    IF       shift, and go to state 11
-    SWITCH   shift, and go to state 12
-
-    $default  reduce using rule 11 (statement)
-
-    statement_list     go to state 97
-    statement          go to state 15
-    if_statement       go to state 16
-    if_else_statement  go to state 17
-    statement_then     go to state 98
-    switch_statement   go to state 18
-    repeat_statement   go to state 19
-    assignment         go to state 20
-    expression         go to state 21
-    expression_list    go to state 22
-    expr_arithmetic    go to state 23
-    expr_unary         go to state 24
-    expr_term          go to state 25
-    factor             go to state 26
-    array_access       go to state 27
+    $default  reduce using rule 56 (expr_term)
 
 
 State 87
 
-   26 expr_bool_and: expr_bool_and AND marker • expr_bool_not
+   57 expr_term: expr_term DIV factor •
 
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 30
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    NOT      shift, and go to state 37
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 38
-
-    expr_bool_not    go to state 99
-    primary_bool     go to state 42
-    expr_bool        go to state 43
-    expression       go to state 44
-    expression_list  go to state 22
-    expr_arithmetic  go to state 23
-    expr_unary       go to state 24
-    expr_term        go to state 25
-    factor           go to state 26
-    array_access     go to state 32
+    $default  reduce using rule 57 (expr_term)
 
 
 State 88
 
-   34 expr_bool: expression GT expression •
+   58 expr_term: expr_term MOD factor •
 
-    $default  reduce using rule 34 (expr_bool)
+    $default  reduce using rule 58 (expr_term)
 
 
 State 89
 
-   35 expr_bool: expression GE expression •
+   45 assignment: array_access ASSIGN expression •
 
-    $default  reduce using rule 35 (expr_bool)
+    $default  reduce using rule 45 (assignment)
 
 
 State 90
 
-   36 expr_bool: expression LT expression •
+   67 array_access: ID LBRACKET expr_arithmetic RBRACKET •
 
-    $default  reduce using rule 36 (expr_bool)
+    $default  reduce using rule 67 (array_access)
 
 
 State 91
 
-   37 expr_bool: expression LE expression •
+   42 repeat_statement: REPEAT repeat_expression DO statement_list • DONE
 
-    $default  reduce using rule 37 (expr_bool)
+    DONE  shift, and go to state 105
 
 
 State 92
 
-   32 expr_bool: expression EQ expression •
+   26 do_until_statement: DO marker statement_list UNTIL • expression_bool
 
-    $default  reduce using rule 32 (expr_bool)
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    NOT      shift, and go to state 42
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 43
+
+    expression_bool  go to state 106
+    expr_bool_and    go to state 45
+    expr_bool_not    go to state 46
+    primary_bool     go to state 47
+    expr_bool        go to state 48
+    expression       go to state 49
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
 
 
 State 93
 
-   33 expr_bool: expression NE expression •
+   34 primary_bool: LPAREN expression_bool RPAREN •
 
-    $default  reduce using rule 33 (expr_bool)
+    $default  reduce using rule 34 (primary_bool)
 
 
 State 94
 
-   16 switch_statement: SWITCH LPAREN expression_switch RPAREN • ENDLINE marker case_list marker default_clause ENDLINE FSWITCH marker
+   28 expression_bool: expression_bool OR marker • expr_bool_and
 
-    ENDLINE  shift, and go to state 100
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    NOT      shift, and go to state 42
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 43
+
+    expr_bool_and    go to state 107
+    expr_bool_not    go to state 46
+    primary_bool     go to state 47
+    expr_bool        go to state 48
+    expression       go to state 49
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
 
 
 State 95
 
-   38 repeat_statement: REPEAT repeat_expression DO statement_list DONE •
+   14 if_statement: IF expression_bool THEN marker • statement_list FI marker
+   15 if_else_statement: IF expression_bool THEN marker • statement_then else_part FI marker
 
-    $default  reduce using rule 38 (repeat_statement)
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 2
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+    REPEAT   shift, and go to state 10
+    DO       shift, and go to state 11
+    IF       shift, and go to state 12
+    SWITCH   shift, and go to state 13
+
+    WHILE     reduce using rule 31 (marker)
+    $default  reduce using rule 13 (statement)
+
+    statement_list      go to state 108
+    statement           go to state 16
+    if_statement        go to state 17
+    if_else_statement   go to state 18
+    statement_then      go to state 109
+    switch_statement    go to state 19
+    while_statement     go to state 20
+    do_until_statement  go to state 21
+    marker              go to state 22
+    repeat_statement    go to state 23
+    assignment          go to state 24
+    expression          go to state 25
+    expression_list     go to state 26
+    expr_arithmetic     go to state 27
+    expr_unary          go to state 28
+    expr_term           go to state 29
+    factor              go to state 30
+    array_access        go to state 31
 
 
 State 96
 
-   24 expression_bool: expression_bool OR marker expr_bool_and •
-   26 expr_bool_and: expr_bool_and • AND marker expr_bool_not
+   30 expr_bool_and: expr_bool_and AND marker • expr_bool_not
 
-    AND  shift, and go to state 65
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 34
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    NOT      shift, and go to state 42
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 43
 
-    $default  reduce using rule 24 (expression_bool)
+    expr_bool_not    go to state 110
+    primary_bool     go to state 47
+    expr_bool        go to state 48
+    expression       go to state 49
+    expression_list  go to state 26
+    expr_arithmetic  go to state 27
+    expr_unary       go to state 28
+    expr_term        go to state 29
+    factor           go to state 30
+    array_access     go to state 36
 
 
 State 97
 
-   12 if_statement: IF expression_bool THEN marker statement_list • FI marker
-   15 statement_then: statement_list •
+   38 expr_bool: expression GT expression •
 
-    FI  shift, and go to state 101
-
-    $default  reduce using rule 15 (statement_then)
+    $default  reduce using rule 38 (expr_bool)
 
 
 State 98
 
-   13 if_else_statement: IF expression_bool THEN marker statement_then • else_part FI marker
+   39 expr_bool: expression GE expression •
 
-    ELSE  shift, and go to state 102
-
-    else_part  go to state 103
+    $default  reduce using rule 39 (expr_bool)
 
 
 State 99
 
-   26 expr_bool_and: expr_bool_and AND marker expr_bool_not •
+   40 expr_bool: expression LT expression •
 
-    $default  reduce using rule 26 (expr_bool_and)
+    $default  reduce using rule 40 (expr_bool)
 
 
 State 100
 
-   16 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE • marker case_list marker default_clause ENDLINE FSWITCH marker
+   41 expr_bool: expression LE expression •
 
-    $default  reduce using rule 27 (marker)
-
-    marker  go to state 104
+    $default  reduce using rule 41 (expr_bool)
 
 
 State 101
 
-   12 if_statement: IF expression_bool THEN marker statement_list FI • marker
+   36 expr_bool: expression EQ expression •
 
-    $default  reduce using rule 27 (marker)
-
-    marker  go to state 105
+    $default  reduce using rule 36 (expr_bool)
 
 
 State 102
 
-   14 else_part: ELSE • marker statement_list
+   37 expr_bool: expression NE expression •
 
-    $default  reduce using rule 27 (marker)
-
-    marker  go to state 106
+    $default  reduce using rule 37 (expr_bool)
 
 
 State 103
 
-   13 if_else_statement: IF expression_bool THEN marker statement_then else_part • FI marker
+   18 switch_statement: SWITCH LPAREN expression_switch RPAREN • ENDLINE marker case_list marker default_clause ENDLINE FSWITCH marker
 
-    FI  shift, and go to state 107
+    ENDLINE  shift, and go to state 111
 
 
 State 104
 
-   16 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker • case_list marker default_clause ENDLINE FSWITCH marker
+   25 while_statement: marker WHILE expression_bool DO • marker statement_list DONE
 
-    $default  reduce using rule 19 (case_list)
+    $default  reduce using rule 31 (marker)
 
-    case_list  go to state 108
+    marker  go to state 112
 
 
 State 105
 
-   12 if_statement: IF expression_bool THEN marker statement_list FI marker •
+   42 repeat_statement: REPEAT repeat_expression DO statement_list DONE •
 
-    $default  reduce using rule 12 (if_statement)
+    $default  reduce using rule 42 (repeat_statement)
 
 
 State 106
 
-   14 else_part: ELSE marker • statement_list
+   26 do_until_statement: DO marker statement_list UNTIL expression_bool •
+   28 expression_bool: expression_bool • OR marker expr_bool_and
 
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 2
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-    REPEAT   shift, and go to state 10
-    IF       shift, and go to state 11
-    SWITCH   shift, and go to state 12
+    OR  shift, and go to state 70
 
-    $default  reduce using rule 11 (statement)
-
-    statement_list     go to state 109
-    statement          go to state 15
-    if_statement       go to state 16
-    if_else_statement  go to state 17
-    switch_statement   go to state 18
-    repeat_statement   go to state 19
-    assignment         go to state 20
-    expression         go to state 21
-    expression_list    go to state 22
-    expr_arithmetic    go to state 23
-    expr_unary         go to state 24
-    expr_term          go to state 25
-    factor             go to state 26
-    array_access       go to state 27
+    $default  reduce using rule 26 (do_until_statement)
 
 
 State 107
 
-   13 if_else_statement: IF expression_bool THEN marker statement_then else_part FI • marker
+   28 expression_bool: expression_bool OR marker expr_bool_and •
+   30 expr_bool_and: expr_bool_and • AND marker expr_bool_not
 
-    $default  reduce using rule 27 (marker)
+    AND  shift, and go to state 72
 
-    marker  go to state 110
+    $default  reduce using rule 28 (expression_bool)
 
 
 State 108
 
-   16 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list • marker default_clause ENDLINE FSWITCH marker
-   18 case_list: case_list • case_block ENDLINE
+   14 if_statement: IF expression_bool THEN marker statement_list • FI marker
+   17 statement_then: statement_list •
 
-    CASE  shift, and go to state 111
+    FI  shift, and go to state 113
 
-    $default  reduce using rule 27 (marker)
-
-    case_block     go to state 112
-    midrule_block  go to state 113
-    marker         go to state 114
+    $default  reduce using rule 17 (statement_then)
 
 
 State 109
 
-   14 else_part: ELSE marker statement_list •
+   15 if_else_statement: IF expression_bool THEN marker statement_then • else_part FI marker
 
-    $default  reduce using rule 14 (else_part)
+    ELSE  shift, and go to state 114
+
+    else_part  go to state 115
 
 
 State 110
 
-   13 if_else_statement: IF expression_bool THEN marker statement_then else_part FI marker •
+   30 expr_bool_and: expr_bool_and AND marker expr_bool_not •
 
-    $default  reduce using rule 13 (if_else_statement)
+    $default  reduce using rule 30 (expr_bool_and)
 
 
 State 111
 
-   21 midrule_block: CASE • INTEGER COLON ENDLINE marker
+   18 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE • marker case_list marker default_clause ENDLINE FSWITCH marker
 
-    INTEGER  shift, and go to state 115
+    $default  reduce using rule 31 (marker)
+
+    marker  go to state 116
 
 
 State 112
 
-   18 case_list: case_list case_block • ENDLINE
+   25 while_statement: marker WHILE expression_bool DO marker • statement_list DONE
 
-    ENDLINE  shift, and go to state 116
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 2
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+    REPEAT   shift, and go to state 10
+    DO       shift, and go to state 11
+    IF       shift, and go to state 12
+    SWITCH   shift, and go to state 13
+
+    WHILE     reduce using rule 31 (marker)
+    $default  reduce using rule 13 (statement)
+
+    statement_list      go to state 117
+    statement           go to state 16
+    if_statement        go to state 17
+    if_else_statement   go to state 18
+    switch_statement    go to state 19
+    while_statement     go to state 20
+    do_until_statement  go to state 21
+    marker              go to state 22
+    repeat_statement    go to state 23
+    assignment          go to state 24
+    expression          go to state 25
+    expression_list     go to state 26
+    expr_arithmetic     go to state 27
+    expr_unary          go to state 28
+    expr_term           go to state 29
+    factor              go to state 30
+    array_access        go to state 31
 
 
 State 113
 
-   20 case_block: midrule_block • statement_list BREAK SEMICOLON
+   14 if_statement: IF expression_bool THEN marker statement_list FI • marker
 
-    INTEGER  shift, and go to state 1
-    ID       shift, and go to state 2
-    REAL     shift, and go to state 3
-    STRING   shift, and go to state 4
-    PLUS     shift, and go to state 5
-    MINUS    shift, and go to state 6
-    PI       shift, and go to state 7
-    E        shift, and go to state 8
-    LPAREN   shift, and go to state 9
-    REPEAT   shift, and go to state 10
-    IF       shift, and go to state 11
-    SWITCH   shift, and go to state 12
+    $default  reduce using rule 31 (marker)
 
-    $default  reduce using rule 11 (statement)
-
-    statement_list     go to state 117
-    statement          go to state 15
-    if_statement       go to state 16
-    if_else_statement  go to state 17
-    switch_statement   go to state 18
-    repeat_statement   go to state 19
-    assignment         go to state 20
-    expression         go to state 21
-    expression_list    go to state 22
-    expr_arithmetic    go to state 23
-    expr_unary         go to state 24
-    expr_term          go to state 25
-    factor             go to state 26
-    array_access       go to state 27
+    marker  go to state 118
 
 
 State 114
 
-   16 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list marker • default_clause ENDLINE FSWITCH marker
+   16 else_part: ELSE • marker statement_list
 
-    DEFAULT  shift, and go to state 118
+    $default  reduce using rule 31 (marker)
 
-    default_clause  go to state 119
+    marker  go to state 119
 
 
 State 115
 
-   21 midrule_block: CASE INTEGER • COLON ENDLINE marker
+   15 if_else_statement: IF expression_bool THEN marker statement_then else_part • FI marker
 
-    COLON  shift, and go to state 120
+    FI  shift, and go to state 120
 
 
 State 116
 
-   18 case_list: case_list case_block ENDLINE •
+   18 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker • case_list marker default_clause ENDLINE FSWITCH marker
 
-    $default  reduce using rule 18 (case_list)
+    $default  reduce using rule 21 (case_list)
+
+    case_list  go to state 121
 
 
 State 117
 
-   20 case_block: midrule_block statement_list • BREAK SEMICOLON
+   25 while_statement: marker WHILE expression_bool DO marker statement_list • DONE
 
-    BREAK  shift, and go to state 121
+    DONE  shift, and go to state 122
 
 
 State 118
 
-   22 default_clause: DEFAULT • COLON ENDLINE marker statement_list BREAK SEMICOLON
+   14 if_statement: IF expression_bool THEN marker statement_list FI marker •
 
-    COLON  shift, and go to state 122
+    $default  reduce using rule 14 (if_statement)
 
 
 State 119
 
-   16 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list marker default_clause • ENDLINE FSWITCH marker
-
-    ENDLINE  shift, and go to state 123
-
-
-State 120
-
-   21 midrule_block: CASE INTEGER COLON • ENDLINE marker
-
-    ENDLINE  shift, and go to state 124
-
-
-State 121
-
-   20 case_block: midrule_block statement_list BREAK • SEMICOLON
-
-    SEMICOLON  shift, and go to state 125
-
-
-State 122
-
-   22 default_clause: DEFAULT COLON • ENDLINE marker statement_list BREAK SEMICOLON
-
-    ENDLINE  shift, and go to state 126
-
-
-State 123
-
-   16 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list marker default_clause ENDLINE • FSWITCH marker
-
-    FSWITCH  shift, and go to state 127
-
-
-State 124
-
-   21 midrule_block: CASE INTEGER COLON ENDLINE • marker
-
-    $default  reduce using rule 27 (marker)
-
-    marker  go to state 128
-
-
-State 125
-
-   20 case_block: midrule_block statement_list BREAK SEMICOLON •
-
-    $default  reduce using rule 20 (case_block)
-
-
-State 126
-
-   22 default_clause: DEFAULT COLON ENDLINE • marker statement_list BREAK SEMICOLON
-
-    $default  reduce using rule 27 (marker)
-
-    marker  go to state 129
-
-
-State 127
-
-   16 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list marker default_clause ENDLINE FSWITCH • marker
-
-    $default  reduce using rule 27 (marker)
-
-    marker  go to state 130
-
-
-State 128
-
-   21 midrule_block: CASE INTEGER COLON ENDLINE marker •
-
-    $default  reduce using rule 21 (midrule_block)
-
-
-State 129
-
-   22 default_clause: DEFAULT COLON ENDLINE marker • statement_list BREAK SEMICOLON
+   16 else_part: ELSE marker • statement_list
 
     INTEGER  shift, and go to state 1
     ID       shift, and go to state 2
@@ -1842,50 +1848,306 @@ State 129
     E        shift, and go to state 8
     LPAREN   shift, and go to state 9
     REPEAT   shift, and go to state 10
-    IF       shift, and go to state 11
-    SWITCH   shift, and go to state 12
+    DO       shift, and go to state 11
+    IF       shift, and go to state 12
+    SWITCH   shift, and go to state 13
 
-    $default  reduce using rule 11 (statement)
+    WHILE     reduce using rule 31 (marker)
+    $default  reduce using rule 13 (statement)
 
-    statement_list     go to state 131
-    statement          go to state 15
-    if_statement       go to state 16
-    if_else_statement  go to state 17
-    switch_statement   go to state 18
-    repeat_statement   go to state 19
-    assignment         go to state 20
-    expression         go to state 21
-    expression_list    go to state 22
-    expr_arithmetic    go to state 23
-    expr_unary         go to state 24
-    expr_term          go to state 25
-    factor             go to state 26
-    array_access       go to state 27
+    statement_list      go to state 123
+    statement           go to state 16
+    if_statement        go to state 17
+    if_else_statement   go to state 18
+    switch_statement    go to state 19
+    while_statement     go to state 20
+    do_until_statement  go to state 21
+    marker              go to state 22
+    repeat_statement    go to state 23
+    assignment          go to state 24
+    expression          go to state 25
+    expression_list     go to state 26
+    expr_arithmetic     go to state 27
+    expr_unary          go to state 28
+    expr_term           go to state 29
+    factor              go to state 30
+    array_access        go to state 31
+
+
+State 120
+
+   15 if_else_statement: IF expression_bool THEN marker statement_then else_part FI • marker
+
+    $default  reduce using rule 31 (marker)
+
+    marker  go to state 124
+
+
+State 121
+
+   18 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list • marker default_clause ENDLINE FSWITCH marker
+   20 case_list: case_list • case_block ENDLINE
+
+    CASE  shift, and go to state 125
+
+    $default  reduce using rule 31 (marker)
+
+    case_block     go to state 126
+    midrule_block  go to state 127
+    marker         go to state 128
+
+
+State 122
+
+   25 while_statement: marker WHILE expression_bool DO marker statement_list DONE •
+
+    $default  reduce using rule 25 (while_statement)
+
+
+State 123
+
+   16 else_part: ELSE marker statement_list •
+
+    $default  reduce using rule 16 (else_part)
+
+
+State 124
+
+   15 if_else_statement: IF expression_bool THEN marker statement_then else_part FI marker •
+
+    $default  reduce using rule 15 (if_else_statement)
+
+
+State 125
+
+   23 midrule_block: CASE • INTEGER COLON ENDLINE marker
+
+    INTEGER  shift, and go to state 129
+
+
+State 126
+
+   20 case_list: case_list case_block • ENDLINE
+
+    ENDLINE  shift, and go to state 130
+
+
+State 127
+
+   22 case_block: midrule_block • statement_list BREAK SEMICOLON
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 2
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+    REPEAT   shift, and go to state 10
+    DO       shift, and go to state 11
+    IF       shift, and go to state 12
+    SWITCH   shift, and go to state 13
+
+    WHILE     reduce using rule 31 (marker)
+    $default  reduce using rule 13 (statement)
+
+    statement_list      go to state 131
+    statement           go to state 16
+    if_statement        go to state 17
+    if_else_statement   go to state 18
+    switch_statement    go to state 19
+    while_statement     go to state 20
+    do_until_statement  go to state 21
+    marker              go to state 22
+    repeat_statement    go to state 23
+    assignment          go to state 24
+    expression          go to state 25
+    expression_list     go to state 26
+    expr_arithmetic     go to state 27
+    expr_unary          go to state 28
+    expr_term           go to state 29
+    factor              go to state 30
+    array_access        go to state 31
+
+
+State 128
+
+   18 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list marker • default_clause ENDLINE FSWITCH marker
+
+    DEFAULT  shift, and go to state 132
+
+    default_clause  go to state 133
+
+
+State 129
+
+   23 midrule_block: CASE INTEGER • COLON ENDLINE marker
+
+    COLON  shift, and go to state 134
 
 
 State 130
 
-   16 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list marker default_clause ENDLINE FSWITCH marker •
+   20 case_list: case_list case_block ENDLINE •
 
-    $default  reduce using rule 16 (switch_statement)
+    $default  reduce using rule 20 (case_list)
 
 
 State 131
 
-   22 default_clause: DEFAULT COLON ENDLINE marker statement_list • BREAK SEMICOLON
+   22 case_block: midrule_block statement_list • BREAK SEMICOLON
 
-    BREAK  shift, and go to state 132
+    BREAK  shift, and go to state 135
 
 
 State 132
 
-   22 default_clause: DEFAULT COLON ENDLINE marker statement_list BREAK • SEMICOLON
+   24 default_clause: DEFAULT • COLON ENDLINE marker statement_list BREAK SEMICOLON
 
-    SEMICOLON  shift, and go to state 133
+    COLON  shift, and go to state 136
 
 
 State 133
 
-   22 default_clause: DEFAULT COLON ENDLINE marker statement_list BREAK SEMICOLON •
+   18 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list marker default_clause • ENDLINE FSWITCH marker
 
-    $default  reduce using rule 22 (default_clause)
+    ENDLINE  shift, and go to state 137
+
+
+State 134
+
+   23 midrule_block: CASE INTEGER COLON • ENDLINE marker
+
+    ENDLINE  shift, and go to state 138
+
+
+State 135
+
+   22 case_block: midrule_block statement_list BREAK • SEMICOLON
+
+    SEMICOLON  shift, and go to state 139
+
+
+State 136
+
+   24 default_clause: DEFAULT COLON • ENDLINE marker statement_list BREAK SEMICOLON
+
+    ENDLINE  shift, and go to state 140
+
+
+State 137
+
+   18 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list marker default_clause ENDLINE • FSWITCH marker
+
+    FSWITCH  shift, and go to state 141
+
+
+State 138
+
+   23 midrule_block: CASE INTEGER COLON ENDLINE • marker
+
+    $default  reduce using rule 31 (marker)
+
+    marker  go to state 142
+
+
+State 139
+
+   22 case_block: midrule_block statement_list BREAK SEMICOLON •
+
+    $default  reduce using rule 22 (case_block)
+
+
+State 140
+
+   24 default_clause: DEFAULT COLON ENDLINE • marker statement_list BREAK SEMICOLON
+
+    $default  reduce using rule 31 (marker)
+
+    marker  go to state 143
+
+
+State 141
+
+   18 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list marker default_clause ENDLINE FSWITCH • marker
+
+    $default  reduce using rule 31 (marker)
+
+    marker  go to state 144
+
+
+State 142
+
+   23 midrule_block: CASE INTEGER COLON ENDLINE marker •
+
+    $default  reduce using rule 23 (midrule_block)
+
+
+State 143
+
+   24 default_clause: DEFAULT COLON ENDLINE marker • statement_list BREAK SEMICOLON
+
+    INTEGER  shift, and go to state 1
+    ID       shift, and go to state 2
+    REAL     shift, and go to state 3
+    STRING   shift, and go to state 4
+    PLUS     shift, and go to state 5
+    MINUS    shift, and go to state 6
+    PI       shift, and go to state 7
+    E        shift, and go to state 8
+    LPAREN   shift, and go to state 9
+    REPEAT   shift, and go to state 10
+    DO       shift, and go to state 11
+    IF       shift, and go to state 12
+    SWITCH   shift, and go to state 13
+
+    WHILE     reduce using rule 31 (marker)
+    $default  reduce using rule 13 (statement)
+
+    statement_list      go to state 145
+    statement           go to state 16
+    if_statement        go to state 17
+    if_else_statement   go to state 18
+    switch_statement    go to state 19
+    while_statement     go to state 20
+    do_until_statement  go to state 21
+    marker              go to state 22
+    repeat_statement    go to state 23
+    assignment          go to state 24
+    expression          go to state 25
+    expression_list     go to state 26
+    expr_arithmetic     go to state 27
+    expr_unary          go to state 28
+    expr_term           go to state 29
+    factor              go to state 30
+    array_access        go to state 31
+
+
+State 144
+
+   18 switch_statement: SWITCH LPAREN expression_switch RPAREN ENDLINE marker case_list marker default_clause ENDLINE FSWITCH marker •
+
+    $default  reduce using rule 18 (switch_statement)
+
+
+State 145
+
+   24 default_clause: DEFAULT COLON ENDLINE marker statement_list • BREAK SEMICOLON
+
+    BREAK  shift, and go to state 146
+
+
+State 146
+
+   24 default_clause: DEFAULT COLON ENDLINE marker statement_list BREAK • SEMICOLON
+
+    SEMICOLON  shift, and go to state 147
+
+
+State 147
+
+   24 default_clause: DEFAULT COLON ENDLINE marker statement_list BREAK SEMICOLON •
+
+    $default  reduce using rule 24 (default_clause)

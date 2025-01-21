@@ -107,6 +107,7 @@
 
 %type <ident> expression
 %type <ident> expression_list
+
 %type <ident> repeat_expression
 %type <ident> if_statement
 %type <statement> else_part
@@ -118,6 +119,10 @@
 %type <statement> default_clause
 %type <ident> expression_switch
 %type <statement> midrule_block
+
+%type <ident> while_statement
+%type <ident> do_until_statement
+%type <ident> for_statement
 
 %type <ident> expression_bool
 %type <ident> expr_bool_and
@@ -189,6 +194,9 @@ statement:
     | if_statement
     | if_else_statement
     | switch_statement
+    | while_statement
+    | do_until_statement
+    | for_statement
     |
     ;
 
@@ -304,6 +312,28 @@ default_clause:
         fprintf(yyout, "PRODUCTION Default\n");
         $$.goto_end_list = makelist(n_instructions);
         emit("GOTO ____\n");
+    }
+    ;
+
+while_statement:
+    marker WHILE expression_bool DO marker statement_list DONE {
+        fprintf(yyout, "PRODUCTION While %s DO\n", value_to_str($3.id_val));
+        emit("GOTO %d\n", $1.instr);
+        backpatch($3.true_list, $5.instr);
+        backpatch($3.false_list, n_instructions);
+    }
+    ;
+
+do_until_statement:
+    DO marker statement_list UNTIL expression_bool {
+        fprintf(yyout, "PRODUCTION Do %s UNTIL\n", value_to_str($5.id_val));
+        backpatch($5.true_list, n_instructions);
+        backpatch($5.false_list, $2.instr);
+    }
+
+for_statement:
+    FOR ID IN expression DOT DOT expression DO statement_list DONE {
+        
     }
     ;
 

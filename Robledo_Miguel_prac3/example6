@@ -1,0 +1,10 @@
+
+x := 500
+
+while x > 200 do
+    x := x - 1
+done
+
+do 
+    x := x - 1
+until x == 0
